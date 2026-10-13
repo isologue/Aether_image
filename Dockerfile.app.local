@@ -64,6 +64,8 @@ COPY crates/ ./crates/
 RUN cargo chef prepare --recipe-path recipe.json
 
 FROM gateway-base AS gateway-builder
+ARG CARGO_BUILD_JOBS=1
+ENV CARGO_BUILD_JOBS=${CARGO_BUILD_JOBS}
 ARG AETHER_BUILD_VERSION
 ENV AETHER_BUILD_VERSION=${AETHER_BUILD_VERSION} \
     AETHER_VERSION=${AETHER_BUILD_VERSION}

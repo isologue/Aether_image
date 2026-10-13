@@ -478,6 +478,9 @@ fn access_for_route(method: &http::Method, decision: &GatewayControlDecision) ->
                     | "users_import"
                     | "data_import"
                     | "smtp_test"
+                    | "image_storage_test"
+                    | "image_storage_sync"
+                    | "image_storage_cleanup"
                     | "important_notification_test"
                     | "cleanup"
                     | "cleanup_usage_manual"
@@ -1143,6 +1146,9 @@ mod tests {
             (http::Method::POST, "rollback"),
             (http::Method::POST, "cleanup"),
             (http::Method::POST, "cleanup_usage_manual"),
+            (http::Method::POST, "image_storage_test"),
+            (http::Method::POST, "image_storage_sync"),
+            (http::Method::POST, "image_storage_cleanup"),
             (http::Method::POST, "purge_config"),
             (http::Method::POST, "purge_users"),
             (http::Method::POST, "purge_usage"),

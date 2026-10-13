@@ -11,6 +11,7 @@ const workspace = vi.hoisted(() => ({
   groups: {} as Record<string, RoutingGroupConfig>,
   busy: false,
   selectionReady: true,
+  openScheduling: vi.fn(),
   updatePriorityPolicy: vi.fn(),
   updateDraftConfig: vi.fn(),
   refreshGroups: vi.fn().mockResolvedValue(undefined),
@@ -156,6 +157,7 @@ vi.mock('@/features/providers/components/ProviderSchedulingView.vue', async () =
           schedulingMode: activePolicy.value.schedulingMode,
         }), { immediate: true })
         expose({
+          openScheduling: workspace.openScheduling,
           updateDraftConfig(value: RoutingGroupConfig) {
             workspace.updateDraftConfig(value)
             workspace.groups[groupId.value] = value
@@ -301,6 +303,17 @@ afterEach(() => {
 })
 
 describe('ProviderManagement provider directory', () => {
+  it('opens scheduling from the button immediately beside the provider title', async () => {
+    const root = await mountView()
+    const title = [...root.querySelectorAll('h3')].find(heading => heading.textContent?.trim() === '提供商管理')!
+    const button = title.parentElement!.querySelector<HTMLButtonElement>('[aria-label="打开策略调度"]')!
+    expect(button).not.toBeNull()
+    expect(button.getAttribute('aria-haspopup')).toBe('dialog')
+    button.click()
+    await settle()
+    expect(workspace.openScheduling).toHaveBeenCalledOnce()
+  })
+
   it('filters and paginates the current search locally', async () => {
     apiMocks.getProvidersSummary.mockResolvedValue({ items: Array.from({ length: 30 }, (_, index) => createProvider({ id: `provider-${index + 1}` })), total: 30 })
     const root = await mountView()

@@ -1,5 +1,5 @@
-# Aether 部署配置 - 使用预构建镜像
-# 使用方法: docker compose up -d
+# Aether 本地构建部署配置
+# 使用方法: docker compose up -d --build
 
 services:
   postgres:
@@ -59,6 +59,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.app.local
+      args:
+        CARGO_BUILD_JOBS: ${CARGO_BUILD_JOBS:-1}
     image: ${LOCAL_APP_IMAGE:-aether-app:latest}
     # image: ${APP_IMAGE:-ghcr.io/fawney19/aether:latest}
     container_name: aether-app
@@ -81,12 +83,15 @@ services:
       REDIS_URL: redis://:${REDIS_PASSWORD:?set REDIS_PASSWORD in .env}@redis:6379/0
       TZ: Asia/Shanghai
       AETHER_BASE_DIR: /opt/aether
+      AETHER_IMAGE_STORAGE_DIR: /data/images
       AETHER_UPDATE_STRATEGY: docker
       AETHER_DOCKER_UPDATE_COMMAND: ${AETHER_DOCKER_UPDATE_COMMAND:-./update.sh}
       AETHER_LOG_DESTINATION: stdout
       AETHER_LOG_FORMAT: ${AETHER_LOG_FORMAT:-pretty}
       APP_PORT: ${APP_PORT:-8084}
       AETHER_GATEWAY_AUTO_PREPARE_DATABASE: ${AETHER_GATEWAY_AUTO_PREPARE_DATABASE:-true}
+    volumes:
+      - image_data:/data/images
     depends_on:
       postgres:
         condition: service_healthy
@@ -102,4 +107,5 @@ services:
     restart: unless-stopped
 
 volumes:
+  image_data:
   postgres_data:

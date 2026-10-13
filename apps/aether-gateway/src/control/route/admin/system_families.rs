@@ -7,6 +7,16 @@ pub(super) fn classify_admin_system_family_route(
     normalized_path: &str,
     _normalized_path_no_trailing: &str,
 ) -> Option<ClassifiedRoute> {
+    let image_kind = match (method.as_str(), normalized_path) {
+        ("GET", "/api/admin/system/images/stats") => Some("image_storage_stats"),
+        ("POST", "/api/admin/system/images/webdav-test") => Some("image_storage_test"),
+        ("POST", "/api/admin/system/images/sync") => Some("image_storage_sync"),
+        ("POST", "/api/admin/system/images/cleanup") => Some("image_storage_cleanup"),
+        _ => None,
+    };
+    if let Some(kind) = image_kind {
+        return Some(classified("admin_proxy", "system_manage", kind, "admin:system", false));
+    }
     if method == http::Method::GET && normalized_path == "/api/admin/system/version" {
         Some(classified(
             "admin_proxy",

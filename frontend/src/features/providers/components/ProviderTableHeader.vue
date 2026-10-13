@@ -2,9 +2,22 @@
   <div class="px-4 sm:px-6 py-3 sm:py-3.5 border-b border-border/50">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
       <!-- 左侧：标题 -->
-      <h3 class="text-sm sm:text-base font-semibold text-foreground shrink-0">
-        {{ legacyT('提供商管理') }}
-      </h3>
+      <div class="flex min-w-0 items-center gap-3">
+        <h3 class="text-sm sm:text-base font-semibold text-foreground shrink-0">
+          {{ legacyT('提供商管理') }}
+        </h3>
+        <Button
+          variant="outline"
+          size="sm"
+          class="h-8 gap-1.5 px-2.5 text-xs"
+          aria-label="打开策略调度"
+          aria-haspopup="dialog"
+          @click="$emit('scheduling')"
+        >
+          <SlidersHorizontal class="h-3.5 w-3.5" />
+          {{ legacyT('调度') }}
+        </Button>
+      </div>
 
       <!-- 右侧：操作区 -->
       <div class="flex flex-wrap items-center gap-2">
@@ -110,7 +123,7 @@
 </template>
 
 <script setup lang="ts">
-import { Search, Plus, FilterX, Users } from 'lucide-vue-next'
+import { Search, Plus, FilterX, Users, SlidersHorizontal } from 'lucide-vue-next'
 import Button from '@/components/ui/button.vue'
 import Input from '@/components/ui/input.vue'
 import Select from '@/components/ui/select.vue'
@@ -141,6 +154,7 @@ defineEmits<{
   'batchProcess': []
   'addProvider': []
   'refresh': []
+  'scheduling': []
 }>()
 
 const { legacyT } = useI18n()

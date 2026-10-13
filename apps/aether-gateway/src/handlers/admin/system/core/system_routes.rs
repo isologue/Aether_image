@@ -57,6 +57,12 @@ pub(super) async fn maybe_build_local_admin_core_system_response(
         return Ok(None);
     }
 
+    if let Some(response) = crate::image_storage::admin_response(
+        state.app(), request_method, request_path, request_body,
+    ).await? {
+        return Ok(Some(response));
+    }
+
     if decision.route_kind.as_deref() == Some("version")
         && request_method == http::Method::GET
         && request_path == "/api/admin/system/version"

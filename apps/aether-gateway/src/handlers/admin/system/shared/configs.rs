@@ -124,6 +124,28 @@ pub(crate) async fn apply_admin_system_config_update(
     let normalized_key = update.normalized_key;
     let description = update.description;
 
+    if normalized_key == crate::image_storage::CONFIG_KEY {
+        let config = match crate::image_storage::parse_config(value.clone()) {
+            Ok(config) => config,
+            Err(_) => {
+                return Ok(Err((
+                    http::StatusCode::BAD_REQUEST,
+                    json!({"detail":"图片存储配置字段或类型错误"}),
+                )));
+            }
+        };
+        if let Err(message) = config.validate() {
+            return Ok(Err((http::StatusCode::BAD_REQUEST, json!({"detail":message}))));
+        }
+        value = serde_json::to_value(config)
+            .map_err(|error| GatewayError::Internal(error.to_string()))?;
+    }
+    if normalized_key == crate::image_storage::PASSWORD_KEY && value.as_str().is_none() {
+        return Ok(Err((
+            http::StatusCode::BAD_REQUEST,
+            json!({"detail":"WebDAV 密码必须为字符串"}),
+        )));
+    }
     if is_sensitive_admin_system_config_key(&normalized_key)
         && value.as_str().is_some_and(|raw| !raw.is_empty())
     {

@@ -438,6 +438,7 @@ impl AppState {
             dashboard_response_cache: Arc::new(DashboardResponseCache::default()),
             overview_total_cache: Arc::new(OverviewTotalCache::default()),
             system_config_cache: Arc::new(SystemConfigCache::default()),
+            image_storage: Arc::new(crate::image_storage::ImageStorage::from_env()?),
             endpoint_response_header_rules_cache: Arc::new(JsonValueCache::default()),
             candidate_row_page_cache: Arc::new(crate::cache::CandidateRowPageCache::default()),
             candidate_page_cache: Arc::new(crate::cache::CandidatePageCache::default()),
@@ -2277,6 +2278,11 @@ impl AppState {
             // its successful completion as an unexpected background-task exit.
             std::mem::drop(handle);
         }
+
+        supervisor.supervise_handle(
+            "image_storage_maintenance",
+            crate::image_storage::spawn_worker(background_state.clone()),
+        );
 
         let mut supervise_worker =
             |task_key: &'static str, handle: Option<tokio::task::JoinHandle<()>>| {

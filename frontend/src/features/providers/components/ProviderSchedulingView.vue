@@ -3,396 +3,410 @@
     class="min-w-0"
     aria-label="提供商调度工作区"
   >
-    <div class="grid min-w-0 items-stretch gap-4 xl:grid-cols-[400px_minmax(0,1fr)]">
-      <aside
-        class="flex min-w-0 flex-col gap-3 xl:min-h-0 xl:[contain:size]"
-        aria-label="策略分组设置"
-      >
-        <Card
-          class="flex min-w-0 flex-1 flex-col xl:h-0 xl:min-h-full"
-          aria-label="策略分组与调度配置"
+    <div
+      class="min-w-0"
+      aria-label="提供商目录"
+    >
+      <slot />
+    </div>
+    <Dialog
+      :model-value="schedulingDialogOpen"
+      title="策略调度"
+      description="管理提供商调度策略、模型范围和故障转移设置"
+      size="xl"
+      no-padding
+      @update:model-value="handleSchedulingDialogChange"
+    >
+      <template #header-actions>
+        <Button
+          variant="ghost"
+          size="icon"
+          class="h-8 w-8 shrink-0"
+          :disabled="busy"
+          aria-label="关闭策略调度"
+          @click="closeScheduling"
         >
-          <div class="flex shrink-0 items-center justify-between gap-2 border-b border-border/50 px-3 py-3 sm:py-3.5">
-            <h3 class="sr-only">
-              策略分组
-            </h3>
-            <Select
-              :model-value="selectedValue"
-              :disabled="busy"
-              @update:model-value="changeGroup"
-            >
-              <SelectTrigger
-                class="h-8 min-w-0 flex-1 px-3 text-sm"
-                aria-label="当前调度策略"
-              >
-                <SelectValue :placeholder="loading ? '正在加载分组' : '选择策略分组'" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem
-                  v-if="isNewDraft"
-                  value="new"
-                >
-                  新建策略
-                </SelectItem>
-                <SelectItem
-                  v-for="group in groups"
-                  :key="group.id"
-                  :value="group.id"
-                >
-                  {{ group.name }}{{ group.is_system_default ? ' · 默认' : '' }}{{ !group.enabled ? ' · 停用' : '' }}
-                </SelectItem>
-              </SelectContent>
-            </Select>
-            <div class="flex shrink-0 items-center gap-0.5">
-              <Button
-                variant="ghost"
-                size="icon"
-                class="h-8 w-8"
-                :disabled="busy || isNewDraft"
-                title="新建分组"
-                aria-label="新建策略"
-                @click="openCreate"
-              >
-                <Plus class="h-3.5 w-3.5" />
-              </Button>
-              <Button
-                v-if="draft?.id"
-                variant="ghost"
-                size="icon"
-                class="h-8 w-8 text-muted-foreground hover:text-destructive"
-                :disabled="busy"
-                title="删除策略分组"
-                aria-label="删除策略"
-                @click="deleteDialogOpen = true"
-              >
-                <Trash2 class="h-3.5 w-3.5" />
-              </Button>
-              <Button
-                v-if="draft"
-                variant="ghost"
-                size="icon"
-                class="h-8 w-8"
-                :class="{ 'text-primary': draft.is_system_default }"
-                :disabled="busy"
-                :title="draft.is_system_default ? '取消系统默认（保存后生效）' : '设为系统默认（保存后生效）'"
-                aria-label="设为系统默认"
-                :aria-pressed="draft.is_system_default"
-                @click="draft.is_system_default = !draft.is_system_default"
-              >
-                <Star
-                  class="h-3.5 w-3.5"
-                  :class="{ 'fill-current': draft.is_system_default }"
-                />
-              </Button>
-              <Button
-                v-if="draft"
-                variant="ghost"
-                size="icon"
-                class="h-8 w-8"
-                :class="{ 'text-primary': draftDirty }"
-                :disabled="!canSaveDraft"
-                :title="saving ? '正在保存…' : billingMultiplierError ?? (!routingSchedulingValid ? '请先选择适用模型' : draftDirty ? '保存修改' : '已保存')"
-                aria-label="保存调度"
-                :aria-busy="saving"
-                @click="saveDraft"
-              >
-                <Save
-                  class="h-3.5 w-3.5"
-                  :class="{ 'animate-pulse': saving }"
-                />
-              </Button>
-            </div>
-          </div>
-          <div class="min-h-0 flex-1 xl:overflow-y-auto">
-            <div
-              v-if="draft"
-              ref="groupMetadata"
-              class="min-w-0 space-y-2 border-b border-border/50 p-3"
-              aria-label="分组信息"
-              :inert="busy"
-            >
-              <div class="flex min-w-0 items-center gap-2">
-                <label class="block min-w-0 flex-1">
-                  <span class="sr-only">策略名称</span>
-                  <Input
-                    v-model="draft.name"
-                    size="sm"
-                    class="min-w-0"
-                    aria-label="策略名称"
-                    placeholder="分组名称"
-                    :disabled="busy"
-                  />
-                </label>
-                <label class="flex shrink-0 items-center gap-1 text-xs">
-                  <span>启用</span>
-                  <Switch
-                    v-model="draft.enabled"
-                    :disabled="busy"
-                    aria-label="启用策略"
-                  />
-                </label>
-              </div>
-              <div class="flex min-w-0 items-center justify-between gap-3">
-                <label class="flex min-w-0 items-center gap-2 text-xs">
-                  <span class="shrink-0">分组倍率</span>
-                  <Input
-                    :model-value="billingMultiplierInput"
-                    type="number"
-                    min="0"
-                    step="any"
-                    size="sm"
-                    class="w-24 min-w-0"
-                    aria-label="分组倍率"
-                    :aria-invalid="Boolean(billingMultiplierError)"
-                    :aria-describedby="billingMultiplierError ? 'group-billing-multiplier-error' : undefined"
-                    :disabled="busy"
-                    @update:model-value="updateBillingMultiplier"
-                  />
-                  <span class="shrink-0 text-muted-foreground">倍</span>
-                </label>
-                <label class="flex shrink-0 items-center gap-1 text-xs">
-                  <span>用户可见</span>
-                  <Switch
-                    v-model="draft.config_json.user_visible"
-                    :disabled="busy"
-                    aria-label="用户可见"
-                  />
-                </label>
-              </div>
-              <p
-                v-if="billingMultiplierError"
-                id="group-billing-multiplier-error"
-                class="text-xs text-destructive"
-              >
-                {{ billingMultiplierError }}
-              </p>
-            </div>
-            <RoutingSchedulingPolicyEditor
-              v-if="draft"
-              :key="draftGeneration"
-              ref="routingSchedulingPolicyEditor"
-              :config="draft.config_json"
-              :initial-selection="initialSchedulingSelection ?? undefined"
-              :refresh-revision="providerRevision"
-              :global-models="globalModels"
-              :loading-models="loadingGlobalModels"
-              :models-error="globalModelsError"
-              :disabled="busy"
-              :aria-busy="saving"
-              class="p-3"
-              aria-label="策略调度配置"
-              layout="config-only"
-              sidebar
-              @update:config="updateDraftConfig"
-              @validity-change="routingSchedulingValid = $event"
-              @selection-change="activePolicy = $event"
-              @reload-models="loadGlobalModels()"
-              @inspect-provider="emit('inspect-provider', $event)"
-            />
-
-            <div
-              v-if="draft"
-              class="min-w-0"
-              :inert="busy"
-            >
-              <section
-                class="min-w-0 border-t border-border/50"
-                :inert="busy"
-              >
-                <button
-                  type="button"
-                  class="flex w-full items-center justify-between gap-3 px-3 py-3 text-left"
-                  :aria-expanded="advancedOpen"
-                  aria-label="高级设置"
-                  @click="advancedOpen = !advancedOpen"
-                >
-                  <span class="text-sm font-medium">高级设置</span>
-                  <ChevronRight
-                    class="h-4 w-4 shrink-0 text-muted-foreground transition-transform"
-                    :class="{ 'rotate-90': advancedOpen }"
-                  />
-                </button>
-                <div
-                  v-show="advancedOpen"
-                  class="min-w-0 space-y-4 px-3 pb-3"
-                >
-                  <section class="min-w-0 space-y-2">
-                    <div>
-                      <h3 class="text-sm font-medium">
-                        系统配置
-                      </h3>
-                    </div>
-                    <div class="grid min-w-0 grid-cols-1 gap-2">
-                      <div
-                        class="order-1 flex min-w-0 min-h-10 items-center justify-between gap-2 rounded-md border border-border/60 px-2 py-2 text-xs"
-                        data-testid="keep-priority-on-conversion"
-                      >
-                        <div class="flex min-w-0 items-center gap-1.5">
-                          <span class="font-medium">格式转换保持优先级</span>
-                          <HelpHint
-                            portal
-                            label="格式转换保持优先级"
-                            text="开启后，跨 API 格式转换的候选不会被降级到同格式候选之后；Provider 自身的同名开关仍单独生效。"
-                          />
-                        </div>
-                        <Switch
-                          :model-value="keepPriorityOnConversion"
-                          :disabled="saving"
-                          aria-label="格式转换保持优先级"
-                          @update:model-value="updateKeepPriorityOnConversion"
-                        />
-                      </div>
-                      <div
-                        class="order-3 flex min-w-0 min-h-10 items-center justify-between gap-2 rounded-md border border-border/60 px-2 py-2 text-xs"
-                        data-testid="cf-heartbeat"
-                      >
-                        <div class="flex min-w-0 items-center gap-1.5">
-                          <span class="font-medium">CF保持心跳</span>
-                          <HelpHint
-                            portal
-                            label="CF保持心跳"
-                            text="同步生图和标准文本非流式失败时保持外层 HTTP 状态为 200，并在响应体中返回错误。"
-                          />
-                        </div>
-                        <Switch
-                          :model-value="cfHeartbeat"
-                          :disabled="saving"
-                          aria-label="CF保持心跳"
-                          @update:model-value="updateExecutionPolicy('enable_cf_heartbeat', $event)"
-                        />
-                      </div>
-                      <div
-                        class="order-2 flex min-w-0 min-h-10 items-center justify-between gap-2 rounded-md border border-border/60 px-2 py-2 text-xs"
-                        data-testid="cyber-continue-failover"
-                      >
-                        <div class="flex min-w-0 items-center gap-1.5">
-                          <span class="font-medium">Cyber继续转移</span>
-                          <HelpHint
-                            portal
-                            label="Cyber继续转移"
-                            text="响应开始前遇到 Cyber Policy 错误时继续故障转移。"
-                          />
-                        </div>
-                        <Switch
-                          :model-value="cyberContinueFailover"
-                          :disabled="saving"
-                          aria-label="Cyber继续转移"
-                          @update:model-value="updateExecutionPolicy('cyber_continue_failover', $event)"
-                        />
-                      </div>
-                      <div
-                        class="order-5 flex min-w-0 min-h-10 items-center justify-between gap-2 rounded-md border border-border/60 px-2 py-2 text-xs"
-                        data-testid="cancel-on-client-disconnect"
-                      >
-                        <div class="flex min-w-0 items-center gap-1.5">
-                          <span class="font-medium">取消请求立即打断</span>
-                          <HelpHint
-                            portal
-                            label="取消请求立即打断"
-                            text="默认关闭：客户端取消或断开后，服务端继续等待请求完成并正常计费。开启后立即打断且不计费，按次计费的请求仍收取单次请求费用。仅作用于当前调度策略。"
-                          />
-                        </div>
-                        <Switch
-                          :model-value="cancelOnClientDisconnect"
-                          :disabled="saving"
-                          aria-label="取消请求立即打断"
-                          @update:model-value="updateExecutionPolicy('cancel_on_client_disconnect', $event)"
-                        />
-                      </div>
-                    </div>
-                  </section>
-                </div>
-              </section>
-              <section class="min-w-0 border-t border-border/50">
-                <button
-                  type="button"
-                  class="flex w-full items-center justify-between gap-3 px-3 py-3 text-left"
-                  :aria-expanded="failoverOpen"
-                  aria-label="故障转移"
-                  @click="failoverOpen = !failoverOpen"
-                >
-                  <span class="text-sm font-medium">故障转移</span>
-                  <ChevronRight
-                    class="h-4 w-4 shrink-0 text-muted-foreground transition-transform"
-                    :class="{ 'rotate-90': failoverOpen }"
-                  />
-                </button>
-                <div
-                  v-show="failoverOpen"
-                  class="min-w-0 px-3 pb-3"
-                >
-                  <RoutingFailoverPolicyEditor
-                    :key="draftGeneration"
-                    ref="routingFailoverPolicyEditor"
-                    :model-value="draft.config_json.default_policy"
-                    :disabled="saving"
-                    sidebar
-                    @update:model-value="updateRoutingFailoverPolicy"
-                    @pending-change="routingFailoverPending = $event"
-                  >
-                    <template #limits-extra>
-                      <label
-                        class="min-w-0 space-y-1.5 text-xs"
-                        data-testid="sticky-key-attempts"
-                      >
-                        <span>错误重试次数</span>
-                        <Input
-                          :model-value="stickyKeyAttempts"
-                          type="number"
-                          min="0"
-                          max="99"
-                          :disabled="saving"
-                          aria-label="错误重试次数"
-                          @update:model-value="updateStickyKeyAttempts"
-                        />
-                      </label>
-                    </template>
-                  </RoutingFailoverPolicyEditor>
-                </div>
-              </section>
-            </div>
-            <div
-              v-if="saveConflict"
-              role="alert"
-              class="m-3 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 text-sm"
-            >
-              <span>分组已被其他操作更新，当前修改已保留。重新加载后可基于最新配置继续编辑。</span>
-              <Button
-                variant="outline"
-                size="sm"
-                :disabled="busy"
-                aria-label="重新加载分组"
-                @click="reloadCurrentGroup"
-              >
-                重新加载分组
-              </Button>
-            </div>
-            <div
-              v-if="!draft"
-              class="p-8 text-center"
-            >
-              <p class="text-sm text-muted-foreground">
-                {{ emptyMessage }}
-              </p>
-              <Button
-                v-if="!loading"
-                variant="outline"
-                class="mt-4"
-                @click="loadingError ? refreshGroups() : groups.length ? openGroup(defaultGroupId) : openCreate()"
-              >
-                {{ loadingError ? '重新加载' : groups.length ? '打开默认分组' : '新建策略分组' }}
-              </Button>
-            </div>
-          </div>
-        </Card>
-      </aside>
+          <X class="h-4 w-4" />
+        </Button>
+      </template>
       <div
         class="min-w-0"
-        aria-label="提供商目录"
+        aria-label="策略分组与调度配置"
       >
-        <slot />
+        <div class="flex shrink-0 items-center justify-between gap-2 border-b border-border/50 px-3 py-3 sm:py-3.5">
+          <h3 class="sr-only">
+            策略分组
+          </h3>
+          <Select
+            :model-value="selectedValue"
+            :disabled="busy"
+            @update:model-value="changeGroup"
+          >
+            <SelectTrigger
+              class="h-8 min-w-0 flex-1 px-3 text-sm"
+              aria-label="当前调度策略"
+            >
+              <SelectValue :placeholder="loading ? '正在加载分组' : '选择策略分组'" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem
+                v-if="isNewDraft"
+                value="new"
+              >
+                新建策略
+              </SelectItem>
+              <SelectItem
+                v-for="group in groups"
+                :key="group.id"
+                :value="group.id"
+              >
+                {{ group.name }}{{ group.is_system_default ? ' · 默认' : '' }}{{ !group.enabled ? ' · 停用' : '' }}
+              </SelectItem>
+            </SelectContent>
+          </Select>
+          <div class="flex shrink-0 items-center gap-0.5">
+            <Button
+              variant="ghost"
+              size="icon"
+              class="h-8 w-8"
+              :disabled="busy || isNewDraft"
+              title="新建分组"
+              aria-label="新建策略"
+              @click="openCreate"
+            >
+              <Plus class="h-3.5 w-3.5" />
+            </Button>
+            <Button
+              v-if="draft?.id"
+              variant="ghost"
+              size="icon"
+              class="h-8 w-8 text-muted-foreground hover:text-destructive"
+              :disabled="busy"
+              title="删除策略分组"
+              aria-label="删除策略"
+              @click="deleteDialogOpen = true"
+            >
+              <Trash2 class="h-3.5 w-3.5" />
+            </Button>
+            <Button
+              v-if="draft"
+              variant="ghost"
+              size="icon"
+              class="h-8 w-8"
+              :class="{ 'text-primary': draft.is_system_default }"
+              :disabled="busy"
+              :title="draft.is_system_default ? '取消系统默认（保存后生效）' : '设为系统默认（保存后生效）'"
+              aria-label="设为系统默认"
+              :aria-pressed="draft.is_system_default"
+              @click="draft.is_system_default = !draft.is_system_default"
+            >
+              <Star
+                class="h-3.5 w-3.5"
+                :class="{ 'fill-current': draft.is_system_default }"
+              />
+            </Button>
+            <Button
+              v-if="draft"
+              variant="ghost"
+              size="icon"
+              class="h-8 w-8"
+              :class="{ 'text-primary': draftDirty }"
+              :disabled="!canSaveDraft"
+              :title="saving ? '正在保存…' : billingMultiplierError ?? (!routingSchedulingValid ? '请先选择适用模型' : draftDirty ? '保存修改' : '已保存')"
+              aria-label="保存调度"
+              :aria-busy="saving"
+              @click="saveDraft"
+            >
+              <Save
+                class="h-3.5 w-3.5"
+                :class="{ 'animate-pulse': saving }"
+              />
+            </Button>
+          </div>
+        </div>
+        <div class="min-w-0">
+          <div
+            v-if="draft"
+            ref="groupMetadata"
+            class="min-w-0 space-y-2 border-b border-border/50 p-3"
+            aria-label="分组信息"
+            :inert="busy"
+          >
+            <div class="flex min-w-0 items-center gap-2">
+              <label class="block min-w-0 flex-1">
+                <span class="sr-only">策略名称</span>
+                <Input
+                  v-model="draft.name"
+                  size="sm"
+                  class="min-w-0"
+                  aria-label="策略名称"
+                  placeholder="分组名称"
+                  :disabled="busy"
+                />
+              </label>
+              <label class="flex shrink-0 items-center gap-1 text-xs">
+                <span>启用</span>
+                <Switch
+                  v-model="draft.enabled"
+                  :disabled="busy"
+                  aria-label="启用策略"
+                />
+              </label>
+            </div>
+            <div class="flex min-w-0 items-center justify-between gap-3">
+              <label class="flex min-w-0 items-center gap-2 text-xs">
+                <span class="shrink-0">分组倍率</span>
+                <Input
+                  :model-value="billingMultiplierInput"
+                  type="number"
+                  min="0"
+                  step="any"
+                  size="sm"
+                  class="w-24 min-w-0"
+                  aria-label="分组倍率"
+                  :aria-invalid="Boolean(billingMultiplierError)"
+                  :aria-describedby="billingMultiplierError ? 'group-billing-multiplier-error' : undefined"
+                  :disabled="busy"
+                  @update:model-value="updateBillingMultiplier"
+                />
+                <span class="shrink-0 text-muted-foreground">倍</span>
+              </label>
+              <label class="flex shrink-0 items-center gap-1 text-xs">
+                <span>用户可见</span>
+                <Switch
+                  v-model="draft.config_json.user_visible"
+                  :disabled="busy"
+                  aria-label="用户可见"
+                />
+              </label>
+            </div>
+            <p
+              v-if="billingMultiplierError"
+              id="group-billing-multiplier-error"
+              class="text-xs text-destructive"
+            >
+              {{ billingMultiplierError }}
+            </p>
+          </div>
+          <RoutingSchedulingPolicyEditor
+            v-if="draft"
+            :key="draftGeneration"
+            ref="routingSchedulingPolicyEditor"
+            :config="draft.config_json"
+            :initial-selection="initialSchedulingSelection ?? undefined"
+            :refresh-revision="providerRevision"
+            :global-models="globalModels"
+            :loading-models="loadingGlobalModels"
+            :models-error="globalModelsError"
+            :disabled="busy"
+            :aria-busy="saving"
+            class="p-3"
+            aria-label="策略调度配置"
+            layout="config-only"
+            sidebar
+            @update:config="updateDraftConfig"
+            @validity-change="routingSchedulingValid = $event"
+            @selection-change="activePolicy = $event"
+            @reload-models="loadGlobalModels()"
+            @inspect-provider="emit('inspect-provider', $event)"
+          />
+
+          <div
+            v-if="draft"
+            class="min-w-0"
+            :inert="busy"
+          >
+            <section
+              class="min-w-0 border-t border-border/50"
+              :inert="busy"
+            >
+              <button
+                type="button"
+                class="flex w-full items-center justify-between gap-3 px-3 py-3 text-left"
+                :aria-expanded="advancedOpen"
+                aria-label="高级设置"
+                @click="advancedOpen = !advancedOpen"
+              >
+                <span class="text-sm font-medium">高级设置</span>
+                <ChevronRight
+                  class="h-4 w-4 shrink-0 text-muted-foreground transition-transform"
+                  :class="{ 'rotate-90': advancedOpen }"
+                />
+              </button>
+              <div
+                v-show="advancedOpen"
+                class="min-w-0 space-y-4 px-3 pb-3"
+              >
+                <section class="min-w-0 space-y-2">
+                  <div>
+                    <h3 class="text-sm font-medium">
+                      系统配置
+                    </h3>
+                  </div>
+                  <div class="grid min-w-0 grid-cols-1 gap-2">
+                    <div
+                      class="order-1 flex min-w-0 min-h-10 items-center justify-between gap-2 rounded-md border border-border/60 px-2 py-2 text-xs"
+                      data-testid="keep-priority-on-conversion"
+                    >
+                      <div class="flex min-w-0 items-center gap-1.5">
+                        <span class="font-medium">格式转换保持优先级</span>
+                        <HelpHint
+                          portal
+                          label="格式转换保持优先级"
+                          text="开启后，跨 API 格式转换的候选不会被降级到同格式候选之后；Provider 自身的同名开关仍单独生效。"
+                        />
+                      </div>
+                      <Switch
+                        :model-value="keepPriorityOnConversion"
+                        :disabled="saving"
+                        aria-label="格式转换保持优先级"
+                        @update:model-value="updateKeepPriorityOnConversion"
+                      />
+                    </div>
+                    <div
+                      class="order-3 flex min-w-0 min-h-10 items-center justify-between gap-2 rounded-md border border-border/60 px-2 py-2 text-xs"
+                      data-testid="cf-heartbeat"
+                    >
+                      <div class="flex min-w-0 items-center gap-1.5">
+                        <span class="font-medium">CF保持心跳</span>
+                        <HelpHint
+                          portal
+                          label="CF保持心跳"
+                          text="同步生图和标准文本非流式失败时保持外层 HTTP 状态为 200，并在响应体中返回错误。"
+                        />
+                      </div>
+                      <Switch
+                        :model-value="cfHeartbeat"
+                        :disabled="saving"
+                        aria-label="CF保持心跳"
+                        @update:model-value="updateExecutionPolicy('enable_cf_heartbeat', $event)"
+                      />
+                    </div>
+                    <div
+                      class="order-2 flex min-w-0 min-h-10 items-center justify-between gap-2 rounded-md border border-border/60 px-2 py-2 text-xs"
+                      data-testid="cyber-continue-failover"
+                    >
+                      <div class="flex min-w-0 items-center gap-1.5">
+                        <span class="font-medium">Cyber继续转移</span>
+                        <HelpHint
+                          portal
+                          label="Cyber继续转移"
+                          text="响应开始前遇到 Cyber Policy 错误时继续故障转移。"
+                        />
+                      </div>
+                      <Switch
+                        :model-value="cyberContinueFailover"
+                        :disabled="saving"
+                        aria-label="Cyber继续转移"
+                        @update:model-value="updateExecutionPolicy('cyber_continue_failover', $event)"
+                      />
+                    </div>
+                    <div
+                      class="order-5 flex min-w-0 min-h-10 items-center justify-between gap-2 rounded-md border border-border/60 px-2 py-2 text-xs"
+                      data-testid="cancel-on-client-disconnect"
+                    >
+                      <div class="flex min-w-0 items-center gap-1.5">
+                        <span class="font-medium">取消请求立即打断</span>
+                        <HelpHint
+                          portal
+                          label="取消请求立即打断"
+                          text="默认关闭：客户端取消或断开后，服务端继续等待请求完成并正常计费。开启后立即打断且不计费，按次计费的请求仍收取单次请求费用。仅作用于当前调度策略。"
+                        />
+                      </div>
+                      <Switch
+                        :model-value="cancelOnClientDisconnect"
+                        :disabled="saving"
+                        aria-label="取消请求立即打断"
+                        @update:model-value="updateExecutionPolicy('cancel_on_client_disconnect', $event)"
+                      />
+                    </div>
+                  </div>
+                </section>
+              </div>
+            </section>
+            <section class="min-w-0 border-t border-border/50">
+              <button
+                type="button"
+                class="flex w-full items-center justify-between gap-3 px-3 py-3 text-left"
+                :aria-expanded="failoverOpen"
+                aria-label="故障转移"
+                @click="failoverOpen = !failoverOpen"
+              >
+                <span class="text-sm font-medium">故障转移</span>
+                <ChevronRight
+                  class="h-4 w-4 shrink-0 text-muted-foreground transition-transform"
+                  :class="{ 'rotate-90': failoverOpen }"
+                />
+              </button>
+              <div
+                v-show="failoverOpen"
+                class="min-w-0 px-3 pb-3"
+              >
+                <RoutingFailoverPolicyEditor
+                  :key="draftGeneration"
+                  ref="routingFailoverPolicyEditor"
+                  :model-value="draft.config_json.default_policy"
+                  :disabled="saving"
+                  sidebar
+                  @update:model-value="updateRoutingFailoverPolicy"
+                  @pending-change="routingFailoverPending = $event"
+                >
+                  <template #limits-extra>
+                    <label
+                      class="min-w-0 space-y-1.5 text-xs"
+                      data-testid="sticky-key-attempts"
+                    >
+                      <span>错误重试次数</span>
+                      <Input
+                        :model-value="stickyKeyAttempts"
+                        type="number"
+                        min="0"
+                        max="99"
+                        :disabled="saving"
+                        aria-label="错误重试次数"
+                        @update:model-value="updateStickyKeyAttempts"
+                      />
+                    </label>
+                  </template>
+                </RoutingFailoverPolicyEditor>
+              </div>
+            </section>
+          </div>
+          <div
+            v-if="saveConflict"
+            role="alert"
+            class="m-3 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 text-sm"
+          >
+            <span>分组已被其他操作更新，当前修改已保留。重新加载后可基于最新配置继续编辑。</span>
+            <Button
+              variant="outline"
+              size="sm"
+              :disabled="busy"
+              aria-label="重新加载分组"
+              @click="reloadCurrentGroup"
+            >
+              重新加载分组
+            </Button>
+          </div>
+          <div
+            v-if="!draft"
+            class="p-8 text-center"
+          >
+            <p class="text-sm text-muted-foreground">
+              {{ emptyMessage }}
+            </p>
+            <Button
+              v-if="!loading"
+              variant="outline"
+              class="mt-4"
+              @click="loadingError ? refreshGroups() : groups.length ? openGroup(defaultGroupId) : openCreate()"
+            >
+              {{ loadingError ? '重新加载' : groups.length ? '打开默认分组' : '新建策略分组' }}
+            </Button>
+          </div>
+        </div>
       </div>
-    </div>
+    </Dialog>
     <AlertDialog
       v-model="deleteDialogOpen"
       type="destructive"
@@ -408,13 +422,14 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { onBeforeRouteLeave, onBeforeRouteUpdate, useRoute, useRouter, type RouteLocationNormalized } from 'vue-router'
-import { ChevronRight, Plus, Save, Star, Trash2 } from 'lucide-vue-next'
-import { Button, Card, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Switch } from '@/components/ui'
+import { ChevronRight, Plus, Save, Star, Trash2, X } from 'lucide-vue-next'
+import { Button, Dialog, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Switch } from '@/components/ui'
 import { AlertDialog } from '@/components/common'
 import HelpHint from '@/components/common/HelpHint.vue'
 import {
   DEFAULT_STICKY_KEY_ATTEMPTS,
   createEmptyRoutingGroupConfig,
+  getDefaultModelPolicy,
   normalizeStickyKeyAttempts,
   parseBillingMultiplier,
   type RoutingModelPolicy,
@@ -423,7 +438,7 @@ import {
   type RoutingGroupConfig,
 } from '@/features/routing/utils/routingPolicy'
 import { RoutingFailoverPolicyEditor, RoutingSchedulingPolicyEditor } from '@/features/routing/components'
-import { normalizeProviderSchedulingConfig } from '@/features/routing/utils/schedulingPolicies'
+import { normalizeProviderSchedulingConfig, readSchedulingPolicies, writeSchedulingPolicies, type SchedulingPolicy } from '@/features/routing/utils/schedulingPolicies'
 import { normalizeRoutingFailoverPolicy, validateRoutingFailoverPolicy, type RoutingFailoverPolicy } from '@/features/routing/utils/routingFailover'
 import { createRoutingGroup, deleteRoutingGroup, listRoutingGroups, updateRoutingGroup, type RoutingGroupRecord } from '@/api/routing-profiles'
 import { getGlobalModels, type GlobalModelResponse } from '@/api/global-models'
@@ -489,6 +504,7 @@ const groupMetadata = ref<HTMLElement | null>(null)
 const advancedOpen = ref(false)
 const failoverOpen = ref(false)
 const deleteDialogOpen = ref(false)
+const schedulingDialogOpen = ref(false)
 let internalNavigation = false
 let discardConfirmation: Promise<boolean> | null = null
 
@@ -551,6 +567,7 @@ function selectGroup(group: RoutingGroupRecord, preserveSelection = false): void
   draft.value = { id: group.id, version: group.version, name: group.name, enabled: group.enabled, is_system_default: group.is_system_default, config_json: cloneConfig(group.config_json) }
   billingMultiplierInput.value = String(draft.value.config_json.billing_multiplier)
   savedDraftSnapshot.value = draftSnapshotValue(draft.value)
+  syncActivePolicy(selection)
 }
 
 function openCreate(): void {
@@ -562,6 +579,7 @@ function startNewDraft(): void {
   resetEditors()
   draft.value = { version: 0, name: '', enabled: true, is_system_default: groups.value.length === 0, config_json: createEmptyRoutingGroupConfig() }
   billingMultiplierInput.value = '1'
+  syncActivePolicy(null)
   savedDraftSnapshot.value = null
   void nextTick(() => {
     groupMetadata.value?.scrollIntoView?.({ block: 'nearest' })
@@ -626,7 +644,9 @@ function preventUnload(event: BeforeUnloadEvent): void {
 }
 
 function updateDraftConfig(value: RoutingGroupConfig): void {
-  if (draft.value) draft.value.config_json = normalizeProviderSchedulingConfig(value)
+  if (!draft.value) return
+  draft.value.config_json = normalizeProviderSchedulingConfig(value)
+  if (!routingSchedulingPolicyEditor.value) syncActivePolicy(activePolicy.value)
 }
 
 function updateBillingMultiplier(value: string | number): void {
@@ -637,8 +657,70 @@ function updateBillingMultiplier(value: string | number): void {
 }
 
 function updatePriorityPolicy(policy: RoutingModelPolicy): void {
-  if (busy.value) return
-  routingSchedulingPolicyEditor.value?.updateSelectedPolicy(policy)
+  if (busy.value || !draft.value || !activePolicy.value?.policy) return
+  if (routingSchedulingPolicyEditor.value) {
+    routingSchedulingPolicyEditor.value.updateSelectedPolicy(policy)
+    return
+  }
+  const entries = readSchedulingPolicies(draft.value.config_json)
+  const selectedEntry = findSchedulingEntry(entries, activePolicy.value)
+  const updated = entries.map(entry => entry === selectedEntry
+    ? { ...entry, policy: { ...policy, model: '*' } }
+    : entry)
+  updateDraftConfig(writeSchedulingPolicies(draft.value.config_json, updated))
+}
+
+function findSchedulingEntry(entries: SchedulingPolicy[], selection: SchedulingSelection | null): SchedulingPolicy | undefined {
+  // Legacy and all-model entries receive a fresh ID when read, so also match their model scope.
+  return entries.find(item => item.id === selection?.id)
+    ?? entries.find(item => selection && item.scope === selection.scope
+      && item.models.length === selection.modelNames.length
+      && item.models.every(model => selection.modelNames.includes(model)))
+    ?? entries[0]
+}
+
+// The provider directory uses this selection even while the dialog editor is unmounted.
+function syncActivePolicy(selection: SchedulingSelection | null): void {
+  if (!draft.value) { activePolicy.value = null; return }
+  const entry = findSchedulingEntry(readSchedulingPolicies(draft.value.config_json), selection)
+  activePolicy.value = entry ? {
+    id: entry.id,
+    policy: entry.scope === 'selected' && !entry.models.length
+      ? null
+      : getDefaultModelPolicy({ ...draft.value.config_json, model_policies: [entry.policy] }),
+    priorityMode: 'provider',
+    schedulingMode: entry.schedulingMode,
+    scope: entry.scope,
+    modelNames: [...entry.models],
+  } : null
+}
+
+function openScheduling(): void {
+  initialSchedulingSelection.value = activePolicy.value
+    ? { id: activePolicy.value.id, scope: activePolicy.value.scope, modelNames: [...activePolicy.value.modelNames] }
+    : null
+  schedulingDialogOpen.value = true
+}
+
+async function closeScheduling(): Promise<void> {
+  if (busy.value || !await confirmDiscard()) return
+  if (draftDirty.value) {
+    const savedGroup = groups.value.find(group => group.id === draft.value?.id)
+    if (savedGroup) selectGroup(savedGroup, true)
+    else {
+      clearDraft()
+      internalNavigation = true
+      try {
+        await router.replace({ name: 'ProviderManagement', query: { ...route.query, group: undefined } })
+        syncRouteState()
+      } finally { internalNavigation = false }
+    }
+  }
+  schedulingDialogOpen.value = false
+}
+
+function handleSchedulingDialogChange(open: boolean): void {
+  if (!open) void closeScheduling()
 }
 
 function updateStickyKeyAttempts(value: string | number): void {
@@ -803,5 +885,5 @@ onMounted(() => {
 onBeforeUnmount(() => window.removeEventListener('beforeunload', preventUnload))
 watch(() => [route.name, route.query.group], syncRouteState)
 watch(() => [draft.value, busy.value, activePolicy.value, providerModelIds.value], () => emit('context-change', { groupId: draft.value?.id ?? null, groupName: draft.value?.name ?? '', config: draft.value?.config_json ?? null, busy: busy.value, activePolicy: activePolicy.value, providerModelIds: providerModelIds.value, priorityMode, schedulingMode: schedulingMode.value }), { deep: true, immediate: true })
-defineExpose({ updateDraftConfig, updatePriorityPolicy, refreshGroups, ensureSaved })
+defineExpose({ openScheduling, updateDraftConfig, updatePriorityPolicy, refreshGroups, ensureSaved })
 </script>

@@ -129,6 +129,10 @@ struct FrontendStaticState {
 pub fn build_router_with_state(state: AppState) -> Router {
     let cors_state = state.clone();
     let mut router = Router::<AppState>::new();
+    router = router.route(
+        "/media/images/{*image_path}",
+        axum::routing::get(crate::image_storage::serve_image),
+    );
     router = api::mount_core_routes(router);
     router = api::mount_operational_routes(router, state.clone());
     router = api::mount_ai_routes(router);
@@ -184,7 +188,8 @@ fn frontend_path_bypasses_static(path: &str) -> bool {
     matches!(
         path,
         "/health" | "/test-connection" | crate::constants::READYZ_PATH
-    ) || path.starts_with("/api/")
+    ) || path.starts_with("/media/images/")
+        || path.starts_with("/api/")
         || path.starts_with("/v1/")
         || path == "/openai/v1/videos"
         || path.starts_with("/openai/v1/videos/")

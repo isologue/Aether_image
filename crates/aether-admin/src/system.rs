@@ -935,6 +935,7 @@ const REQUEST_RECORD_LEVEL_KEY: &str = "request_record_level";
 const LEGACY_REQUEST_LOG_LEVEL_KEY: &str = "request_log_level";
 const DEFAULT_BARK_API_BASE: &str = "https://api.day.app";
 const SENSITIVE_SYSTEM_CONFIG_KEYS: &[&str] = &[
+    "image_webdav_password",
     "smtp_password",
     "turnstile_secret_key",
     "backup_s3_secret_access_key",
@@ -2224,6 +2225,11 @@ pub fn is_sensitive_admin_system_config_key(key: &str) -> bool {
 
 pub fn admin_system_config_default_value(key: &str) -> Option<serde_json::Value> {
     match key {
+        "image_webdav_password" => Some(json!("")),
+        "image_storage" => Some(json!({"return_format":"base64", "honor_response_format":false,
+            "public_base_url":"", "storage_mode":"local", "webdav_url":"", "webdav_username":"",
+            "webdav_root":"aether/images", "webdav_public_url":"", "cleanup_enabled":false,
+            "retention_hours":168, "cleanup_interval_hours":6})),
         "site_name" => Some(json!("Aether")),
         "site_subtitle" => Some(json!("AI Gateway")),
         "default_user_initial_gift_usd" => Some(json!(10.0)),

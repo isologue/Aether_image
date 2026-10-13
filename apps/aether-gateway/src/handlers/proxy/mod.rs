@@ -1035,11 +1035,22 @@ pub(crate) async fn proxy_request(
     ConnectInfo(remote_addr): ConnectInfo<std::net::SocketAddr>,
     request: Request,
 ) -> Result<Response<Body>, GatewayError> {
-    crate::request_lifecycle::run_request_with_usage(
+    let image_request = crate::image_storage::is_image_path(request.uri().path());
+    let slot = crate::image_storage::ImageRequestSlot::default();
+    let mut request = request;
+    if image_request {
+        request.extensions_mut().insert(slot.clone());
+    }
+    let response = crate::request_lifecycle::run_request_with_usage(
         state.usage_runtime.clone(),
-        Box::pin(proxy_request_inner(state, remote_addr, request)),
+        Box::pin(proxy_request_inner(state.clone(), remote_addr, request)),
     )
-    .await
+    .await?;
+    if image_request {
+        crate::image_storage::transform_response(state, slot, response).await
+    } else {
+        Ok(response)
+    }
 }
 
 async fn proxy_request_inner(
@@ -1697,13 +1708,14 @@ async fn proxy_request_inner(
         should_buffer_request_for_local_auth(control_decision, &parts.headers);
     let should_buffer_body = should_try_control_execute
         || should_buffer_for_local_auth
-        || should_buffer_for_local_ai_public;
+        || should_buffer_for_local_ai_public
+        || parts.extensions.get::<crate::image_storage::ImageRequestSlot>().is_some();
 
     let allow_control_execute_fallback = should_try_control_execute
         && control_decision.is_some_and(allows_control_execute_emergency)
         && request_enables_control_execute(&parts.headers);
 
-    let buffered_body = if should_buffer_body {
+    let mut buffered_body = if should_buffer_body {
         if let Some(body) = authenticated_affinity_body.as_ref() {
             Some(body.clone())
         } else {
@@ -1769,6 +1781,38 @@ async fn proxy_request_inner(
             &started_at,
             request_permit.take(),
         ));
+    }
+
+    if let (Some(slot), Some(body)) = (
+        parts.extensions.get::<crate::image_storage::ImageRequestSlot>(),
+        buffered_body.as_ref(),
+    ) {
+        let trusted = request_origin_from_headers_and_remote_addr(&parts.headers, &remote_addr)
+            .forwarded_headers_trusted;
+        match slot.capture(&state, &parts.headers, body, trusted).await {
+            Ok(body) => {
+                buffered_body = Some(body);
+                parts.headers.remove(http::header::CONTENT_LENGTH);
+            }
+            Err(message) => {
+                let response = build_local_http_error_response_with_request_path(
+                    &trace_id,
+                    control_decision,
+                    Some(parts.uri.path()),
+                    http::StatusCode::BAD_REQUEST,
+                    &message,
+                )?;
+                return Ok(finalize_gateway_response_with_context(
+                    &state,
+                    response,
+                    &remote_addr,
+                    &request_context,
+                    EXECUTION_PATH_LOCAL_INVALID_REQUEST,
+                    &started_at,
+                    request_permit.take(),
+                ));
+            }
+        }
     }
 
     if let Some(rejection) = trusted_auth_local_rejection(control_decision, &parts.headers) {

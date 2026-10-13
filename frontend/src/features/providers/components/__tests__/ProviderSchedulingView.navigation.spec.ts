@@ -2,7 +2,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createApp, defineComponent, h, nextTick, ref, type App } from 'vue'
 import { createMemoryHistory, createRouter, RouterView, type LocationQueryRaw } from 'vue-router'
 import ProviderSchedulingView from '../ProviderSchedulingView.vue'
-import { createEmptyRoutingGroupConfig, setDefaultProviderPriorityOverrides, type RoutingGroupConfig } from '@/features/routing/utils/routingPolicy'
+import { createEmptyRoutingGroupConfig, setDefaultProviderPriorityOverrides, type RoutingGroupConfig, type RoutingModelPolicy } from '@/features/routing/utils/routingPolicy'
+import { readSchedulingPolicies, writeSchedulingPolicies, createSchedulingPolicy } from '@/features/routing/utils/schedulingPolicies'
 import type { RoutingGroupRecord, RoutingGroupUpdateRequest } from '@/api/routing-profiles'
 
 const routingApi = vi.hoisted(() => ({ listRoutingGroups: vi.fn(), updateRoutingGroup: vi.fn(), createRoutingGroup: vi.fn(), deleteRoutingGroup: vi.fn() }))
@@ -45,12 +46,12 @@ async function flush() {
   await new Promise(resolve => setTimeout(resolve, 0))
   await nextTick()
 }
-async function mountWorkspace(query: LocationQueryRaw = {}, items = [group('first'), group('default', { is_system_default: true }), group('last')]) {
+async function mountWorkspace(query: LocationQueryRaw = {}, items = [group('first'), group('default', { is_system_default: true }), group('last')], openDialog = true) {
   routingApi.listRoutingGroups.mockResolvedValue({ items, total: items.length })
   routingApi.updateRoutingGroup.mockImplementation(async (id: string, payload: RoutingGroupUpdateRequest) => ({ ...items.find(item => item.id === id), ...payload, version: 2 }))
   routingApi.createRoutingGroup.mockImplementation(async payload => group('created', payload))
   const providerRevision = ref(0)
-  const workspace = ref<{ updateDraftConfig: (config: RoutingGroupConfig) => void; refreshGroups: () => Promise<void>; ensureSaved: () => Promise<boolean> } | null>(null)
+  const workspace = ref<{ openScheduling: () => void; updatePriorityPolicy: (policy: RoutingModelPolicy) => void; updateDraftConfig: (config: RoutingGroupConfig) => void; refreshGroups: () => Promise<void>; ensureSaved: () => Promise<boolean> } | null>(null)
   const Providers = defineComponent({
     setup() {
       return () => h(ProviderSchedulingView, { ref: workspace, providerRevision: providerRevision.value, onInspectProvider: inspectProvider, onContextChange: contextChange }, { default: () => h('div', { 'data-testid': 'provider-directory' }, '提供商目录') })
@@ -69,6 +70,7 @@ async function mountWorkspace(query: LocationQueryRaw = {}, items = [group('firs
   app.mount(root)
   mounted.push({ app, root })
   await flush()
+  if (openDialog) { workspace.value!.openScheduling(); await flush() }
   return { root, router, providerRevision, workspace }
 }
 function element<T extends HTMLElement>(root: HTMLElement, selector: string): T {
@@ -215,7 +217,7 @@ describe('ProviderSchedulingView workspace navigation', () => {
     const { root, router } = await mountWorkspace({ group: 'new' })
     expect(router.currentRoute.value.query.group).toBe('new')
     expect(selector(root).textContent?.trim()).toBe('新建策略')
-    expect(document.querySelector('[role="dialog"]')).toBeNull()
+    expect(document.querySelector('[role="dialog"][aria-label="策略调度"]')).not.toBeNull()
     await editName(root, '免费分组')
     expect(element<HTMLInputElement>(root, '[aria-label="分组倍率"]').value).toBe('1')
     await editMultiplier(root, '')
@@ -232,12 +234,55 @@ describe('ProviderSchedulingView workspace navigation', () => {
     expect(router.currentRoute.value.query.group).toBe('created')
   })
 
+  it('shows only the directory until scheduling is opened and confirms discarding changes on close', async () => {
+    const { root, workspace } = await mountWorkspace({}, undefined, false)
+    expect(root.querySelector('[data-testid="provider-directory"]')).not.toBeNull()
+    expect(document.querySelector('[role="dialog"]')).toBeNull()
+    expect(contextChange.mock.lastCall?.[0].activePolicy.policy).not.toBeNull()
+    workspace.value!.openScheduling()
+    await flush()
+    await editName(root, '未保存名称')
+    button(root, '关闭策略调度').click()
+    await flush()
+    expect(confirm).toHaveBeenCalledOnce()
+    expect(element<HTMLInputElement>(root, '[aria-label="策略名称"]').value).toBe('未保存名称')
+    confirm.mockResolvedValueOnce(true)
+    button(root, '关闭策略调度').click()
+    await flush()
+    expect(document.querySelector('[role="dialog"]')).toBeNull()
+    workspace.value!.openScheduling()
+    await flush()
+    expect(element<HTMLInputElement>(root, '[aria-label="策略名称"]').value).toBe('default')
+    expect(button(root, '保存调度').disabled).toBe(true)
+  })
+
+  it('updates the selected model priority while the scheduling dialog is closed', async () => {
+    const config = createEmptyRoutingGroupConfig()
+    const first = { ...createSchedulingPolicy(config), models: ['model-a'] }
+    const second = { ...createSchedulingPolicy(config), models: ['model-b'] }
+    const stored = writeSchedulingPolicies(config, [first, second])
+    const { root, workspace } = await mountWorkspace({}, [group('default', { is_system_default: true, config_json: stored })], false)
+    const selection = contextChange.mock.lastCall?.[0].activePolicy
+    expect(selection.modelNames).toEqual(['model-a'])
+    workspace.value!.updatePriorityPolicy({ ...selection.policy, provider_priority_overrides: { 'provider-a': 7 } })
+    await flush()
+    const updated = readSchedulingPolicies(contextChange.mock.lastCall?.[0].config)
+    expect(updated[0].policy.provider_priority_overrides).toEqual({ 'provider-a': 7 })
+    expect(updated[1].policy.provider_priority_overrides).toEqual(second.policy.provider_priority_overrides)
+    workspace.value!.openScheduling()
+    await flush()
+    expect(button(root, '保存调度').disabled).toBe(false)
+    button(root, '保存调度').click()
+    await flush()
+    expect(readSchedulingPolicies(routingApi.updateRoutingGroup.mock.lastCall?.[1].config_json)[0].policy.provider_priority_overrides).toEqual({ 'provider-a': 7 })
+  })
+
   it('opens the system default immediately and forwards provider inspection and refreshes', async () => {
     const { root, providerRevision } = await mountWorkspace()
     expect(selector(root).textContent?.trim()).toBe('default · 默认')
     expect(button(root, '保存调度').disabled).toBe(true)
     expect(root.querySelector('[data-testid="provider-directory"]')).not.toBeNull()
-    expect(document.querySelector('[role="dialog"]')).toBeNull()
+    expect(document.querySelector('[role="dialog"][aria-label="策略调度"]')).not.toBeNull()
     expect(button(root, '查看示例提供商').dataset.layout).toBe('config-only')
     const directory = element(root, '[data-testid="provider-directory"]')
     const combined = element(root, '[aria-label="策略分组与调度配置"]')
@@ -259,7 +304,7 @@ describe('ProviderSchedulingView workspace navigation', () => {
     expect(button(root, '删除策略').textContent?.trim()).toBe('')
     expect(combined.querySelector('[role="status"]')).toBeNull()
     expect(combined.querySelector('[aria-label="撤销修改"]')).toBeNull()
-    expect(button(root, '查看示例提供商').compareDocumentPosition(directory) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(element(root, '[role="dialog"]').contains(directory)).toBe(false)
     expect(button(root, '故障转移').getAttribute('aria-expanded')).toBe('false')
     expect(button(root, '高级设置').getAttribute('aria-expanded')).toBe('false')
     expect(combined.contains(button(root, '故障转移'))).toBe(true)
@@ -368,7 +413,7 @@ describe('ProviderSchedulingView workspace navigation', () => {
     await flush()
     expect(selector(root).textContent?.trim()).toBe('default · 默认')
     expect(router.currentRoute.value.query.group).toBeUndefined()
-    expect(document.querySelector('[role="dialog"]')).toBeNull()
+    expect(document.querySelector('[role="dialog"][aria-label="策略调度"]')).not.toBeNull()
     expect(button(root, '保存调度').disabled).toBe(false)
     expect(contextChange.mock.lastCall?.[0].groupName).toBe('保留的分组草稿')
     expect(routingApi.createRoutingGroup).not.toHaveBeenCalled()
@@ -389,7 +434,7 @@ describe('ProviderSchedulingView workspace navigation', () => {
     await flush()
     expect(router.currentRoute.value.query.group).toBe('new')
     expect(selector(root).textContent?.trim()).toBe('新建策略')
-    expect(document.querySelector('[role="dialog"]')).toBeNull()
+    expect(document.querySelector('[role="dialog"][aria-label="策略调度"]')).not.toBeNull()
     expect(root.querySelector('button[aria-label="删除策略"]')).toBeNull()
     expect(root.querySelector('[data-testid="provider-directory"]')).not.toBeNull()
     expect(element<HTMLInputElement>(root, '[aria-label="分组倍率"]').value).toBe('1')
@@ -446,7 +491,7 @@ describe('ProviderSchedulingView workspace navigation', () => {
     expect(button(root, '用户可见').getAttribute('aria-checked')).toBe('false')
     expect(button(root, '设为系统默认').getAttribute('aria-pressed')).toBe(String(firstGroup))
     expect(root.querySelector('button[aria-label="删除策略"]')).toBeNull()
-    expect(document.querySelector('[role="dialog"]')).toBeNull()
+    expect(document.querySelector('[role="dialog"][aria-label="策略调度"]')).not.toBeNull()
     expect(routingApi.createRoutingGroup).not.toHaveBeenCalled()
     await editName(root, '深链新建')
     button(root, '保存调度').click()

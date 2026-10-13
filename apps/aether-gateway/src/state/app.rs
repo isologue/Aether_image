@@ -391,6 +391,7 @@ pub struct AppState {
     pub(crate) request_activity: Arc<crate::request_activity::RequestActivity>,
     pub(crate) execution_activity: Arc<crate::execution_activity::ExecutionActivity>,
     pub(crate) video_tasks: Arc<VideoTaskService>,
+    pub(crate) image_storage: Arc<crate::image_storage::ImageStorage>,
     pub(crate) video_task_poller: Option<VideoTaskPollerConfig>,
     pub(crate) frontdoor_runtime_guards: Arc<FrontdoorRuntimeGuardConfig>,
     pub(crate) request_body_buffer_budget: Arc<Semaphore>,

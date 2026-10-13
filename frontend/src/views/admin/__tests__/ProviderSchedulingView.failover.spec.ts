@@ -29,7 +29,7 @@ vi.mock('@/features/routing/components', async () => ({
 vi.mock('@/features/routing/components/RoutingPriorityPolicyEditor.vue', () => ({ default: { render: () => null } }))
 
 const mounted: Array<{ app: App, root: HTMLElement }> = []
-let workspaceInstance: ComponentPublicInstance & { updatePriorityPolicy: (policy: RoutingModelPolicy) => void }
+let workspaceInstance: ComponentPublicInstance & { openScheduling: () => void; updatePriorityPolicy: (policy: RoutingModelPolicy) => void }
 
 function group(id: string): RoutingGroupRecord {
   return {
@@ -64,9 +64,12 @@ async function mountPage(groups = [group('strategy-a'), group('strategy-b')]) {
   workspaceInstance = app.mount(root) as typeof workspaceInstance
   mounted.push({ app, root })
   await flush()
-  button(root, '故障转移').click()
+  workspaceInstance.openScheduling()
   await flush()
-  return root
+  const dialog = document.querySelector<HTMLElement>('[role="dialog"][aria-label="策略调度"]')!
+  button(dialog, '故障转移').click()
+  await flush()
+  return dialog
 }
 
 function element<T extends HTMLElement>(root: HTMLElement, selector: string): T {
@@ -310,6 +313,26 @@ describe('ProviderSchedulingView top-level scheduling selection', () => {
     })
     expect(contextChange.mock.lastCall?.[0].providerModelIds).toEqual(scope === 'selected' ? ['id-b'] : undefined)
     expect(button(root, '保存调度').disabled).toBe(true)
+    button(root, '关闭策略调度').click()
+    await flush()
+    expect(document.querySelector('[role="dialog"][aria-label="策略调度"]')).toBeNull()
+    const selected = contextChange.mock.lastCall?.[0].activePolicy
+    workspaceInstance.updatePriorityPolicy({ ...selected.policy, provider_priority_overrides: { 'provider-b': 9 } })
+    await flush()
+    expect(contextChange.mock.lastCall?.[0].activePolicy).toMatchObject({
+      scope,
+      modelNames: second.models,
+      policy: { provider_priority_overrides: { 'provider-b': 9 } },
+    })
+    workspaceInstance.openScheduling()
+    await flush()
+    const reopened = document.querySelector<HTMLElement>('[role="dialog"][aria-label="策略调度"]')!
+    expect(button(reopened, '选择调度配置 2').getAttribute('aria-pressed')).toBe('true')
+    button(reopened, '保存调度').click()
+    await flush()
+    const stored = readSchedulingPolicies(routingApi.updateRoutingGroup.mock.lastCall?.[1].config_json)
+    expect(stored[0].policy.provider_priority_overrides).toEqual(first.policy.provider_priority_overrides)
+    expect(stored[1].policy.provider_priority_overrides).toEqual({ 'provider-b': 9 })
   })
 
   it('emits all selected model IDs and applies directory priorities to the whole selection', async () => {

@@ -42,6 +42,7 @@
           @batch-process="openProviderBatchDialog"
           @add-provider="openAddProviderDialog"
           @refresh="loadProviders"
+          @scheduling="schedulingWorkspace?.openScheduling()"
         />
 
         <!-- 加载状态 -->
@@ -369,6 +370,7 @@ interface SchedulingContext {
 }
 const schedulingContext = ref<SchedulingContext>({ groupId: null, groupName: '', config: null, busy: true, activePolicy: null })
 const schedulingWorkspace = ref<{
+  openScheduling: () => void
   updateDraftConfig: (config: RoutingGroupConfig) => void
   updatePriorityPolicy: (policy: RoutingModelPolicy) => void
   refreshGroups: () => Promise<void>

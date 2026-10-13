@@ -53,6 +53,7 @@ mod handlers;
 mod headers;
 mod hooks;
 mod image_capabilities;
+mod image_storage;
 mod important_notification;
 mod internal_gateway_auth;
 mod local_auth_token;
