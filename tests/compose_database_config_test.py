@@ -34,18 +34,18 @@ with tempfile.TemporaryDirectory(prefix="aether-compose-databases-") as director
         )
 
     database_environment = "DB_PASSWORD=fixture-postgres\nREDIS_PASSWORD=fixture-redis\n"
-    standard_compose_files = (
-        ["docker-compose.yml"],
-        ["docker-compose.yml", "docker-compose.local.yml"],
-        ["docker-compose.single-node.yml"],
+    standard_compose_configs = (
+        (["docker-compose.yml"], {"image_data", "postgres_data"}),
+        (["docker-compose.yml", "docker-compose.local.yml"], {"image_data", "postgres_data"}),
+        (["docker-compose.single-node.yml"], {"postgres_data"}),
     )
     env_file.write_text(database_environment)
-    for files in standard_compose_files:
+    for files, expected_volumes in standard_compose_configs:
         result = compose_config(files)
         assert result.returncode == 0, result.stderr
         config = json.loads(result.stdout)
         assert set(config["services"]) == {"app", "postgres", "redis"}
-        assert set(config["volumes"]) == {"image_data", "postgres_data"}
+        assert set(config["volumes"]) == expected_volumes
         app = config["services"]["app"]
         assert app["user"] == "0:0"
         assert app["read_only"] is True
@@ -81,7 +81,7 @@ with tempfile.TemporaryDirectory(prefix="aether-compose-databases-") as director
             + f"AETHER_LOG_DESTINATION={log_destination}\nAETHER_LOG_DIR=/app/logs\n"
             + "AETHER_CONTAINER_UID=65532\nAETHER_CONTAINER_GID=65532\n"
         )
-        for files in standard_compose_files:
+        for files, _ in standard_compose_configs:
             result = compose_config(files)
             assert result.returncode == 0, result.stderr
             app = json.loads(result.stdout)["services"]["app"]
