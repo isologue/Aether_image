@@ -58,8 +58,13 @@ pub(super) async fn maybe_build_local_admin_core_system_response(
     }
 
     if let Some(response) = crate::image_storage::admin_response(
-        state.app(), request_method, request_path, request_body,
-    ).await? {
+        state.app(),
+        request_method,
+        request_path,
+        request_body,
+    )
+    .await?
+    {
         return Ok(Some(response));
     }
 

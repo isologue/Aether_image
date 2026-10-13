@@ -1709,7 +1709,10 @@ async fn proxy_request_inner(
     let should_buffer_body = should_try_control_execute
         || should_buffer_for_local_auth
         || should_buffer_for_local_ai_public
-        || parts.extensions.get::<crate::image_storage::ImageRequestSlot>().is_some();
+        || parts
+            .extensions
+            .get::<crate::image_storage::ImageRequestSlot>()
+            .is_some();
 
     let allow_control_execute_fallback = should_try_control_execute
         && control_decision.is_some_and(allows_control_execute_emergency)
@@ -1784,7 +1787,9 @@ async fn proxy_request_inner(
     }
 
     if let (Some(slot), Some(body)) = (
-        parts.extensions.get::<crate::image_storage::ImageRequestSlot>(),
+        parts
+            .extensions
+            .get::<crate::image_storage::ImageRequestSlot>(),
         buffered_body.as_ref(),
     ) {
         let trusted = request_origin_from_headers_and_remote_addr(&parts.headers, &remote_addr)

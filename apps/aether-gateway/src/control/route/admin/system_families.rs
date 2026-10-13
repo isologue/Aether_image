@@ -15,7 +15,13 @@ pub(super) fn classify_admin_system_family_route(
         _ => None,
     };
     if let Some(kind) = image_kind {
-        return Some(classified("admin_proxy", "system_manage", kind, "admin:system", false));
+        return Some(classified(
+            "admin_proxy",
+            "system_manage",
+            kind,
+            "admin:system",
+            false,
+        ));
     }
     if method == http::Method::GET && normalized_path == "/api/admin/system/version" {
         Some(classified(

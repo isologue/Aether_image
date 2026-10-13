@@ -135,7 +135,10 @@ pub(crate) async fn apply_admin_system_config_update(
             }
         };
         if let Err(message) = config.validate() {
-            return Ok(Err((http::StatusCode::BAD_REQUEST, json!({"detail":message}))));
+            return Ok(Err((
+                http::StatusCode::BAD_REQUEST,
+                json!({"detail":message}),
+            )));
         }
         value = serde_json::to_value(config)
             .map_err(|error| GatewayError::Internal(error.to_string()))?;

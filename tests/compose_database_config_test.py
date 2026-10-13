@@ -45,7 +45,7 @@ with tempfile.TemporaryDirectory(prefix="aether-compose-databases-") as director
         assert result.returncode == 0, result.stderr
         config = json.loads(result.stdout)
         assert set(config["services"]) == {"app", "postgres", "redis"}
-        assert set(config["volumes"]) == {"postgres_data"}
+        assert set(config["volumes"]) == {"image_data", "postgres_data"}
         app = config["services"]["app"]
         assert app["user"] == "0:0"
         assert app["read_only"] is True
