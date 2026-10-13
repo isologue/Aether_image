@@ -56,7 +56,11 @@ services:
     restart: unless-stopped
 
   app:
-    image: ${APP_IMAGE:-ghcr.io/fawney19/aether:latest}
+    build:
+      context: .
+      dockerfile: Dockerfile.app.local
+    image: ${LOCAL_APP_IMAGE:-aether-app:latest}
+    # image: ${APP_IMAGE:-ghcr.io/fawney19/aether:latest}
     container_name: aether-app
     user: "0:0"
     read_only: true
