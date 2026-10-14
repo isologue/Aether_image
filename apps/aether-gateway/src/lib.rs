@@ -25,6 +25,7 @@
     clippy::useless_concat
 )]
 
+mod account_push;
 mod admin_api;
 mod ai_serving;
 mod allocator_metrics;

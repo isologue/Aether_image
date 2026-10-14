@@ -553,6 +553,26 @@ pub(crate) async fn find_duplicate_provider_oauth_key(
     auth_config: &serde_json::Map<String, serde_json::Value>,
     exclude_key_id: Option<&str>,
 ) -> Result<Option<StoredProviderCatalogKey>, String> {
+    find_matching_provider_oauth_key(state, provider_id, auth_config, exclude_key_id, false).await
+}
+
+// Periodic pushes update credentials even while the existing account is healthy.
+// Interactive imports retain their existing duplicate admission policy.
+pub(crate) async fn find_provider_oauth_key_for_push(
+    state: &AdminAppState<'_>,
+    provider_id: &str,
+    auth_config: &serde_json::Map<String, serde_json::Value>,
+) -> Result<Option<StoredProviderCatalogKey>, String> {
+    find_matching_provider_oauth_key(state, provider_id, auth_config, None, true).await
+}
+
+async fn find_matching_provider_oauth_key(
+    state: &AdminAppState<'_>,
+    provider_id: &str,
+    auth_config: &serde_json::Map<String, serde_json::Value>,
+    exclude_key_id: Option<&str>,
+    replace_active_accounts: bool,
+) -> Result<Option<StoredProviderCatalogKey>, String> {
     let new_email = normalize_provider_oauth_identity_value(auth_config.get("email"));
     let new_user_id = normalize_provider_oauth_identity_value(auth_config.get("user_id"));
     let new_account_id = normalize_provider_oauth_identity_value(auth_config.get("account_id"));
@@ -683,7 +703,7 @@ pub(crate) async fn find_duplicate_provider_oauth_key(
         if !is_duplicate {
             continue;
         }
-        if existing_provider_oauth_key_is_replaceable(&existing_key) {
+        if replace_active_accounts || existing_provider_oauth_key_is_replaceable(&existing_key) {
             return Ok(Some(existing_key));
         }
         let identifier = normalize_provider_oauth_identity_value_from_keys(

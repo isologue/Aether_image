@@ -36,6 +36,7 @@ describe('PoolManagementHeader', () => {
           refreshTitle: '刷新',
           onViewProvider: () => events.push('viewProvider'),
           onImport: () => events.push('import'),
+          onAccountPush: () => events.push('accountPush'),
           onPrefetchProvider: () => events.push('prefetchProvider'),
           onScheduling: () => events.push('scheduling'),
           onDemandMetrics: () => events.push('demandMetrics'),
@@ -57,6 +58,7 @@ describe('PoolManagementHeader', () => {
     mobileViewProviderButton?.dispatchEvent(new Event('pointerenter'))
     mobileViewProviderButton?.click()
     root.querySelector<HTMLButtonElement>('[title="导入账号"]')?.click()
+    root.querySelector<HTMLButtonElement>('[title="账号推送"]')?.click()
     root.querySelector<HTMLButtonElement>('[title="点击调整号池调度"]')?.click()
     root.querySelector<HTMLButtonElement>('[title="查看自适应热池指标"]')?.click()
     const desktopActions = root.querySelector('[data-testid="pool-header-actions"]')
@@ -75,6 +77,7 @@ describe('PoolManagementHeader', () => {
       'prefetchProvider',
       'viewProvider',
       'import',
+      'accountPush',
       'scheduling',
       'demandMetrics',
       'advanced',

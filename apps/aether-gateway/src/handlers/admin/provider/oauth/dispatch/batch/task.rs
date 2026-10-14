@@ -532,6 +532,7 @@ async fn handle_admin_provider_oauth_start_import_task(
             &provider_type_for_worker,
             raw_credentials.as_str(),
             proxy_node_id.as_deref(),
+            false,
             Some(&mut progress_reporter),
         );
         tokio::pin!(execution);

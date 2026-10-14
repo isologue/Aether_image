@@ -133,6 +133,9 @@ pub fn build_router_with_state(state: AppState) -> Router {
         "/media/images/{*image_path}",
         axum::routing::get(crate::image_storage::serve_image),
     );
+    for path in ["/api/accounts", "/api/accounts/upload"] {
+        router = router.route(path, axum::routing::post(crate::account_push::receive));
+    }
     router = api::mount_core_routes(router);
     router = api::mount_operational_routes(router, state.clone());
     router = api::mount_ai_routes(router);

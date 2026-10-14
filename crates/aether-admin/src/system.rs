@@ -935,6 +935,7 @@ const REQUEST_RECORD_LEVEL_KEY: &str = "request_record_level";
 const LEGACY_REQUEST_LOG_LEVEL_KEY: &str = "request_log_level";
 const DEFAULT_BARK_API_BASE: &str = "https://api.day.app";
 const SENSITIVE_SYSTEM_CONFIG_KEYS: &[&str] = &[
+    "account_push_api_key",
     "image_webdav_password",
     "smtp_password",
     "turnstile_secret_key",
@@ -2225,6 +2226,9 @@ pub fn is_sensitive_admin_system_config_key(key: &str) -> bool {
 
 pub fn admin_system_config_default_value(key: &str) -> Option<serde_json::Value> {
     match key {
+        "account_push_api_key" => Some(json!("")),
+        "account_push" => Some(json!({"enabled":false,"provider_id":""})),
+        "account_push_last_result" => Some(serde_json::Value::Null),
         "image_webdav_password" => Some(json!("")),
         "image_storage" => Some(
             json!({"return_format":"base64", "honor_response_format":false,

@@ -15,6 +15,7 @@ pub(crate) use crate::handlers::admin::{
     OAUTH_ACCOUNT_BLOCK_PREFIX, OAUTH_REQUEST_FAILED_PREFIX,
 };
 
+pub(crate) use crate::handlers::admin::import_pushed_accounts;
 use crate::handlers::admin::{
     admin_stats_bad_request_response as admin_stats_bad_request_response_impl,
     parse_bounded_u32 as parse_bounded_u32_impl, round_to as round_to_impl,

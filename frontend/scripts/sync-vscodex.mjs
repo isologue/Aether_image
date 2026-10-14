@@ -10,7 +10,11 @@ const webPackagePath = resolve(webRoot, 'package.json')
 const webLockPath = resolve(webRoot, 'package-lock.json')
 const webPackage = JSON.parse(readFileSync(webPackagePath, 'utf8'))
 const webLock = JSON.parse(readFileSync(webLockPath, 'utf8'))
-const npmCommand = process.platform === 'win32' ? 'npm.cmd' : 'npm'
+// Invoke npm's JavaScript entrypoint on Windows; npm.cmd cannot be spawned
+// directly by recent Node versions without an extra shell.
+const npmCliPath = process.env.npm_execpath || resolve(dirname(process.execPath), 'node_modules/npm/bin/npm-cli.js')
+const npmCommand = process.platform === 'win32' ? process.execPath : 'npm'
+const npmCommandArgs = process.platform === 'win32' ? [npmCliPath] : []
 const requiredPackages = Object.keys({
   ...webPackage.dependencies,
   ...webPackage.devDependencies
@@ -41,7 +45,7 @@ const hasWebDependencies =
   )
 
 function runNpm(args, action) {
-  const result = spawnSync(npmCommand, ['--prefix', webRoot, ...args], {
+  const result = spawnSync(npmCommand, [...npmCommandArgs, '--prefix', webRoot, ...args], {
     stdio: 'inherit'
   })
 

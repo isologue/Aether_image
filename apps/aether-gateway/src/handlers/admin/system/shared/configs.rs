@@ -124,6 +124,45 @@ pub(crate) async fn apply_admin_system_config_update(
     let normalized_key = update.normalized_key;
     let description = update.description;
 
+    if normalized_key == crate::account_push::CONFIG_KEY {
+        let config = match serde_json::from_value::<crate::account_push::PushConfig>(value.clone())
+        {
+            Ok(config) => config,
+            Err(_) => {
+                return Ok(Err((
+                    http::StatusCode::BAD_REQUEST,
+                    json!({"detail":"账号推送配置字段或类型错误"}),
+                )))
+            }
+        };
+        if let Err(message) = config.validate(state.app()).await {
+            return Ok(Err((
+                http::StatusCode::BAD_REQUEST,
+                json!({"detail":message}),
+            )));
+        }
+        value = serde_json::to_value(config)
+            .map_err(|error| GatewayError::Internal(error.to_string()))?;
+    }
+    if normalized_key == crate::account_push::SECRET_KEY {
+        if !value.as_str().is_some_and(|key| {
+            key.is_empty()
+                || (key.trim() == key
+                    && (24..=256).contains(&key.len())
+                    && key.bytes().all(|byte| byte.is_ascii_graphic()))
+        }) {
+            return Ok(Err((
+                http::StatusCode::BAD_REQUEST,
+                json!({"detail":"推送密钥必须为 24–256 个 ASCII 字符且不包含空白"}),
+            )));
+        }
+    }
+    if normalized_key == crate::account_push::RESULT_KEY {
+        return Ok(Err((
+            http::StatusCode::BAD_REQUEST,
+            json!({"detail":"推送结果由接收接口记录，不能手动修改"}),
+        )));
+    }
     if normalized_key == crate::image_storage::CONFIG_KEY {
         let config = match crate::image_storage::parse_config(value.clone()) {
             Ok(config) => config,

@@ -1,4 +1,5 @@
 mod dispatch;
+pub(crate) use dispatch::import_pushed_accounts;
 pub(crate) mod duplicates;
 pub(crate) mod errors;
 pub(crate) mod provisioning;

@@ -23,6 +23,7 @@
         @view-provider="openProviderDrawer"
         @prefetch-provider="prefetchProviderDetailDrawer"
         @import="showImportDialog = true"
+        @account-push="showAccountPushDialog = true"
         @scheduling="openSchedulingDialog"
         @demand-metrics="showDemandMetricsDialog = true"
         @advanced="openAdvancedDialog"
@@ -930,6 +931,11 @@
     </Card>
 
     <!-- Dialogs -->
+    <PoolAccountPushDialog
+      v-model="showAccountPushDialog"
+      :providers="poolProviders"
+      :provider-id="selectedProviderId"
+    />
     <OAuthAccountDialog
       v-if="selectedProviderId"
       :open="showImportDialog"
@@ -1111,6 +1117,7 @@ import PoolDemandMetricsDialog from '@/features/pool/components/PoolDemandMetric
 import PoolAccountBatchDialog from '@/features/pool/components/PoolAccountBatchDialog.vue'
 import PoolKeyBatchEditDialog from '@/features/pool/components/PoolKeyBatchEditDialog.vue'
 import PoolManagementHeader from '@/features/pool/components/PoolManagementHeader.vue'
+import PoolAccountPushDialog from '@/features/pool/components/PoolAccountPushDialog.vue'
 import PoolKeyQuotaPanel from '@/features/pool/components/PoolKeyQuotaPanel.vue'
 import PoolKeyStatsPanel from '@/features/pool/components/PoolKeyStatsPanel.vue'
 import KeyAllowedModelsEditDialog from '@/features/providers/components/KeyAllowedModelsEditDialog.vue'
@@ -3037,6 +3044,7 @@ async function toggleKeyActive(key: PoolKeyDetail) {
 }
 
 // --- Dialogs ---
+const showAccountPushDialog = ref(false)
 const showImportDialog = ref(false)
 const showSchedulingDialog = ref(false)
 const showAdvancedDialog = ref(false)

@@ -22,6 +22,7 @@ use axum::{
 };
 
 mod batch;
+pub(crate) use batch::import_pushed_accounts;
 mod complete;
 mod cookie;
 mod cookie_task;

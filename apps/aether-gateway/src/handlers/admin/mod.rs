@@ -1,4 +1,5 @@
 mod announcements;
+pub(crate) use provider::oauth::import_pushed_accounts;
 pub(super) mod auth;
 mod billing;
 pub(super) mod endpoint;

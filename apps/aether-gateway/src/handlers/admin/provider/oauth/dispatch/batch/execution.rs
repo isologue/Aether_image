@@ -16,7 +16,7 @@ use super::progress::{
 };
 use crate::handlers::admin::provider::oauth::duplicates::{
     acquire_codex_oauth_account_locks, find_duplicate_provider_oauth_key,
-    release_codex_oauth_account_locks,
+    find_provider_oauth_key_for_push, release_codex_oauth_account_locks,
 };
 use crate::handlers::admin::provider::oauth::provisioning::build_provider_oauth_auth_config_from_token_payload;
 use crate::handlers::admin::provider::oauth::provisioning::{
@@ -223,6 +223,7 @@ pub(super) async fn execute_admin_provider_oauth_batch_import_for_provider_type(
     provider_type: &str,
     raw_credentials: &str,
     proxy_node_id: Option<&str>,
+    replace_active_accounts: bool,
     progress: Option<&mut dyn AdminProviderOAuthBatchProgressReporter>,
 ) -> Result<AdminProviderOAuthBatchImportOutcome, GatewayError> {
     if provider_type.eq_ignore_ascii_case("kiro") {
@@ -243,6 +244,7 @@ pub(super) async fn execute_admin_provider_oauth_batch_import_for_provider_type(
             provider_type,
             &entries,
             proxy_node_id,
+            replace_active_accounts,
             progress,
         )
         .await
@@ -453,6 +455,7 @@ pub(super) async fn execute_admin_provider_oauth_batch_import(
     provider_type: &str,
     entries: &[AdminProviderOAuthBatchImportEntry],
     proxy_node_id: Option<&str>,
+    replace_active_accounts: bool,
     mut progress: Option<&mut dyn AdminProviderOAuthBatchProgressReporter>,
 ) -> Result<AdminProviderOAuthBatchImportOutcome, GatewayError> {
     let Some(provider) = state
@@ -632,29 +635,33 @@ pub(super) async fn execute_admin_provider_oauth_batch_import(
                 Vec::new()
             };
 
-        let duplicate =
-            match find_duplicate_provider_oauth_key(state, provider_id, &auth_config, None).await {
-                Ok(value) => value,
-                Err(detail) => {
-                    release_codex_oauth_account_locks(state, codex_oauth_account_leases).await;
-                    failed += 1;
-                    results.push(json!({
-                        "index": index,
-                        "status": "error",
-                        "error": detail,
-                        "replaced": false,
-                    }));
-                    maybe_report_admin_provider_oauth_batch_import_progress(
-                        &mut progress,
-                        entries.len(),
-                        success,
-                        failed,
-                        &results,
-                    )
-                    .await;
-                    continue;
-                }
-            };
+        let duplicate_result = if replace_active_accounts {
+            find_provider_oauth_key_for_push(state, provider_id, &auth_config).await
+        } else {
+            find_duplicate_provider_oauth_key(state, provider_id, &auth_config, None).await
+        };
+        let duplicate = match duplicate_result {
+            Ok(value) => value,
+            Err(detail) => {
+                release_codex_oauth_account_locks(state, codex_oauth_account_leases).await;
+                failed += 1;
+                results.push(json!({
+                    "index": index,
+                    "status": "error",
+                    "error": detail,
+                    "replaced": false,
+                }));
+                maybe_report_admin_provider_oauth_batch_import_progress(
+                    &mut progress,
+                    entries.len(),
+                    success,
+                    failed,
+                    &results,
+                )
+                .await;
+                continue;
+            }
+        };
 
         let replaced = duplicate.is_some();
         let (persisted_key, key_name) = if let Some(existing_key) = duplicate {

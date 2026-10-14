@@ -327,6 +327,7 @@ import { computed } from 'vue'
 import {
   Activity,
   ChevronDown,
+  CloudUpload,
   Eye,
   ListChecks,
   Search,
@@ -358,6 +359,7 @@ import {
 
 type HeaderActionEvent =
   | 'import'
+  | 'accountPush'
   | 'scheduling'
   | 'viewProvider'
   | 'demandMetrics'
@@ -365,6 +367,7 @@ type HeaderActionEvent =
 
 type HeaderActionKey =
   | 'import'
+  | 'accountPush'
   | 'scheduling'
   | 'viewProvider'
   | 'demandMetrics'
@@ -403,6 +406,7 @@ const emit = defineEmits<{
   'update:status': [value: string]
   'update:search': [value: string]
   import: []
+  accountPush: []
   prefetchProvider: []
   scheduling: []
   viewProvider: []
@@ -416,6 +420,7 @@ const emit = defineEmits<{
 function triggerAction(event: HeaderActionEvent) {
   const handlers = {
     import: () => emit('import'),
+    accountPush: () => emit('accountPush'),
     scheduling: () => emit('scheduling'),
     viewProvider: () => emit('viewProvider'),
     demandMetrics: () => emit('demandMetrics'),
@@ -449,6 +454,7 @@ const mobileActions = computed<HeaderAction[]>(() => {
   const actions: HeaderAction[] = [
     { key: 'viewProvider', title: legacyT('查看详情'), event: 'viewProvider', icon: Eye },
     { key: 'import', title: legacyT('导入账号'), event: 'import', icon: Upload },
+    { key: 'accountPush', title: legacyT('账号推送'), event: 'accountPush', icon: CloudUpload },
     { key: 'scheduling', title: legacyT('号池调度'), event: 'scheduling', icon: SlidersHorizontal },
   ]
   if (props.showAdaptiveHotPoolMetricsButton) {
@@ -464,6 +470,7 @@ const desktopActions = computed<HeaderAction[]>(() => {
   const actions: HeaderAction[] = [
     { key: 'viewProvider', title: legacyT('查看详情'), event: 'viewProvider', icon: Eye },
     { key: 'import', title: legacyT('导入账号'), event: 'import', icon: Upload },
+    { key: 'accountPush', title: legacyT('账号推送'), event: 'accountPush', icon: CloudUpload },
   ]
   if (props.showAdaptiveHotPoolMetricsButton) {
     actions.push({ key: 'demandMetrics', title: legacyT('查看自适应热池指标'), event: 'demandMetrics', icon: Activity })
