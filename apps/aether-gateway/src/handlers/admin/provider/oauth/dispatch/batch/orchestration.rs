@@ -89,7 +89,7 @@ async fn execute_import(
     if push && !matches!(provider_type.as_str(), "chatgpt_web" | "codex") {
         return Ok(build_internal_control_error_response(
             http::StatusCode::BAD_REQUEST,
-            "ChatGPT2API 账号推送仅支持 ChatGPT Web 或 Codex Provider",
+            "账号推送仅支持 ChatGPT Web 或 Codex Provider",
         ));
     }
     if !is_fixed_provider_type_for_provider_oauth(&provider_type) {

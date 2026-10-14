@@ -1,9 +1,9 @@
-//! ChatGPT2API-compatible account ingestion. Credentials stay in the existing OAuth pipeline.
+//! Sub2API-compatible account ingestion. Credentials stay in the existing OAuth pipeline.
 use crate::{admin_api::AdminAppState, AppState, GatewayError};
 use axum::{
     body::to_bytes,
     extract::{Request, State},
-    http::{header, HeaderMap, StatusCode},
+    http::{header, HeaderMap, Method, StatusCode},
     response::{IntoResponse, Response},
     Json,
 };
@@ -21,6 +21,7 @@ pub(crate) const SECRET_KEY: &str = "account_push_api_key";
 pub(crate) const RESULT_KEY: &str = "account_push_last_result";
 const BODY_LIMIT: usize = 128 * 1024 * 1024;
 const IMPORT_BATCH_SIZE: usize = 100;
+static IMPORT_GATE: OnceLock<Arc<tokio::sync::Mutex<()>>> = OnceLock::new();
 
 #[derive(Default, Clone, Serialize, Deserialize)]
 #[serde(default, deny_unknown_fields)]
@@ -88,6 +89,22 @@ fn valid_bearer(headers: &HeaderMap, secret: &str) -> bool {
     if !scheme.eq_ignore_ascii_case("bearer") || token.is_empty() || token.trim() != token {
         return false;
     }
+    valid_secret(token, secret)
+}
+fn valid_sub2api_key(headers: &HeaderMap, secret: &str) -> bool {
+    let mut values = headers.get_all("x-api-key").iter();
+    let Some(value) = values.next().and_then(|value| value.to_str().ok()) else {
+        return false;
+    };
+    if values.next().is_some() || value.is_empty() || value.trim() != value {
+        return false;
+    }
+    valid_secret(value, secret)
+}
+fn valid_secret(token: &str, secret: &str) -> bool {
+    if secret.is_empty() {
+        return false;
+    }
     // HMAC verify uses a constant-time tag comparison without adding another dependency.
     let mut expected =
         Hmac::<Sha256>::new_from_slice(secret.as_bytes()).expect("HMAC accepts any key length");
@@ -98,47 +115,19 @@ fn valid_bearer(headers: &HeaderMap, secret: &str) -> bool {
     presented.update(b"aether-account-push-auth");
     presented.verify_slice(&tag).is_ok()
 }
-fn failure(status: StatusCode, message: &str) -> Response {
+
+fn sub2api_failure(status: StatusCode, message: &str) -> Response {
     (
         status,
-        Json(json!({"success":false,"detail":{"error":message},"error":message})),
+        Json(json!({"code":status.as_u16(),"message":message})),
     )
         .into_response()
 }
 
-#[derive(Default, Deserialize)]
-#[serde(default)]
-struct PushRequest {
-    accounts: Vec<Value>,
-    tokens: Vec<String>,
-    // Accepted for compatibility. Refresh behavior is owned by Aether's OAuth importer;
-    // account credentials are never echoed, even when return_items is true.
-    refresh: Option<bool>,
-    return_items: Option<bool>,
-}
-fn normalize_payload(value: Value) -> Result<String, &'static str> {
-    let payload = match value {
-        Value::Array(accounts) => PushRequest {
-            accounts,
-            ..Default::default()
-        },
-        Value::Object(ref object)
-            if object.contains_key("access_token")
-                || object.contains_key("accessToken")
-                || object.contains_key("refresh_token")
-                || object.contains_key("refreshToken") =>
-        {
-            PushRequest {
-                accounts: vec![value],
-                ..Default::default()
-            }
-        }
-        value => serde_json::from_value::<PushRequest>(value)
-            .map_err(|_| "请求体必须为包含 accounts 或 tokens 的 JSON 对象")?,
-    };
+fn normalize_accounts(accounts: Vec<Value>) -> Result<Vec<Value>, &'static str> {
     let mut items = Vec::new();
     let mut seen = HashSet::new();
-    for item in payload.accounts {
+    for item in accounts {
         let Some(object) = item.as_object() else {
             return Err("accounts 中每项必须为账号对象");
         };
@@ -165,10 +154,13 @@ fn normalize_payload(value: Value) -> Result<String, &'static str> {
             "account_id",
             "accountId",
             "chatgpt_account_id",
+            "chatgpt_user_id",
             "account_user_id",
             "accountUserId",
             "user_id",
             "userId",
+            "workspace_id",
+            "workspaceId",
             "email",
             "plan_type",
             "planType",
@@ -193,16 +185,196 @@ fn normalize_payload(value: Value) -> Result<String, &'static str> {
         }
         items.push(Value::Object(clean));
     }
-    for token in payload.tokens {
-        let token = token.trim();
-        if !token.is_empty() && seen.insert(token.to_owned()) {
-            items.push(json!({"access_token":token}));
+    if items.is_empty() {
+        return Err("没有可导入的账号，accounts 不能为空");
+    }
+    Ok(items)
+}
+
+fn normalize_sub2api_payload(value: Value) -> Result<Vec<Value>, &'static str> {
+    // Move the envelope instead of cloning a potentially 128 MiB account bundle.
+    let data = match value {
+        Value::Object(mut object) => match object.remove("data") {
+            Some(data) => data,
+            None => Value::Object(object),
+        },
+        value => value,
+    };
+    let object = data.as_object().ok_or("Sub2API 请求体必须是 JSON 对象")?;
+    if object
+        .get("type")
+        .is_some_and(|kind| !matches!(kind.as_str(), Some("" | "sub2api-data" | "sub2api-bundle")))
+    {
+        return Err("不支持的 Sub2API 数据类型");
+    }
+    if object
+        .get("version")
+        .is_some_and(|version| !matches!(version.as_u64(), Some(0 | 1)))
+    {
+        return Err("不支持的 Sub2API 数据版本");
+    }
+    let accounts = object
+        .get("accounts")
+        .and_then(Value::as_array)
+        .ok_or("Sub2API 数据缺少 accounts 数组")?;
+
+    let mut normalized_accounts = Vec::with_capacity(accounts.len());
+    for account in accounts {
+        if contains_agent_identity(account) {
+            return Err("Agent Identity 凭据必须使用专属导入接口");
+        }
+        let account = account
+            .as_object()
+            .ok_or("Sub2API accounts 中每项必须是账号对象")?;
+        if !account
+            .get("platform")
+            .and_then(Value::as_str)
+            .is_some_and(|platform| platform.trim().eq_ignore_ascii_case("openai"))
+        {
+            return Err("Sub2API 仅支持导入 OpenAI OAuth 账号");
+        }
+        if !account
+            .get("type")
+            .and_then(Value::as_str)
+            .is_some_and(|kind| kind.trim().eq_ignore_ascii_case("oauth"))
+        {
+            return Err("Sub2API 仅支持导入 OpenAI OAuth 账号");
+        }
+        let credentials = account
+            .get("credentials")
+            .and_then(Value::as_object)
+            .ok_or("Sub2API 账号缺少 credentials 对象")?;
+        let mut merged = credentials.clone();
+        if let Some(name) = account
+            .get("name")
+            .and_then(Value::as_str)
+            .map(str::trim)
+            .filter(|name| !name.is_empty())
+        {
+            merged.entry("account_name").or_insert_with(|| json!(name));
+        }
+        for source in
+            std::iter::once(account).chain(account.get("extra").and_then(Value::as_object))
+        {
+            for field in [
+                "account_id",
+                "chatgpt_account_id",
+                "chatgpt_user_id",
+                "account_user_id",
+                "user_id",
+                "email",
+                "plan_type",
+                "workspace_id",
+            ] {
+                if let Some(value) = source.get(field).cloned() {
+                    merged.entry(field).or_insert(value);
+                }
+            }
+        }
+        normalized_accounts.push(Value::Object(merged));
+    }
+    if normalized_accounts.is_empty() {
+        return Err("Sub2API 数据中没有可导入的 OpenAI OAuth 账号");
+    }
+    normalize_accounts(normalized_accounts)
+}
+
+async fn authorize_sub2api(state: &AppState, headers: &HeaderMap) -> Result<PushConfig, Response> {
+    let config: PushConfig = match state.read_system_config_json_value_strong(CONFIG_KEY).await {
+        Ok(value) => serde_json::from_value(value.unwrap_or_else(|| json!({}))).map_err(|_| {
+            sub2api_failure(StatusCode::SERVICE_UNAVAILABLE, "账号推送配置格式错误")
+        })?,
+        Err(_) => {
+            return Err(sub2api_failure(
+                StatusCode::SERVICE_UNAVAILABLE,
+                "账号推送暂不可用",
+            ))
+        }
+    };
+    if !config.enabled {
+        return Err(sub2api_failure(StatusCode::NOT_FOUND, "账号推送未启用"));
+    }
+    let secret = load_secret(state)
+        .await
+        .map_err(|_| sub2api_failure(StatusCode::SERVICE_UNAVAILABLE, "账号推送密钥不可用"))?;
+    if !valid_bearer(headers, &secret) && !valid_sub2api_key(headers, &secret) {
+        return Err(sub2api_failure(StatusCode::UNAUTHORIZED, "推送密钥无效"));
+    }
+    Ok(config)
+}
+
+pub(crate) async fn receive_sub2api(State(state): State<AppState>, request: Request) -> Response {
+    let config = match authorize_sub2api(&state, request.headers()).await {
+        Ok(config) => config,
+        Err(response) => return response,
+    };
+
+    if request.method() == Method::GET {
+        // Connection probe only; this endpoint never exports stored credentials.
+        return Json(json!({
+            "code": 0,
+            "message": "success",
+            "data": {
+                "type": "sub2api-data",
+                "version": 1,
+                "exported_at": chrono::Utc::now().to_rfc3339(),
+                "proxies": [],
+                "accounts": [],
+            }
+        }))
+        .into_response();
+    }
+    if request.method() != Method::POST {
+        return sub2api_failure(StatusCode::METHOD_NOT_ALLOWED, "仅支持 GET 或 POST");
+    }
+    let content_type = request
+        .headers()
+        .get(header::CONTENT_TYPE)
+        .and_then(|value| value.to_str().ok())
+        .unwrap_or("application/json")
+        .split(';')
+        .next()
+        .unwrap_or("")
+        .trim();
+    if !content_type.eq_ignore_ascii_case("application/json") {
+        return sub2api_failure(
+            StatusCode::UNSUPPORTED_MEDIA_TYPE,
+            "请使用 application/json 推送 Sub2API 数据",
+        );
+    }
+    let bytes = match to_bytes(request.into_body(), BODY_LIMIT).await {
+        Ok(bytes) => bytes,
+        Err(_) => {
+            return sub2api_failure(StatusCode::PAYLOAD_TOO_LARGE, "推送请求不能超过 128 MiB")
+        }
+    };
+    let value = match serde_json::from_slice::<Value>(&bytes) {
+        Ok(value) => value,
+        Err(_) => return sub2api_failure(StatusCode::BAD_REQUEST, "请求体不是合法 JSON"),
+    };
+    let credentials = match normalize_sub2api_payload(value) {
+        Ok(credentials) => credentials,
+        Err(message) => return sub2api_failure(StatusCode::BAD_REQUEST, message),
+    };
+    let Ok(guard) = IMPORT_GATE
+        .get_or_init(|| Arc::new(tokio::sync::Mutex::new(())))
+        .clone()
+        .try_lock_owned()
+    else {
+        return sub2api_failure(StatusCode::CONFLICT, "已有推送正在导入，请稍后重试");
+    };
+    let state = state.clone();
+    let result = tokio::spawn(async move {
+        let _guard = guard;
+        complete_import(&state, &config.provider_id, credentials).await
+    })
+    .await;
+    match result {
+        Ok(Ok((status, result))) => (status, Json(result)).into_response(),
+        Ok(Err(_)) | Err(_) => {
+            sub2api_failure(StatusCode::SERVICE_UNAVAILABLE, "Sub2API 账号导入暂不可用")
         }
     }
-    if items.is_empty() {
-        return Err("没有可导入的账号，accounts 或 tokens 不能为空");
-    }
-    serde_json::to_string(&items).map_err(|_| "账号 JSON 编码失败")
 }
 fn string_field<'a>(
     object: &'a serde_json::Map<String, Value>,
@@ -229,89 +401,11 @@ fn contains_agent_identity(value: &Value) -> bool {
     }
 }
 
-pub(crate) async fn receive(State(state): State<AppState>, request: Request) -> Response {
-    match receive_inner(&state, request).await {
-        Ok(response) => response,
-        Err(_) => failure(
-            StatusCode::SERVICE_UNAVAILABLE,
-            "账号推送暂不可用，请检查服务配置后重试",
-        ),
-    }
-}
-async fn receive_inner(state: &AppState, request: Request) -> Result<Response, GatewayError> {
-    // Strong reads make disabling the endpoint or rotating its key effective immediately.
-    let config: PushConfig = serde_json::from_value(
-        state
-            .read_system_config_json_value_strong(CONFIG_KEY)
-            .await?
-            .unwrap_or_else(|| json!({})),
-    )
-    .map_err(|_| GatewayError::Internal("账号推送配置格式错误".into()))?;
-    if !config.enabled {
-        return Ok(failure(StatusCode::NOT_FOUND, "账号推送未启用"));
-    }
-    if !valid_bearer(request.headers(), &load_secret(state).await?) {
-        return Ok(failure(StatusCode::UNAUTHORIZED, "推送密钥无效"));
-    }
-    let content_type = request
-        .headers()
-        .get(header::CONTENT_TYPE)
-        .and_then(|value| value.to_str().ok())
-        .unwrap_or("application/json")
-        .split(';')
-        .next()
-        .unwrap_or("")
-        .trim();
-    if !content_type.eq_ignore_ascii_case("application/json") {
-        return Ok(failure(
-            StatusCode::UNSUPPORTED_MEDIA_TYPE,
-            "请使用 application/json 推送账号",
-        ));
-    }
-    let bytes = match to_bytes(request.into_body(), BODY_LIMIT).await {
-        Ok(bytes) => bytes,
-        Err(_) => {
-            return Ok(failure(
-                StatusCode::PAYLOAD_TOO_LARGE,
-                "推送请求不能超过 128 MiB",
-            ))
-        }
-    };
-    let value = match serde_json::from_slice::<Value>(&bytes) {
-        Ok(value) => value,
-        Err(_) => return Ok(failure(StatusCode::BAD_REQUEST, "请求体不是合法 JSON")),
-    };
-    let credentials = match normalize_payload(value) {
-        Ok(credentials) => credentials,
-        Err(message) => return Ok(failure(StatusCode::BAD_REQUEST, message)),
-    };
-    static IMPORT_GATE: OnceLock<Arc<tokio::sync::Mutex<()>>> = OnceLock::new();
-    let Ok(guard) = IMPORT_GATE
-        .get_or_init(|| Arc::new(tokio::sync::Mutex::new(())))
-        .clone()
-        .try_lock_owned()
-    else {
-        return Ok(failure(
-            StatusCode::CONFLICT,
-            "已有推送正在导入，请稍后重试",
-        ));
-    };
-    // Keep importing and recording the result even if the sender disconnects.
-    let state = state.clone();
-    tokio::spawn(async move {
-        let _guard = guard;
-        complete_import(&state, &config.provider_id, credentials).await
-    })
-    .await
-    .map_err(|_| GatewayError::Internal("账号导入任务异常".into()))?
-}
 async fn complete_import(
     state: &AppState,
     provider_id: &str,
-    credentials: String,
-) -> Result<Response, GatewayError> {
-    let credentials: Vec<Value> = serde_json::from_str(&credentials)
-        .map_err(|_| GatewayError::Internal("账号 JSON 格式错误".into()))?;
+    credentials: Vec<Value>,
+) -> Result<(StatusCode, Value), GatewayError> {
     let mut added = 0usize;
     let mut updated = 0usize;
     let mut failed = 0usize;
@@ -325,12 +419,32 @@ async fn complete_import(
                 .map_err(|error| GatewayError::Internal(error.to_string()))?,
         )
         .await?;
+        let batch_status = response.status();
         let body = to_bytes(response.into_body(), BODY_LIMIT)
             .await
             .map_err(|_| GatewayError::Internal("读取导入结果失败".into()))?;
         let result: Value = serde_json::from_slice(&body)
             .map_err(|_| GatewayError::Internal("导入结果格式错误".into()))?;
         let offset = batch_index * IMPORT_BATCH_SIZE;
+        let batch_added = result["added"].as_u64();
+        let batch_updated = result["updated"].as_u64();
+        let batch_failed = result["failed"].as_u64();
+        if !matches!((batch_added, batch_updated, batch_failed), (Some(a), Some(u), Some(f)) if a + u + f == batch.len() as u64)
+        {
+            tracing::warn!(
+                status = batch_status.as_u16(),
+                "account push importer returned invalid counters"
+            );
+            failed += batch.len();
+            errors.extend((0..batch.len()).map(|index| {
+                json!({
+                    "index": offset + index,
+                    "kind": "account",
+                    "message": "账号导入失败，请检查目标提供商配置",
+                })
+            }));
+            continue;
+        }
         added += result["added"].as_u64().unwrap_or_default() as usize;
         updated += result["updated"].as_u64().unwrap_or_default() as usize;
         failed += result["failed"].as_u64().unwrap_or_default() as usize;
@@ -339,7 +453,8 @@ async fn complete_import(
                 let local_index = error["index"].as_u64().unwrap_or_default() as usize;
                 json!({
                     "index": offset + local_index,
-                    "error": error["error"],
+                    "kind": "account",
+                    "message": error["error"],
                 })
             }));
         }
@@ -352,15 +467,17 @@ async fn complete_import(
         StatusCode::OK
     };
     let result = json!({
-        "success": failed == 0,
-        "total": total,
-        "added": added,
-        "updated": updated,
-        "skipped": 0,
-        "failed": failed,
-        "refreshed": 0,
-        "errors": errors,
-        "items": [],
+        "code": if status.is_success() { 0 } else { status.as_u16() },
+        "message": if status.is_success() { "success" } else { "import failed" },
+        "data": {
+            "proxy_created": 0,
+            "proxy_reused": 0,
+            "proxy_failed": 0,
+            "account_created": added,
+            "account_updated": updated,
+            "account_failed": failed,
+            "errors": errors,
+        },
     });
     let timestamp = std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
@@ -375,7 +492,7 @@ async fn complete_import(
     {
         tracing::warn!("failed to persist account push result summary");
     }
-    Ok((status, Json(result)).into_response())
+    Ok((status, result))
 }
 
 #[cfg(test)]

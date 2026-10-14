@@ -2,7 +2,7 @@
   <Dialog
     :model-value="modelValue"
     title="账号推送"
-    description="接收外部程序通过 ChatGPT2API 模式推送的账号"
+    description="接收外部程序通过 Sub2API 模式推送的账号"
     size="lg"
     :persistent="saving"
     @update:model-value="emit('update:modelValue', $event)"
@@ -62,7 +62,7 @@
             </option>
           </select>
           <p class="text-xs text-muted-foreground">
-            同一提供商内重复推送的账号会更新凭据。此入口的目标提供商对两个接收路径统一生效。
+            同一提供商内重复推送的账号会更新凭据。账号将导入所选的目标提供商。
           </p>
           <p
             v-if="eligibleProviders.length === 0"
@@ -114,7 +114,7 @@
             发送端填写方式
           </p>
           <p class="text-xs text-muted-foreground">
-            服务类型选择 ChatGPT2API，API URL 填下面的服务根地址，API Key 填推送密钥。
+            服务类型选择 Sub2API，API URL 填下面的服务根地址，API Key 填推送密钥。
           </p>
           <Label for="account-push-base-url">API URL（服务根地址）</Label>
           <div class="flex gap-2">
@@ -131,13 +131,13 @@
             </Button>
           </div>
           <p class="break-all text-xs text-muted-foreground">
-            接收路径：POST /api/accounts/upload，也兼容 POST /api/accounts。使用 Authorization: Bearer &lt;API Key&gt; 和 application/json。
+            Sub2API 接收路径：GET / POST /api/v1/admin/accounts/data，使用 X-API-Key 或 Bearer 推送密钥。请求体使用 application/json。
           </p>
           <p class="text-xs text-muted-foreground">
-            每批最多 100 个账号。等待导入完成后返回 added、updated、failed、errors；部分失败时 success 为 false，请检查结果后重试。
+            单次请求最大 128 MiB，内部按每批 100 个账号顺序处理，全部完成后返回 account_created、account_updated、account_failed、errors；部分成功时 code 为 0，请检查失败数后重试。
           </p>
           <p class="text-xs text-muted-foreground">
-            按本地 ChatGPT2API 的 accounts / tokens 格式兼容，refresh 由 Aether 的账号导入流程处理，响应不会回传账号凭据。
+            Sub2API 支持 OpenAI OAuth 账号备份包。账号刷新由 Aether 的导入流程处理，响应不会回传账号凭据。
           </p>
         </div>
         <div class="space-y-2 text-sm">
