@@ -358,6 +358,21 @@ fn normalize_local_oauth_refresh_error_message(
                         .map(str::trim)
                         .filter(|value| !value.is_empty())
                         .map(|value| value.to_ascii_lowercase());
+                } else if let Some(error) = object
+                    .get("error")
+                    .and_then(serde_json::Value::as_str)
+                {
+                    // OAuth token endpoints commonly return {"error":"invalid_grant"}
+                    // rather than a nested error object. Keep only the bounded error code.
+                    let error = error.trim();
+                    if !error.is_empty()
+                        && error.len() <= 64
+                        && error
+                            .bytes()
+                            .all(|byte| byte.is_ascii_alphanumeric() || b"._-".contains(&byte))
+                    {
+                        error_code = Some(error.to_ascii_lowercase());
+                    }
                 }
                 if message.is_none() {
                     message = object
@@ -406,6 +421,14 @@ fn normalize_local_oauth_refresh_error_message(
                 .any(|keyword| lowered.contains(keyword)))
     {
         return "refresh_token 无效、已过期或已撤销，请重新登录授权".to_string();
+    }
+    if let Some(error_code) = (!error_code.is_empty()).then_some(error_code.as_str()) {
+        if status_code.is_some() {
+            return format!(
+                "HTTP {} (upstream_error_code={error_code})",
+                status_code.unwrap_or_default()
+            );
+        }
     }
     status_code
         .map(|status_code| format!("HTTP {status_code}"))
@@ -4591,11 +4614,21 @@ mod tests {
     }
 
     #[test]
+    fn normalizes_top_level_oauth_error_code_without_logging_body() {
+        let body = r#"{"error":"invalid_grant","error_description":"refresh token expired"}"#;
+
+        assert_eq!(
+            super::normalize_local_oauth_refresh_error_message(Some(401), Some(body)),
+            "refresh_token \u{65e0}\u{6548}\u{3001}\u{5df2}\u{8fc7}\u{671f}\u{6216}\u{5df2}\u{64a4}\u{9500}\u{ff0c}\u{8bf7}\u{91cd}\u{65b0}\u{767b}\u{5f55}\u{6388}\u{6743}"
+        );
+    }
+
+    #[test]
     fn local_oauth_diagnostics_do_not_reflect_unknown_response_credentials() {
         let body = r#"{"error":{"message":"authorization=Bearer upstream-secret https://user:pass@example.test?q=secret","type":"invalid_request_error","code":"unexpected"}}"#;
 
         let normalized = super::normalize_local_oauth_refresh_error_message(Some(502), Some(body));
-        assert_eq!(normalized, "HTTP 502");
+        assert_eq!(normalized, "HTTP 502 (upstream_error_code=unexpected)");
         assert_eq!(super::local_oauth_log_excerpt(body), "[redacted]");
         for secret in ["upstream-secret", "user:pass", "q=secret"] {
             assert!(!normalized.contains(secret), "leaked {secret}");
