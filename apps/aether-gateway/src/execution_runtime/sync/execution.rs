@@ -2902,6 +2902,12 @@ async fn execute_execution_runtime_sync_impl(
         if let Some(retry_scope) = retry_scope_out.as_deref_mut() {
             *retry_scope =
                 ai_attempt_retry_scope_from_failure_disposition(failure_disposition);
+            if crate::execution_runtime::chatgpt_web_image::should_switch_chatgpt_web_image_account(
+                &plan, report_context.as_ref(), body_json.as_ref(),
+            ) {
+                // Skip this account for this request, without invalidating it.
+                *retry_scope = AiAttemptRetryScope::Credential;
+            }
         }
         if failure_disposition.preserve_upstream_error {
             if let Some(retry_fallback) = retry_fallback_out.as_deref_mut() {

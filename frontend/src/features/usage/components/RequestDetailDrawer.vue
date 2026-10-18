@@ -617,6 +617,14 @@
               <!-- Tabs 区域 -->
               <Card>
                 <div class="p-3 sm:p-4">
+                  <p
+                    v-if="(!hasRequestBodyAvailable || !hasResponseBodyAvailable) && detail.status !== 'pending' && detail.status !== 'streaming'"
+                    data-body-capture-notice
+                    class="mb-3 rounded-lg bg-muted p-3 text-sm text-muted-foreground"
+                  >
+                    本记录未保存{{ !hasRequestBodyAvailable && !hasResponseBodyAvailable ? '请求体和响应体' : !hasRequestBodyAvailable ? '请求体' : '响应体' }}。
+                    如需记录后续请求，请在「系统设置 → 请求记录」选择 FULL；未保存或已清理的历史内容无法补回。
+                  </p>
                   <Tabs
                     v-model="activeTab"
                     :default-value="activeTab"

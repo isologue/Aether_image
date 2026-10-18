@@ -66,6 +66,11 @@ const CHATGPT_WEB_IMAGE_STREAM_CHUNK_BYTES: usize = 1024 * 1024;
 const CHATGPT_WEB_IMAGE_PUBLIC_CONNECT_TIMEOUT_MS: u64 = 10_000;
 const CHATGPT_WEB_IMAGE_PUBLIC_READ_TIMEOUT_MS: u64 = 30_000;
 const CHATGPT_WEB_IMAGE_PUBLIC_TOTAL_TIMEOUT_MS: u64 = 300_000;
+// The initial SSE has already ended before polling starts. Allow background
+// generation a short grace period to expose an asset, rather than spending the
+// full download retry budget on a conversation that never produces one.
+const CHATGPT_WEB_IMAGE_NO_ASSET_POLL_GRACE: Duration = Duration::from_secs(20);
+const CHATGPT_WEB_IMAGE_POLL_INTERVAL: Duration = Duration::from_secs(5);
 const CHATGPT_WEB_OPAQUE_ID_MAX_BYTES: usize = 256;
 const CHATGPT_WEB_IMAGE_MAX_UPLOAD_URL_BYTES: usize = 64 * 1024;
 const CHATGPT_WEB_IMAGE_UPLOAD_RESPONSE_LIMIT_BYTES: usize = 64 * 1024;
@@ -122,6 +127,7 @@ struct WebImageSseSummary {
     direct_urls: Vec<String>,
     failure: Option<Value>,
     last_text: Option<String>,
+    turn_finished: bool,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -310,6 +316,18 @@ fn is_chatgpt_web_image_plan(plan: &ExecutionPlan, report_context: Option<&Value
     header_marker || context_marker
 }
 
+pub(super) fn should_switch_chatgpt_web_image_account(
+    plan: &ExecutionPlan,
+    report_context: Option<&Value>,
+    error_body: Option<&Value>,
+) -> bool {
+    is_chatgpt_web_image_plan(plan, report_context)
+        && error_body
+            .and_then(|body| body.pointer("/error/code"))
+            .and_then(Value::as_str)
+            == Some("chatgpt_web_no_image")
+}
+
 async fn execute_chatgpt_web_image(
     state: &AppState,
     plan: &ExecutionPlan,
@@ -400,18 +418,46 @@ async fn execute_chatgpt_web_image(
         &uploads,
     )
     .await?;
+    let poll_started_at = tokio::time::Instant::now();
+    let no_asset_deadline = poll_started_at + CHATGPT_WEB_IMAGE_NO_ASSET_POLL_GRACE;
+    let mut no_asset_timeout = false;
+    let mut poll_count = 0;
     if downloaded.is_empty() && summary.failure.is_none() {
-        for _ in 0..24 {
+        for poll_index in 0..24 {
+            // Without a conversation ID there is nothing to poll. Previously
+            // this branch still slept for 24 * 5 seconds before retrying.
+            if !should_poll_web_image(&summary) {
+                break;
+            }
+            if summary.retained_item_count() == 0
+                && tokio::time::Instant::now() >= no_asset_deadline
+            {
+                no_asset_timeout = true;
+                break;
+            }
             if let Some(conversation_id) = summary.conversation_id.as_deref() {
-                let mut poll = web_poll_conversation(
+                let poll = web_poll_conversation(
                     plan,
                     &base_url,
                     &fp,
                     token.as_str(),
                     conversation_id,
                     &uploads,
-                )
-                .await?;
+                );
+                poll_count += 1;
+                // Include an in-flight poll in the grace period: a slow GET
+                // must not silently turn the 20 second budget into minutes.
+                let mut poll = if summary.retained_item_count() == 0 {
+                    match tokio::time::timeout_at(no_asset_deadline, poll).await {
+                        Ok(result) => result?,
+                        Err(_) => {
+                            no_asset_timeout = true;
+                            break;
+                        }
+                    }
+                } else {
+                    poll.await?
+                };
                 merge_web_summary(&mut summary, &mut poll);
                 filter_uploaded_asset_ids(&mut summary, &uploads);
                 downloaded = resolve_and_download_images(
@@ -424,12 +470,35 @@ async fn execute_chatgpt_web_image(
                     &uploads,
                 )
                 .await?;
-                if !downloaded.is_empty() || summary.failure.is_some() {
+                if !downloaded.is_empty() || !should_poll_web_image(&summary) {
                     break;
                 }
             }
-            tokio::time::sleep(std::time::Duration::from_secs(5)).await;
+            if poll_index < 23 {
+                let mut wake_at = tokio::time::Instant::now() + CHATGPT_WEB_IMAGE_POLL_INTERVAL;
+                if summary.retained_item_count() == 0 {
+                    wake_at = wake_at.min(no_asset_deadline);
+                }
+                tokio::time::sleep_until(wake_at).await;
+            }
         }
+    }
+
+    if downloaded.is_empty() {
+        warn!(
+            event_name = "chatgpt_web_image_no_output",
+            request_id = %plan.request_id,
+            candidate_id = ?plan.candidate_id,
+            elapsed_ms = started_at.elapsed().as_millis() as u64,
+            has_conversation_id = summary.conversation_id.is_some(),
+            turn_finished = summary.turn_finished,
+            has_failure = summary.failure.is_some(),
+            asset_count = summary.retained_item_count(),
+            poll_count,
+            poll_elapsed_ms = poll_started_at.elapsed().as_millis() as u64,
+            no_asset_timeout,
+            "ChatGPT-Web image attempt ended without a downloadable image"
+        );
     }
 
     let body = if let Some(failure) = summary.failure.as_ref().filter(|_| downloaded.is_empty()) {
@@ -813,7 +882,9 @@ async fn web_poll_conversation(
     .await?;
     ensure_success(&result, "ChatGPT-Web conversation poll")?;
     let mut summary = WebImageSseSummary::default();
-    extract_web_image_values(&execution_result_json(&result)?, &mut summary);
+    let value = execution_result_json(&result)?;
+    observe_web_image_progress(&value, &mut summary);
+    extract_web_image_values(&value, &mut summary);
     filter_uploaded_asset_ids(&mut summary, uploads);
     Ok(summary)
 }
@@ -2641,6 +2712,14 @@ fn parse_web_image_sse(bytes: &[u8]) -> WebImageSseSummary {
     summary
 }
 
+fn should_poll_web_image(summary: &WebImageSseSummary) -> bool {
+    summary.conversation_id.is_some()
+        && summary.failure.is_none()
+        // A known asset may still need time to become downloadable, even
+        // after the assistant's turn has finished.
+        && (!summary.turn_finished || summary.retained_item_count() > 0)
+}
+
 fn flush_sse_data(data_lines: &mut Vec<String>, summary: &mut WebImageSseSummary) {
     if data_lines.is_empty() {
         return;
@@ -2651,12 +2730,7 @@ fn flush_sse_data(data_lines: &mut Vec<String>, summary: &mut WebImageSseSummary
         return;
     }
     if let Ok(value) = serde_json::from_str::<Value>(&data) {
-        if matches!(
-            value.get("type").and_then(Value::as_str),
-            Some("error" | "response.failed")
-        ) {
-            summary.failure = Some(bounded_web_failure_value(&value));
-        }
+        observe_web_image_progress(&value, summary);
         if let Some(text) = extract_assistant_text(&value) {
             summary.last_text = Some(text);
         }
@@ -2866,10 +2940,48 @@ fn extract_web_image_values(value: &Value, summary: &mut WebImageSseSummary) {
     }
 }
 
+fn observe_web_image_progress(value: &Value, summary: &mut WebImageSseSummary) {
+    if matches!(
+        value.get("type").and_then(Value::as_str),
+        Some("error" | "response.failed")
+    ) {
+        summary.failure = Some(bounded_web_failure_value(value));
+    }
+    // Full v1 snapshots wrap the message in `v`. Do not interpret patch
+    // fragments as full messages or scan historical mapping nodes.
+    let value = value.get("v").filter(|v| v.is_object()).unwrap_or(value);
+    // Poll snapshots contain historical branches. Only the current node can
+    // establish whether this turn has finished.
+    let message = value.get("message").or_else(|| {
+        let current = value.get("current_node")?.as_str()?;
+        value.get("mapping")?.get(current)?.get("message")
+    });
+    if let Some(message) = message {
+        let is_final_assistant = message.pointer("/author/role").and_then(Value::as_str)
+            == Some("assistant")
+            && message.get("recipient").and_then(Value::as_str) == Some("all")
+            && message.get("channel").and_then(Value::as_str) == Some("final");
+        summary.turn_finished = is_final_assistant
+            && message.get("end_turn").and_then(Value::as_bool) == Some(true)
+            && message.get("status").and_then(Value::as_str) == Some("finished_successfully");
+        if is_final_assistant {
+            if let Some(text) = extract_web_message_text(message) {
+                summary.last_text = Some(text);
+            }
+        }
+    }
+    if value.get("type").and_then(Value::as_str) == Some("response.completed") {
+        summary.turn_finished = true;
+    }
+}
+
 fn extract_assistant_text(value: &Value) -> Option<String> {
-    value
-        .get("message")
-        .and_then(|message| message.get("content"))
+    extract_web_message_text(value.get("message")?)
+}
+
+fn extract_web_message_text(message: &Value) -> Option<String> {
+    message
+        .get("content")
         .and_then(|content| content.get("parts"))
         .and_then(Value::as_array)
         .and_then(|parts| parts.iter().filter_map(Value::as_str).next())
@@ -2907,6 +3019,7 @@ fn bounded_web_failure_value(value: &Value) -> Value {
 }
 
 fn merge_web_summary(target: &mut WebImageSseSummary, source: &mut WebImageSseSummary) {
+    target.turn_finished |= source.turn_finished;
     if target.conversation_id.is_none() {
         target.conversation_id = source
             .conversation_id
@@ -4735,37 +4848,82 @@ mod tests {
     }
 
     async fn start_mock_chatgpt_web() -> (String, tokio::task::JoinHandle<()>) {
-        let app = Router::new().fallback(any(|request: Request| async move {
-            let path = request.uri().path().to_string();
-            let method = request.method().clone();
-            match (method, path.as_str()) {
-                (Method::GET, "/") => response(StatusCode::OK, "text/html", "ok"),
-                (Method::POST, "/backend-api/sentinel/chat-requirements") => json_response(json!({
-                    "token": "requirements-token",
-                    "proofofwork": {"required": false},
-                    "arkose": {"required": false}
-                })),
-                (Method::POST, "/backend-api/f/conversation/prepare") => {
-                    json_response(json!({"conduit_token": "conduit-token"}))
+        start_mock_chatgpt_web_with_output(
+            concat!(
+                "data: {\"conversation_id\":\"conv-test-1\"}\n\n",
+                "data: {\"message\":{\"content\":{\"parts\":[\"working\"]}},\"asset\":\"file-generated-123456\"}\n\n",
+                "data: [DONE]\n\n"
+            ),
+            json!({}),
+        ).await
+    }
+
+    async fn start_mock_chatgpt_web_with_output(
+        initial_sse: &'static str,
+        poll_body: Value,
+    ) -> (String, tokio::task::JoinHandle<()>) {
+        start_mock_chatgpt_web_with_timing(
+            initial_sse,
+            vec![poll_body],
+            Duration::ZERO,
+            Duration::ZERO,
+        )
+        .await
+    }
+
+    async fn start_mock_chatgpt_web_with_timing(
+        initial_sse: &'static str,
+        poll_bodies: Vec<Value>,
+        poll_delay: Duration,
+        asset_ready_after: Duration,
+    ) -> (String, tokio::task::JoinHandle<()>) {
+        let poll_bodies = Arc::new(poll_bodies);
+        let poll_index = Arc::new(std::sync::atomic::AtomicUsize::new(0));
+        let started_at = Instant::now();
+        let app = Router::new().fallback(any(move |request: Request| {
+            let poll_bodies = Arc::clone(&poll_bodies);
+            let poll_index = Arc::clone(&poll_index);
+            async move {
+                let path = request.uri().path().to_string();
+                let method = request.method().clone();
+                match (method, path.as_str()) {
+                    (Method::GET, "/") => response(StatusCode::OK, "text/html", "ok"),
+                    (Method::POST, "/backend-api/sentinel/chat-requirements") => {
+                        json_response(json!({
+                            "token": "requirements-token",
+                            "proofofwork": {"required": false},
+                            "arkose": {"required": false}
+                        }))
+                    }
+                    (Method::POST, "/backend-api/f/conversation/prepare") => {
+                        json_response(json!({"conduit_token": "conduit-token"}))
+                    }
+                    (Method::POST, "/backend-api/f/conversation") => {
+                        response(StatusCode::OK, "text/event-stream", initial_sse)
+                    }
+                    (Method::GET, "/backend-api/conversation/conv-test-1") => {
+                        tokio::time::sleep(poll_delay).await;
+                        let index = poll_index.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+                        json_response(
+                            poll_bodies
+                                .get(index)
+                                .or_else(|| poll_bodies.last())
+                                .cloned()
+                                .unwrap_or_else(|| json!({})),
+                        )
+                    }
+                    (Method::GET, "/backend-api/files/download/file-generated-123456") => {
+                        if started_at.elapsed() < asset_ready_after {
+                            response(StatusCode::NOT_FOUND, "text/plain", "not ready")
+                        } else {
+                            json_response(json!({"download_url": "/generated.png"}))
+                        }
+                    }
+                    (Method::GET, "/generated.png") => {
+                        response(StatusCode::OK, "image/png", png_header_bytes(2, 3))
+                    }
+                    _ => response(StatusCode::NOT_FOUND, "text/plain", "not found"),
                 }
-                (Method::POST, "/backend-api/f/conversation") => response(
-                    StatusCode::OK,
-                    "text/event-stream",
-                    concat!(
-                        "data: {\"conversation_id\":\"conv-test-1\"}\n\n",
-                        "data: {\"message\":{\"content\":{\"parts\":[\"working\"]}},\"asset\":\"file-generated-123456\"}\n\n",
-                        "data: [DONE]\n\n"
-                    ),
-                ),
-                (Method::GET, "/backend-api/files/download/file-generated-123456") => {
-                    json_response(json!({"download_url": "/generated.png"}))
-                }
-                (Method::GET, "/generated.png") => response(
-                    StatusCode::OK,
-                    "image/png",
-                    png_header_bytes(2, 3),
-                ),
-                _ => response(StatusCode::NOT_FOUND, "text/plain", "not found"),
             }
         }));
         let listener = crate::test_support::bind_loopback_listener()
@@ -4897,6 +5055,227 @@ data: [DONE]
                 .and_then(Value::as_str),
             Some("response.failed")
         );
+    }
+
+    #[test]
+    fn chatgpt_web_no_image_switches_accounts_only_for_marked_image_plans() {
+        let mut plan = sample_plan("https://chatgpt.com", json!({}), false);
+        let no_image = json!({"error": {"code": "chatgpt_web_no_image"}});
+        assert!(should_switch_chatgpt_web_image_account(
+            &plan,
+            None,
+            Some(&no_image)
+        ));
+        assert!(!should_switch_chatgpt_web_image_account(&plan, None, None));
+        assert!(!should_switch_chatgpt_web_image_account(
+            &plan,
+            None,
+            Some(&json!({"error": {"code": "other_error"}}))
+        ));
+        plan.headers.remove(CHATGPT_WEB_INTERNAL_HEADER);
+        assert!(!should_switch_chatgpt_web_image_account(
+            &plan,
+            None,
+            Some(&no_image)
+        ));
+        assert!(should_switch_chatgpt_web_image_account(
+            &plan,
+            Some(&json!({"chatgpt_web_image": true})),
+            Some(&no_image)
+        ));
+        plan.provider_api_format = "openai:chat".to_string();
+        assert!(!should_switch_chatgpt_web_image_account(
+            &plan,
+            Some(&json!({"chatgpt_web_image": true})),
+            Some(&no_image)
+        ));
+    }
+
+    #[test]
+    fn web_image_polling_requires_a_recoverable_pending_conversation() {
+        let mut summary = parse_web_image_sse(b"data: [DONE]\n\n");
+        assert!(!should_poll_web_image(&summary));
+        summary.conversation_id = Some("conv-test-1".to_string());
+        // End of the transport is not proof that background generation ended.
+        assert!(should_poll_web_image(&summary));
+        summary.turn_finished = true;
+        assert!(!should_poll_web_image(&summary));
+        summary.file_ids.push("file-generated-123456".to_string());
+        assert!(should_poll_web_image(&summary));
+        summary.failure = Some(json!({"type": "error"}));
+        assert!(!should_poll_web_image(&summary));
+    }
+
+    #[test]
+    fn web_image_terminal_detection_ignores_old_conversation_branches() {
+        let finished = json!({
+            "author": {"role": "assistant"}, "recipient": "all", "channel": "final",
+            "end_turn": true, "status": "finished_successfully",
+            "content": {"parts": ["Cannot generate this image"]}
+        });
+        let mut snapshot = json!({
+            "current_node": "active", "mapping": {
+                "old": {"message": finished},
+                "active": {"message": {"author": {"role": "tool"}, "status": "in_progress"}}
+            }
+        });
+        let mut summary = WebImageSseSummary::default();
+        observe_web_image_progress(&snapshot, &mut summary);
+        extract_web_image_values(&snapshot, &mut summary);
+        assert!(!summary.turn_finished);
+        snapshot["current_node"] = json!("old");
+        observe_web_image_progress(&snapshot, &mut summary);
+        assert!(summary.turn_finished);
+        assert_eq!(
+            summary.last_text.as_deref(),
+            Some("Cannot generate this image")
+        );
+        snapshot["current_node"] = json!("active");
+        observe_web_image_progress(&snapshot, &mut summary);
+        assert!(!summary.turn_finished);
+    }
+
+    #[test]
+    fn web_image_sse_detects_terminal_snapshots_but_not_transport_done() {
+        for event in [
+            json!({"type": "response.completed"}),
+            json!({"v": {"message": {
+                "author": {"role": "assistant"}, "recipient": "all", "channel": "final",
+                "end_turn": true, "status": "finished_successfully"
+            }}}),
+        ] {
+            let sse = format!("data: {event}\n\ndata: [DONE]\n\n");
+            assert!(parse_web_image_sse(sse.as_bytes()).turn_finished);
+        }
+        assert!(!parse_web_image_sse(b"data: [DONE]\n\n").turn_finished);
+    }
+
+    #[tokio::test]
+    async fn chatgpt_web_image_executor_exits_unrecoverable_output_without_120_second_wait() {
+        let cases = [
+            ("data: [DONE]\n\n", json!({}), false),
+            (
+                "data: {\"conversation_id\":\"conv-test-1\"}\n\ndata: [DONE]\n\n",
+                json!({"current_node": "final", "mapping": {"final": {"message": {
+                    "author": {"role": "assistant"}, "recipient": "all", "channel": "final",
+                    "end_turn": true, "status": "finished_successfully",
+                    "content": {"parts": ["Cannot generate this image"]}
+                }}}}),
+                false,
+            ),
+            (
+                "data: {\"conversation_id\":\"conv-test-1\"}\n\ndata: [DONE]\n\n",
+                json!({"type": "error", "error": {"code": "rate_limit_exceeded", "message": "limited"}}),
+                false,
+            ),
+            (
+                "data: {\"conversation_id\":\"conv-test-1\"}\n\ndata: [DONE]\n\n",
+                json!({"asset": "file-generated-123456"}),
+                true,
+            ),
+        ];
+        for (initial, poll, succeeds) in cases {
+            let (base_url, handle) = start_mock_chatgpt_web_with_output(initial, poll).await;
+            let state = crate::AppState::new().expect("state should build");
+            let plan = sample_plan(&base_url, json!({"images": []}), false);
+            let result = tokio::time::timeout(
+                Duration::from_secs(5),
+                maybe_execute_chatgpt_web_image_sync(&state, &plan, None),
+            )
+            .await;
+            handle.abort();
+            let result = result
+                .expect("must not enter the old 120 second wait")
+                .expect("executor should run")
+                .expect("plan should be intercepted");
+            let body = String::from_utf8(execution_result_body_bytes_lossy(&result)).unwrap();
+            assert_eq!(body.contains("response.completed"), succeeds, "{body}");
+            assert_eq!(body.contains("response.failed"), !succeeds, "{body}");
+        }
+    }
+
+    #[tokio::test]
+    async fn chatgpt_web_image_bounds_empty_and_stalled_polls_to_twenty_seconds() {
+        let cases = [Duration::ZERO, Duration::from_secs(60)];
+        futures_util::future::join_all(cases.into_iter().map(|poll_delay| async move {
+            let (base_url, handle) = start_mock_chatgpt_web_with_timing(
+                "data: {\"conversation_id\":\"conv-test-1\"}\n\ndata: [DONE]\n\n",
+                vec![json!({})],
+                poll_delay,
+                Duration::ZERO,
+            )
+            .await;
+            let state = crate::AppState::new().expect("state should build");
+            let plan = sample_plan(&base_url, json!({"images": []}), false);
+            let started_at = Instant::now();
+            let result = tokio::time::timeout(
+                Duration::from_secs(25),
+                maybe_execute_chatgpt_web_image_sync(&state, &plan, None),
+            )
+            .await;
+            handle.abort();
+            let result = result
+                .expect("empty or stalled polls must respect the grace deadline")
+                .expect("executor should run")
+                .expect("plan should be intercepted");
+            assert!(started_at.elapsed() >= CHATGPT_WEB_IMAGE_NO_ASSET_POLL_GRACE);
+            let body = String::from_utf8(execution_result_body_bytes_lossy(&result)).unwrap();
+            assert!(body.contains("chatgpt_web_no_image"), "{body}");
+            assert!(body.contains("response.failed"), "{body}");
+        }))
+        .await;
+    }
+
+    #[tokio::test]
+    async fn chatgpt_web_image_accepts_background_asset_during_grace_period() {
+        let (base_url, handle) = start_mock_chatgpt_web_with_timing(
+            "data: {\"conversation_id\":\"conv-test-1\"}\n\ndata: [DONE]\n\n",
+            vec![json!({}), json!({"asset": "file-generated-123456"})],
+            Duration::ZERO,
+            Duration::ZERO,
+        )
+        .await;
+        let state = crate::AppState::new().expect("state should build");
+        let plan = sample_plan(&base_url, json!({"images": []}), false);
+        let result = tokio::time::timeout(
+            Duration::from_secs(15),
+            maybe_execute_chatgpt_web_image_sync(&state, &plan, None),
+        )
+        .await;
+        handle.abort();
+        let result = result
+            .expect("background asset should arrive during grace period")
+            .expect("executor should run")
+            .expect("plan should be intercepted");
+        let body = String::from_utf8(execution_result_body_bytes_lossy(&result)).unwrap();
+        assert!(body.contains("response.completed"), "{body}");
+    }
+
+    #[tokio::test]
+    async fn chatgpt_web_image_keeps_waiting_for_known_asset_beyond_empty_grace() {
+        let (base_url, handle) = start_mock_chatgpt_web_with_timing(
+            "data: {\"conversation_id\":\"conv-test-1\",\"asset\":\"file-generated-123456\"}\n\ndata: [DONE]\n\n",
+            vec![json!({})],
+            Duration::ZERO,
+            CHATGPT_WEB_IMAGE_NO_ASSET_POLL_GRACE + Duration::from_secs(1),
+        )
+        .await;
+        let state = crate::AppState::new().expect("state should build");
+        let plan = sample_plan(&base_url, json!({"images": []}), false);
+        let started_at = Instant::now();
+        let result = tokio::time::timeout(
+            Duration::from_secs(35),
+            maybe_execute_chatgpt_web_image_sync(&state, &plan, None),
+        )
+        .await;
+        handle.abort();
+        let result = result
+            .expect("known assets must retain the download retry budget")
+            .expect("executor should run")
+            .expect("plan should be intercepted");
+        assert!(started_at.elapsed() > CHATGPT_WEB_IMAGE_NO_ASSET_POLL_GRACE);
+        let body = String::from_utf8(execution_result_body_bytes_lossy(&result)).unwrap();
+        assert!(body.contains("response.completed"), "{body}");
     }
 
     #[test]

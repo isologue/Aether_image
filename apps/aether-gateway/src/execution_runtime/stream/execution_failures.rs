@@ -619,6 +619,13 @@ pub(super) async fn handle_prefetch_provider_private_stream_error(
         );
         if let Some(retry_scope) = retry_scope_out {
             *retry_scope = ai_attempt_retry_scope_from_failure_disposition(failure_disposition);
+            if crate::execution_runtime::chatgpt_web_image::should_switch_chatgpt_web_image_account(
+                plan,
+                payload.report_context.as_ref(),
+                payload.body_json.as_ref(),
+            ) {
+                *retry_scope = AiAttemptRetryScope::Credential;
+            }
         }
         if failure_disposition.preserve_upstream_error {
             if let Some(retry_fallback) = retry_fallback_out {
@@ -736,6 +743,13 @@ pub(super) async fn handle_prefetch_stream_failure(
         );
         if let Some(retry_scope) = retry_scope_out {
             *retry_scope = ai_attempt_retry_scope_from_failure_disposition(failure_disposition);
+            if crate::execution_runtime::chatgpt_web_image::should_switch_chatgpt_web_image_account(
+                plan,
+                payload.report_context.as_ref(),
+                payload.body_json.as_ref(),
+            ) {
+                *retry_scope = AiAttemptRetryScope::Credential;
+            }
         }
         warn!(
             event_name = "local_stream_candidate_retry_scheduled",

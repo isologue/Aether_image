@@ -126,6 +126,7 @@ describe('RequestDetailDrawer body capture', () => {
     await openDrawer()
     expect(mocks.getRequestBody).not.toHaveBeenCalled()
     expect(mocks.getRequestDetail).toHaveBeenCalledWith('usage-full-capture', expect.objectContaining({ includeBodies: false }))
+    expect(document.body.querySelector('[data-body-capture-notice]')).toBeNull()
     findButton('请求体')!.click()
     await expectBody('request_body')
     expect(mocks.getRequestBody).toHaveBeenLastCalledWith('usage-full-capture', 'request_body', expect.any(AbortSignal))
@@ -142,6 +143,24 @@ describe('RequestDetailDrawer body capture', () => {
     await openDrawer()
     expect(findButton('请求体')).toBeUndefined()
     expect(findButton('响应体')).toBeUndefined()
+    expect(document.body.querySelector('[data-body-capture-notice]')?.textContent).toContain('请求体和响应体')
+    expect(document.body.querySelector('[data-body-capture-notice]')?.textContent).toContain('FULL')
+    expect(mocks.getRequestBody).not.toHaveBeenCalled()
+  })
+
+  it('explains a missing response without hiding a captured request', async () => {
+    mocks.getRequestDetail.mockResolvedValue({ ...buildDetail(true), has_response_body: false })
+    await openDrawer()
+    expect(document.body.querySelector('[data-body-capture-notice]')?.textContent).toContain('未保存响应体')
+    expect(findButton('响应体')).toBeUndefined()
+    findButton('请求体')!.click()
+    await expectBody('request_body')
+  })
+
+  it('does not mark an unfinished request as missing historical content', async () => {
+    mocks.getRequestDetail.mockResolvedValue({ ...buildDetail(false), status: 'streaming' })
+    await openDrawer()
+    expect(document.body.querySelector('[data-body-capture-notice]')).toBeNull()
     expect(mocks.getRequestBody).not.toHaveBeenCalled()
   })
 
