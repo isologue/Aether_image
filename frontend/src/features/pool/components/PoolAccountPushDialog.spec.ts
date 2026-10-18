@@ -2,8 +2,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createApp, nextTick, type App } from 'vue'
 import PoolAccountPushDialog from './PoolAccountPushDialog.vue'
 import type { PoolOverviewItem } from '@/api/endpoints/pool'
-const api = vi.hoisted(() => ({ get: vi.fn(), update: vi.fn(), success: vi.fn(), error: vi.fn() }))
+const api = vi.hoisted(() => ({ get: vi.fn(), update: vi.fn(), copy: vi.fn(), success: vi.fn(), error: vi.fn() }))
 vi.mock('@/api/admin', () => ({ adminApi: { getSystemConfig: api.get, updateSystemConfig: api.update } }))
+vi.mock('@/composables/useClipboard', () => ({ useClipboard: () => ({ copyToClipboard: api.copy }) }))
 vi.mock('@/composables/useToast', () => ({ useToast: () => ({ success: api.success, error: api.error }) }))
 let app: App | undefined
 let host: HTMLDivElement
@@ -25,21 +26,51 @@ async function setSecret(value: string) {
 }
 beforeEach(() => {
   vi.clearAllMocks()
+  api.copy.mockResolvedValue(true)
   api.get.mockImplementation(async (key: string) => key === 'account_push' ? { value: { enabled: false, provider_id: '' } } : { value: null, is_set: false })
   api.update.mockResolvedValue({})
 })
 afterEach(async () => { app?.unmount(); app = undefined; host?.remove(); await flush() })
 describe('PoolAccountPushDialog', () => {
   it('filters providers and preserves an existing secret', async () => {
-    api.get.mockImplementation(async (key: string) => key === 'account_push' ? { value: { enabled: true, provider_id: 'codex' } } : { value: null, is_set: true })
+    api.get.mockImplementation(async (key: string) => key === 'account_push' ? { value: { enabled: true, provider_id: 'codex' } } : key === 'account_push_api_key' ? { value: 'aether_push_saved_secret_123456', is_set: true } : { value: null, is_set: true })
     await mount()
     const select = document.querySelector('#account-push-provider') as HTMLSelectElement
     expect(select.value).toBe('codex')
     expect([...select.options].map(item => item.value)).toEqual(['', 'web', 'codex'])
     const secret = document.querySelector('#account-push-secret') as HTMLInputElement
-    expect(secret.value).toBe(''); expect(secret.placeholder).toContain('已配置')
+    expect(secret.value).toBe('aether_push_saved_secret_123456'); expect(secret.type).toBe('password')
+    button('显示').click(); await flush()
+    expect((document.querySelector('#account-push-secret') as HTMLInputElement).type).toBe('text')
+    button('隐藏').click(); await flush()
     button('保存').click(); await flush()
     expect(api.update.mock.calls).toEqual([['account_push', { enabled: true, provider_id: 'codex' }]])
+  })
+  it('copies the saved secret and API URL through the clipboard helper', async () => {
+    const savedSecret = 'aether_push_saved_secret_123456'
+    api.get.mockImplementation(async (key: string) => key === 'account_push' ? { value: { enabled: false, provider_id: '' } } : key === 'account_push_api_key' ? { value: savedSecret, is_set: true } : { value: null, is_set: false })
+    await mount()
+    const secretInput = document.querySelector('#account-push-secret')!
+    const secretCopyButton = secretInput.parentElement!.parentElement!.querySelectorAll('button')[2]
+    secretCopyButton.click(); await flush()
+    const urlInput = document.querySelector('#account-push-base-url')!
+    urlInput.parentElement!.querySelector('button')!.click(); await flush()
+    expect(api.copy.mock.calls).toEqual([[savedSecret, false], [window.location.origin, false]])
+  })
+  it('selects the requested text and reveals the secret when clipboard access is blocked', async () => {
+    api.get.mockImplementation(async (key: string) => key === 'account_push' ? { value: { enabled: false, provider_id: '' } } : key === 'account_push_api_key' ? { value: 'aether_push_saved_secret_123456', is_set: true } : { value: null, is_set: false })
+    api.copy.mockResolvedValue(false)
+    await mount()
+    const secretInput = document.querySelector('#account-push-secret') as HTMLInputElement
+    secretInput.parentElement!.parentElement!.querySelectorAll('button')[2].click(); await flush()
+    expect(secretInput.type).toBe('text')
+    expect(secretInput.selectionStart).toBe(0)
+    expect(secretInput.selectionEnd).toBe(secretInput.value.length)
+    expect(api.error).toHaveBeenCalledWith(expect.stringContaining('文本已选中'))
+    const urlInput = document.querySelector('#account-push-base-url') as HTMLInputElement
+    urlInput.parentElement!.querySelector('button')!.click(); await flush()
+    expect(urlInput.selectionStart).toBe(0)
+    expect(urlInput.selectionEnd).toBe(urlInput.value.length)
   })
   it('saves a new secret before enabling the receiver', async () => {
     await mount()
@@ -51,7 +82,7 @@ describe('PoolAccountPushDialog', () => {
       ['account_push_api_key', 'aether_push_test_12345678901234567890'],
       ['account_push', { enabled: true, provider_id: 'web' }],
     ])
-    expect((document.querySelector('#account-push-secret') as HTMLInputElement).value).toBe('')
+    expect((document.querySelector('#account-push-secret') as HTMLInputElement).value).toBe('aether_push_test_12345678901234567890')
   })
   it('requires a secret and stops after a failed secret save', async () => {
     await mount()

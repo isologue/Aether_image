@@ -102,6 +102,28 @@ pub(crate) async fn build_admin_system_config_detail_payload(
         }
     }
     let value = value.or_else(|| admin_system_config_default_value(&normalized_key));
+    if normalized_key == crate::account_push::SECRET_KEY {
+        let stored = value
+            .as_ref()
+            .and_then(serde_json::Value::as_str)
+            .filter(|stored| !stored.is_empty());
+        let secret = match stored {
+            Some(stored) => crate::handlers::shared::decrypt_system_config_secret(
+                state.app(),
+                crate::account_push::SECRET_KEY,
+                stored,
+            )
+            .ok_or_else(|| {
+                GatewayError::Internal("推送密钥解密失败，请重新保存密钥".into())
+            })?,
+            None => String::new(),
+        };
+        return Ok(Ok(json!({
+            "key": requested_key,
+            "value": secret,
+            "is_set": !secret.is_empty(),
+        })));
+    }
     Ok(build_admin_system_config_detail_payload_pure(
         requested_key,
         value,

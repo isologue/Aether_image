@@ -7,12 +7,16 @@ export function useClipboard() {
   async function copyToClipboard(text: string, showToast = true): Promise<boolean> {
     try {
       if (navigator.clipboard && window.isSecureContext) {
-        await navigator.clipboard.writeText(text)
-        if (showToast) success('已复制到剪贴板')
-        return true
+        try {
+          await navigator.clipboard.writeText(text)
+          if (showToast) success('已复制到剪贴板')
+          return true
+        } catch (err) {
+          log.warn('Clipboard API failed; trying legacy fallback:', err)
+        }
       }
 
-      // Fallback for non-secure contexts
+      // Fallback for non-secure contexts and denied clipboard permissions.
       const textArea = document.createElement('textarea')
       textArea.value = text
       textArea.style.position = 'fixed'

@@ -75,6 +75,7 @@
           <Label for="account-push-secret">推送 API Key</Label>
           <div class="flex gap-2">
             <Input
+              ref="secretInputRef"
               id="account-push-secret"
               v-model="secret"
               :type="revealSecret ? 'text' : 'password'"
@@ -102,7 +103,7 @@
               variant="outline"
               size="sm"
               :disabled="!secret || saving"
-              @click="copy(secret)"
+              @click="copy(secret, 'secret')"
             >
               复制新密钥
             </Button>
@@ -119,13 +120,14 @@
           <Label for="account-push-base-url">API URL（服务根地址）</Label>
           <div class="flex gap-2">
             <Input
+              ref="baseUrlInputRef"
               id="account-push-base-url"
               :model-value="baseUrl"
               readonly
             />
             <Button
               variant="outline"
-              @click="copy(baseUrl)"
+              @click="copy(baseUrl, 'baseUrl')"
             >
               复制
             </Button>
@@ -188,19 +190,24 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import { Dialog, Button, Input, Label, Switch } from '@/components/ui'
 import { adminApi } from '@/api/admin'
 import type { PoolOverviewItem } from '@/api/endpoints/pool'
+import { useClipboard } from '@/composables/useClipboard'
 import { useToast } from '@/composables/useToast'
 import { parseApiError } from '@/utils/errorParser'
 
 const props = defineProps<{ modelValue: boolean, providers: PoolOverviewItem[], providerId?: string | null }>()
 const emit = defineEmits<{ 'update:modelValue': [value: boolean] }>()
 const { success, error } = useToast()
+const { copyToClipboard } = useClipboard()
+const secretInputRef = ref<{ inputRef: HTMLInputElement | null } | null>(null)
+const baseUrlInputRef = ref<{ inputRef: HTMLInputElement | null } | null>(null)
 const form = ref({ enabled: false, provider_id: '' })
 const secret = ref('')
 const secretSet = ref(false)
+const savedSecret = ref('')
 const revealSecret = ref(false)
 const loaded = ref(false)
 const loadError = ref('')
@@ -216,9 +223,10 @@ async function load() {
   loaded.value = false
   loadError.value = ''
   secret.value = ''
+  savedSecret.value = ''
   revealSecret.value = false
   try {
-    const [config, savedSecret, result] = await Promise.all([
+    const [config, savedSecretConfig, result] = await Promise.all([
       adminApi.getSystemConfig('account_push'),
       adminApi.getSystemConfig('account_push_api_key'),
       adminApi.getSystemConfig('account_push_last_result'),
@@ -227,7 +235,9 @@ async function load() {
     const value = config.value as Partial<typeof form.value> | null
     form.value = { enabled: value?.enabled === true, provider_id: value?.provider_id || '' }
     if (!form.value.provider_id && eligibleProviders.value.some(provider => provider.provider_id === props.providerId)) form.value.provider_id = props.providerId || ''
-    secretSet.value = savedSecret.is_set === true
+    secretSet.value = savedSecretConfig.is_set === true
+    secret.value = secretSet.value && typeof savedSecretConfig.value === 'string' ? savedSecretConfig.value : ''
+    savedSecret.value = secret.value
     lastResult.value = result.value as PushResult | null
     loaded.value = true
   } catch (err) { if (sequence === loadSequence) loadError.value = parseApiError(err) }
@@ -236,9 +246,20 @@ function generateSecret() {
   secret.value = `aether_push_${Array.from(crypto.getRandomValues(new Uint8Array(32)), byte => byte.toString(16).padStart(2, '0')).join('')}`
   revealSecret.value = false
 }
-async function copy(value: string) {
-  try { await navigator.clipboard.writeText(value); success('已复制') }
-  catch { error('复制失败，请手动复制') }
+async function copy(value: string, target: 'secret' | 'baseUrl') {
+  if (await copyToClipboard(value, false)) {
+    success('已复制')
+    return
+  }
+
+  if (target === 'secret') revealSecret.value = true
+  await nextTick()
+  const input = target === 'secret' ? secretInputRef.value?.inputRef : baseUrlInputRef.value?.inputRef
+  input?.focus()
+  input?.select()
+  error(input
+    ? '浏览器禁止自动复制，文本已选中，请按 Ctrl+C；一键复制请使用 HTTPS 打开'
+    : '复制失败，请使用 HTTPS 打开后重试')
 }
 async function save() {
   if (form.value.enabled && !eligibleProviders.value.some(provider => provider.provider_id === form.value.provider_id)) { error('请选择 ChatGPT Web 或 Codex 提供商'); return }
@@ -247,12 +268,13 @@ async function save() {
   saving.value = true
   try {
     if (secret.value) {
-      await adminApi.updateSystemConfig('account_push_api_key', secret.value)
-      secretSet.value = true
+      if (!secretSet.value || secret.value !== savedSecret.value) {
+        await adminApi.updateSystemConfig('account_push_api_key', secret.value)
+        secretSet.value = true
+        savedSecret.value = secret.value
+      }
     }
     await adminApi.updateSystemConfig('account_push', form.value)
-    secret.value = ''
-    revealSecret.value = false
     success('账号推送配置已保存')
   } catch (err) { error(parseApiError(err)) }
   finally { saving.value = false }
