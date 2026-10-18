@@ -54,6 +54,7 @@ mod handlers;
 mod headers;
 mod hooks;
 mod image_capabilities;
+mod image_generation;
 mod image_storage;
 mod important_notification;
 mod internal_gateway_auth;

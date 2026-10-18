@@ -57,6 +57,11 @@ pub(crate) fn is_sensitive_admin_system_config_key(key: &str) -> bool {
 }
 
 fn admin_system_config_default_value(key: &str) -> Option<serde_json::Value> {
+    if key == crate::image_generation::NO_ASSET_GRACE_KEY {
+        return Some(json!(
+            crate::image_generation::DEFAULT_NO_ASSET_GRACE_SECONDS
+        ));
+    }
     admin_system_config_default_value_pure(key)
 }
 
@@ -113,9 +118,7 @@ pub(crate) async fn build_admin_system_config_detail_payload(
                 crate::account_push::SECRET_KEY,
                 stored,
             )
-            .ok_or_else(|| {
-                GatewayError::Internal("推送密钥解密失败，请重新保存密钥".into())
-            })?,
+            .ok_or_else(|| GatewayError::Internal("推送密钥解密失败，请重新保存密钥".into()))?,
             None => String::new(),
         };
         return Ok(Ok(json!({
@@ -145,6 +148,15 @@ pub(crate) async fn apply_admin_system_config_update(
     let mut value = update.value;
     let normalized_key = update.normalized_key;
     let description = update.description;
+
+    if normalized_key == crate::image_generation::NO_ASSET_GRACE_KEY
+        && crate::image_generation::parse_no_asset_grace_seconds(&value).is_none()
+    {
+        return Ok(Err((
+            http::StatusCode::BAD_REQUEST,
+            json!({"detail":"无图片补查等待时间必须为 0–120 秒的整数"}),
+        )));
+    }
 
     if normalized_key == crate::account_push::CONFIG_KEY {
         let config = match serde_json::from_value::<crate::account_push::PushConfig>(value.clone())
@@ -314,4 +326,52 @@ pub(crate) async fn delete_admin_system_config(
         )));
     }
     Ok(Ok(build_admin_system_config_deleted_payload(requested_key)))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::image_generation::{no_asset_poll_grace, NO_ASSET_GRACE_KEY};
+    use std::time::Duration;
+
+    #[tokio::test]
+    async fn image_generation_admin_config_defaults_validates_and_hot_updates_grace() {
+        let app = crate::AppState::new().unwrap().with_data_state_for_tests(
+            crate::data::GatewayDataState::disabled().with_system_config_values_for_tests([]),
+        );
+        let state = AdminAppState::new(&app);
+        let detail = build_admin_system_config_detail_payload(&state, NO_ASSET_GRACE_KEY)
+            .await
+            .unwrap()
+            .unwrap();
+        assert_eq!(detail["value"], 20);
+        // Prime the runtime cache before saving through the admin path.
+        assert_eq!(no_asset_poll_grace(&app).await, Duration::from_secs(20));
+        for value in [
+            json!(-1),
+            json!(121),
+            json!(1.5),
+            json!("10"),
+            serde_json::Value::Null,
+        ] {
+            let body = Bytes::from(serde_json::to_vec(&json!({"value": value})).unwrap());
+            let error = apply_admin_system_config_update(&state, NO_ASSET_GRACE_KEY, &body)
+                .await
+                .unwrap()
+                .unwrap_err();
+            assert_eq!(error.0, http::StatusCode::BAD_REQUEST);
+            assert_eq!(no_asset_poll_grace(&app).await, Duration::from_secs(20));
+        }
+        for seconds in [1, 0, 120] {
+            let body = Bytes::from(serde_json::to_vec(&json!({"value": seconds})).unwrap());
+            apply_admin_system_config_update(&state, NO_ASSET_GRACE_KEY, &body)
+                .await
+                .unwrap()
+                .unwrap();
+            assert_eq!(
+                no_asset_poll_grace(&app).await,
+                Duration::from_secs(seconds)
+            );
+        }
+    }
 }

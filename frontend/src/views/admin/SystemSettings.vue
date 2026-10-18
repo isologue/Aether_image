@@ -106,6 +106,7 @@
             @update:enable-format-conversion="systemConfig.enable_format_conversion = $event"
           />
 
+          <ImageGenerationSection id="section-image-generation" />
           <ImageStorageSection id="section-images" />
 
           <!-- 请求记录配置 -->
@@ -265,6 +266,7 @@ import SiteInfoSection from './system-settings/SiteInfoSection.vue'
 import DataManagementSection from './system-settings/DataManagementSection.vue'
 import ProxyConfigSection from './system-settings/ProxyConfigSection.vue'
 import ImageStorageSection from './system-settings/ImageStorageSection.vue'
+import ImageGenerationSection from './system-settings/ImageGenerationSection.vue'
 import BasicConfigSection from './system-settings/BasicConfigSection.vue'
 import RequestLogSection from './system-settings/RequestLogSection.vue'
 import CleanupPolicySection from './system-settings/CleanupPolicySection.vue'
@@ -284,6 +286,7 @@ const tocItems = [
   { id: 'section-data-mgmt', label: '数据管理' },
   { id: 'section-proxy', label: '网络代理' },
   { id: 'section-basic', label: '基础配置' },
+  { id: 'section-image-generation', label: '图片生成' },
   { id: 'section-images', label: '图片存储' },
   { id: 'section-request-log', label: '请求记录' },
   { id: 'section-cleanup', label: '记录清理策略' },

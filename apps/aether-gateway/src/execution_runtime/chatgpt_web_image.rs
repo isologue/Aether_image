@@ -69,7 +69,9 @@ const CHATGPT_WEB_IMAGE_PUBLIC_TOTAL_TIMEOUT_MS: u64 = 300_000;
 // The initial SSE has already ended before polling starts. Allow background
 // generation a short grace period to expose an asset, rather than spending the
 // full download retry budget on a conversation that never produces one.
-const CHATGPT_WEB_IMAGE_NO_ASSET_POLL_GRACE: Duration = Duration::from_secs(20);
+#[cfg(test)]
+const CHATGPT_WEB_IMAGE_NO_ASSET_POLL_GRACE: Duration =
+    Duration::from_secs(crate::image_generation::DEFAULT_NO_ASSET_GRACE_SECONDS);
 const CHATGPT_WEB_IMAGE_POLL_INTERVAL: Duration = Duration::from_secs(5);
 const CHATGPT_WEB_OPAQUE_ID_MAX_BYTES: usize = 256;
 const CHATGPT_WEB_IMAGE_MAX_UPLOAD_URL_BYTES: usize = 64 * 1024;
@@ -418,8 +420,9 @@ async fn execute_chatgpt_web_image(
         &uploads,
     )
     .await?;
+    let no_asset_poll_grace = crate::image_generation::no_asset_poll_grace(state).await;
     let poll_started_at = tokio::time::Instant::now();
-    let no_asset_deadline = poll_started_at + CHATGPT_WEB_IMAGE_NO_ASSET_POLL_GRACE;
+    let no_asset_deadline = poll_started_at + no_asset_poll_grace;
     let mut no_asset_timeout = false;
     let mut poll_count = 0;
     if downloaded.is_empty() && summary.failure.is_none() {
@@ -446,7 +449,7 @@ async fn execute_chatgpt_web_image(
                 );
                 poll_count += 1;
                 // Include an in-flight poll in the grace period: a slow GET
-                // must not silently turn the 20 second budget into minutes.
+                // must not silently turn the configured budget into minutes.
                 let mut poll = if summary.retained_item_count() == 0 {
                     match tokio::time::timeout_at(no_asset_deadline, poll).await {
                         Ok(result) => result?,
@@ -496,6 +499,7 @@ async fn execute_chatgpt_web_image(
             asset_count = summary.retained_item_count(),
             poll_count,
             poll_elapsed_ms = poll_started_at.elapsed().as_millis() as u64,
+            no_asset_grace_seconds = no_asset_poll_grace.as_secs(),
             no_asset_timeout,
             "ChatGPT-Web image attempt ended without a downloadable image"
         );
@@ -5192,6 +5196,47 @@ data: [DONE]
             assert_eq!(body.contains("response.completed"), succeeds, "{body}");
             assert_eq!(body.contains("response.failed"), !succeeds, "{body}");
         }
+    }
+
+    #[tokio::test]
+    async fn chatgpt_web_image_uses_hot_configured_empty_poll_deadline() {
+        let (base_url, handle) = start_mock_chatgpt_web_with_timing(
+            "data: {\"conversation_id\":\"conv-test-1\"}\n\ndata: [DONE]\n\n",
+            vec![json!({})],
+            Duration::from_secs(60),
+            Duration::ZERO,
+        )
+        .await;
+        let state = crate::AppState::new().unwrap().with_data_state_for_tests(
+            crate::data::GatewayDataState::disabled().with_system_config_values_for_tests([]),
+        );
+        let plan = sample_plan(&base_url, json!({"images": []}), false);
+        for seconds in [1, 0] {
+            state
+                .upsert_system_config_json_value(
+                    crate::image_generation::NO_ASSET_GRACE_KEY,
+                    &json!(seconds),
+                    None,
+                )
+                .await
+                .unwrap();
+            let started_at = Instant::now();
+            let result = tokio::time::timeout(
+                Duration::from_secs(4),
+                maybe_execute_chatgpt_web_image_sync(&state, &plan, None),
+            )
+            .await
+            .expect("must honor the configured deadline")
+            .unwrap()
+            .unwrap();
+            assert!(started_at.elapsed() >= Duration::from_secs(seconds));
+            if seconds == 0 {
+                assert!(started_at.elapsed() < Duration::from_secs(1));
+            }
+            let body = String::from_utf8(execution_result_body_bytes_lossy(&result)).unwrap();
+            assert!(body.contains("chatgpt_web_no_image"), "{body}");
+        }
+        handle.abort();
     }
 
     #[tokio::test]
