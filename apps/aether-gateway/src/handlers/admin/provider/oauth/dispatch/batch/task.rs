@@ -43,7 +43,6 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use tokio::task;
 use uuid::Uuid;
 
-const PROVIDER_OAUTH_BATCH_TASK_MAX_ERROR_SAMPLES: usize = 20;
 const PROVIDER_OAUTH_BATCH_IMPORT_KIND: &str = "oauth_batch";
 const PROVIDER_AGENT_IDENTITY_IMPORT_KIND: &str = "agent_identity";
 const PROVIDER_AGENT_IDENTITY_IMPORT_LOCK_TTL: Duration = Duration::from_secs(180);
@@ -212,7 +211,6 @@ impl AdminProviderOAuthBatchProgressReporter for BatchTaskProgressReporter {
                 .get("status")
                 .and_then(serde_json::Value::as_str)
                 == Some("error")
-                && self.error_samples.len() < PROVIDER_OAUTH_BATCH_TASK_MAX_ERROR_SAMPLES
             {
                 self.error_samples.push(latest_result.clone());
             }
@@ -582,7 +580,6 @@ async fn handle_admin_provider_oauth_start_import_task(
                     .filter(|item| {
                         item.get("status").and_then(serde_json::Value::as_str) == Some("error")
                     })
-                    .take(PROVIDER_OAUTH_BATCH_TASK_MAX_ERROR_SAMPLES)
                     .cloned()
                     .collect::<Vec<_>>();
                 let replaced_count = outcome
@@ -613,7 +610,7 @@ async fn handle_admin_provider_oauth_start_import_task(
                     replaced_count,
                     Some(message.as_str()),
                     None,
-                    error_samples,
+                    error_samples.clone(),
                     created_at,
                     Some(started_at),
                     Some(finished_at),
@@ -636,6 +633,7 @@ async fn handle_admin_provider_oauth_start_import_task(
                         "failed": outcome.failed,
                         "created_count": created_count,
                         "replaced_count": replaced_count,
+                        "error_samples": error_samples,
                     })),
                     None,
                     None,

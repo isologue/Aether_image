@@ -675,6 +675,87 @@ mod tests {
         }
     }
 
+    #[derive(Debug)]
+    struct ChatgptWebTokenExecutor {
+        expected_client_id: &'static str,
+    }
+
+    #[async_trait]
+    impl LocalOAuthHttpExecutor for ChatgptWebTokenExecutor {
+        async fn execute(
+            &self,
+            provider_type: &'static str,
+            _transport: &GatewayProviderTransportSnapshot,
+            request: &LocalOAuthHttpRequest,
+        ) -> Result<LocalOAuthHttpResponse, LocalOAuthRefreshError> {
+            assert_eq!(provider_type, "chatgpt_web");
+            assert_eq!(request.url, "https://auth.openai.com/oauth/token");
+            let profile = request
+                .transport_profile
+                .as_ref()
+                .expect("browser transport");
+            assert_eq!(profile.backend, "browser_wreq");
+            assert_eq!(
+                profile.extra.as_ref().expect("browser profile")["browser_profile"],
+                "chrome110"
+            );
+            let fields =
+                url::form_urlencoded::parse(request.body_bytes.as_deref().expect("refresh form"))
+                    .into_owned()
+                    .collect::<std::collections::BTreeMap<_, _>>();
+            assert_eq!(fields.len(), 3);
+            assert_eq!(fields["client_id"], self.expected_client_id);
+            assert_eq!(fields["refresh_token"], "old-web-refresh-token");
+            Ok(LocalOAuthHttpResponse {
+                status_code: 200,
+                body_text: json!({
+                    "access_token": "fresh-web-access-token",
+                    "refresh_token": "rotated-web-refresh-token",
+                    "id_token": "fresh-web-id-token",
+                    "expires_in": 3600,
+                })
+                .to_string(),
+            })
+        }
+    }
+
+    #[tokio::test]
+    async fn chatgpt_web_local_refresh_preserves_browser_transport_and_rotated_credentials() {
+        for client_id in [None, Some("app-explicit-web")] {
+            let mut transport = sample_transport();
+            transport.provider.provider_type = "chatgpt_web".to_string();
+            transport.key.decrypted_api_key = "stale-web-access-token".to_string();
+            transport.key.decrypted_auth_config = Some(
+                json!({
+                    "provider_type": "chatgpt_web",
+                    "refresh_token": "old-web-refresh-token",
+                    "expires_at": 1,
+                    "client_id": client_id,
+                })
+                .to_string(),
+            );
+            let refreshed = GenericOAuthRefreshAdapter::default()
+                .refresh(
+                    &ChatgptWebTokenExecutor {
+                        expected_client_id: client_id.unwrap_or("app_2SKx67EdpoN0G6j64rFvigXD"),
+                    },
+                    &transport,
+                    None,
+                )
+                .await
+                .expect("web refresh should succeed")
+                .expect("web refresh should produce a cache entry");
+            assert_eq!(refreshed.auth_header_value, "Bearer fresh-web-access-token");
+            let metadata = refreshed.metadata.expect("persisted credentials");
+            assert_eq!(metadata["refresh_token"], "rotated-web-refresh-token");
+            assert_eq!(metadata["id_token"], "fresh-web-id-token");
+            assert_eq!(
+                metadata["client_id"],
+                client_id.unwrap_or("app_2SKx67EdpoN0G6j64rFvigXD")
+            );
+        }
+    }
+
     fn sample_transport() -> GatewayProviderTransportSnapshot {
         GatewayProviderTransportSnapshot {
             provider: GatewayProviderTransportProvider {

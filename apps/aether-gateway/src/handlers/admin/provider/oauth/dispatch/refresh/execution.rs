@@ -52,7 +52,7 @@ pub(super) async fn execute_admin_provider_oauth_refresh(
                 reason = %error_reason,
                 "gateway manual provider oauth refresh failed"
             );
-            if matches!(status_code, 400 | 401 | 403) {
+            {
                 let auto_removed = state
                     .app()
                     .persist_local_oauth_refresh_failure_state(
@@ -89,6 +89,10 @@ pub(super) async fn execute_admin_provider_oauth_refresh(
             ));
         }
         Err(AdminLocalOAuthRefreshError::Transport { .. }) => {
+            state
+                .app()
+                .persist_local_oauth_refresh_failure_state(&transport, 0, "", false)
+                .await?;
             tracing::warn!(
                 trace_id = %trace_id,
                 key_id = %key_id,
@@ -103,6 +107,10 @@ pub(super) async fn execute_admin_provider_oauth_refresh(
             ));
         }
         Err(AdminLocalOAuthRefreshError::TransportMessage { .. }) => {
+            state
+                .app()
+                .persist_local_oauth_refresh_failure_state(&transport, 0, "", false)
+                .await?;
             tracing::warn!(
                 trace_id = %trace_id,
                 key_id = %key_id,
@@ -117,6 +125,10 @@ pub(super) async fn execute_admin_provider_oauth_refresh(
             ));
         }
         Err(AdminLocalOAuthRefreshError::InvalidResponse { .. }) => {
+            state
+                .app()
+                .persist_local_oauth_refresh_failure_state(&transport, 0, "", false)
+                .await?;
             tracing::warn!(
                 trace_id = %trace_id,
                 key_id = %key_id,

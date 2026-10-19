@@ -1,7 +1,5 @@
 use super::super::adapter::{find_string, form_headers, mapped_bool, mapped_string};
-use crate::core::{
-    redacted_oauth_error_body_excerpt, OAuthAuthorizeResponse, OAuthError, OAuthTokenSet,
-};
+use crate::core::{oauth_error_body_excerpt, OAuthAuthorizeResponse, OAuthError, OAuthTokenSet};
 use crate::identity::{
     ExternalIdentity, IdentityClaims, IdentityOAuthExchangeContext, IdentityOAuthProvider,
     IdentityOAuthProviderConfig, IdentityOAuthStartContext,
@@ -108,7 +106,7 @@ impl IdentityOAuthProvider for CustomOidcIdentityOAuthProvider {
         if !(200..300).contains(&response.status_code) {
             return Err(OAuthError::HttpStatus {
                 status_code: response.status_code,
-                body_excerpt: redacted_oauth_error_body_excerpt(&response.body_text),
+                body_excerpt: oauth_error_body_excerpt(&response.body_text),
             });
         }
         let payload = response
@@ -151,7 +149,7 @@ impl IdentityOAuthProvider for CustomOidcIdentityOAuthProvider {
         if !(200..300).contains(&response.status_code) {
             return Err(OAuthError::HttpStatus {
                 status_code: response.status_code,
-                body_excerpt: redacted_oauth_error_body_excerpt(&response.body_text),
+                body_excerpt: oauth_error_body_excerpt(&response.body_text),
             });
         }
         let raw = response

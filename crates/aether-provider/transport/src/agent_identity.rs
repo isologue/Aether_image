@@ -1036,6 +1036,7 @@ impl LocalOAuthRefreshAdapter for CodexAgentIdentityRefreshAdapter {
                 "signature": signature,
             })),
             body_bytes: None,
+            transport_profile: None,
         };
         let response = executor
             .execute(CODEX_AGENT_IDENTITY_PROVIDER_TYPE, transport, &request)

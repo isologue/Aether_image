@@ -1,4 +1,4 @@
-use crate::core::{current_unix_secs, redacted_oauth_error_body_excerpt, OAuthError};
+use crate::core::{current_unix_secs, oauth_error_body_excerpt, OAuthError};
 use crate::network::{OAuthHttpExecutor, OAuthHttpRequest};
 use crate::provider::ProviderOAuthAdapter;
 use crate::provider::{
@@ -376,7 +376,7 @@ impl KiroProviderOAuthAdapter {
         if !(200..300).contains(&response.status_code) {
             return Err(OAuthError::HttpStatus {
                 status_code: response.status_code,
-                body_excerpt: redacted_oauth_error_body_excerpt(&response.body_text),
+                body_excerpt: oauth_error_body_excerpt(&response.body_text),
             });
         }
         let payload = response
@@ -455,7 +455,7 @@ impl KiroProviderOAuthAdapter {
         if !(200..300).contains(&response.status_code) {
             return Err(OAuthError::HttpStatus {
                 status_code: response.status_code,
-                body_excerpt: redacted_oauth_error_body_excerpt(&response.body_text),
+                body_excerpt: oauth_error_body_excerpt(&response.body_text),
             });
         }
         let payload = response

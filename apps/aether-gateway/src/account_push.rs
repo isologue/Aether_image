@@ -124,10 +124,105 @@ fn sub2api_failure(status: StatusCode, message: &str) -> Response {
         .into_response()
 }
 
-fn normalize_accounts(accounts: Vec<Value>) -> Result<Vec<Value>, &'static str> {
+#[derive(Debug)]
+struct NormalizedPush {
+    accounts: Vec<Value>,
+    client_ids: Vec<PushClientIdDiagnostic>,
+}
+
+#[derive(Debug)]
+struct PushClientIdDiagnostic {
+    account_index: usize,
+    fields: Vec<&'static str>,
+    provided_client_id: Option<String>,
+    duplicate: bool,
+}
+
+impl PushClientIdDiagnostic {
+    fn from_credentials(account_index: usize, credentials: &Value, duplicate: bool) -> Self {
+        let mut fields = Vec::new();
+        for (container, field, path) in [
+            (credentials, "client_id", "credentials.client_id"),
+            (credentials, "clientId", "credentials.clientId"),
+            (
+                &credentials["auth_config"],
+                "client_id",
+                "credentials.auth_config.client_id",
+            ),
+            (
+                &credentials["auth_config"],
+                "clientId",
+                "credentials.auth_config.clientId",
+            ),
+            (
+                &credentials["authConfig"],
+                "client_id",
+                "credentials.authConfig.client_id",
+            ),
+            (
+                &credentials["authConfig"],
+                "clientId",
+                "credentials.authConfig.clientId",
+            ),
+        ] {
+            if container.get(field).is_some() {
+                fields.push(path);
+            }
+        }
+        Self {
+            account_index,
+            fields,
+            provided_client_id: aether_oauth::provider::providers::explicit_oauth_client_id(
+                credentials,
+            ),
+            duplicate,
+        }
+    }
+
+    fn log(&self, push_id: &str, provider_id: &str, provider_type: &str) {
+        let state = if self.provided_client_id.is_some() {
+            "valid"
+        } else if self.fields.is_empty() {
+            "missing"
+        } else {
+            "invalid"
+        };
+        let default_client_id = aether_oauth::provider::providers::GENERIC_PROVIDER_OAUTH_TEMPLATES
+            .iter()
+            .find(|template| template.provider_type == provider_type)
+            .map(|template| template.client_id);
+        let (selected_client_id, source) = match provider_type {
+            "chatgpt_web" => match self.provided_client_id.as_deref() {
+                Some(value) => (Some(value), "account"),
+                None => (default_client_id, "web_default"),
+            },
+            "codex" => (default_client_id, "codex_default"),
+            _ => (None, "unsupported_provider"),
+        };
+        // Log only diagnostic fields, never the credentials object or invalid raw values.
+        // This is the refresh policy selected at ingestion, not proof of an OAuth request.
+        tracing::info!(
+            push_id,
+            provider_id,
+            provider_type,
+            account_index = self.account_index,
+            duplicate = self.duplicate,
+            client_id_present = !self.fields.is_empty(),
+            client_id_state = state,
+            client_id_fields = %self.fields.join(","),
+            provided_client_id = self.provided_client_id.as_deref(),
+            selected_refresh_client_id = selected_client_id,
+            client_id_source = source,
+            "account_push_client_id"
+        );
+    }
+}
+
+fn normalize_accounts(accounts: Vec<Value>) -> Result<NormalizedPush, &'static str> {
     let mut items = Vec::new();
+    let mut client_ids = Vec::with_capacity(accounts.len());
     let mut seen = HashSet::new();
-    for item in accounts {
+    for (account_index, item) in accounts.into_iter().enumerate() {
         let Some(object) = item.as_object() else {
             return Err("accounts 中每项必须为账号对象");
         };
@@ -139,7 +234,13 @@ fn normalize_accounts(accounts: Vec<Value>) -> Result<Vec<Value>, &'static str> 
         let identity = access
             .or(refresh)
             .ok_or("账号缺少 access_token 或 refresh_token")?;
-        if !seen.insert(identity.to_owned()) {
+        let duplicate = !seen.insert(identity.to_owned());
+        client_ids.push(PushClientIdDiagnostic::from_credentials(
+            account_index,
+            &item,
+            duplicate,
+        ));
+        if duplicate {
             continue;
         }
         // Only account credential/identity fields can enter the importer. An external
@@ -183,15 +284,22 @@ fn normalize_accounts(accounts: Vec<Value>) -> Result<Vec<Value>, &'static str> 
         if let Some(refresh) = refresh {
             clean.insert("refresh_token".into(), json!(refresh));
         }
+        if let Some(client_id) = aether_oauth::provider::providers::explicit_oauth_client_id(&item)
+        {
+            clean.insert("client_id".into(), json!(client_id));
+        }
         items.push(Value::Object(clean));
     }
     if items.is_empty() {
         return Err("没有可导入的账号，accounts 不能为空");
     }
-    Ok(items)
+    Ok(NormalizedPush {
+        accounts: items,
+        client_ids,
+    })
 }
 
-fn normalize_sub2api_payload(value: Value) -> Result<Vec<Value>, &'static str> {
+fn normalize_sub2api_payload(value: Value) -> Result<NormalizedPush, &'static str> {
     // Move the envelope instead of cloning a potentially 128 MiB account bundle.
     let data = match value {
         Value::Object(mut object) => match object.remove("data") {
@@ -404,8 +512,20 @@ fn contains_agent_identity(value: &Value) -> bool {
 async fn complete_import(
     state: &AppState,
     provider_id: &str,
-    credentials: Vec<Value>,
+    normalized: NormalizedPush,
 ) -> Result<(StatusCode, Value), GatewayError> {
+    let push_id = uuid::Uuid::new_v4().to_string();
+    let provider_type = state
+        .read_provider_catalog_providers_by_ids(&[provider_id.to_owned()])
+        .await?
+        .into_iter()
+        .next()
+        .map(|provider| provider.provider_type.trim().to_ascii_lowercase())
+        .unwrap_or_default();
+    for diagnostic in &normalized.client_ids {
+        diagnostic.log(&push_id, provider_id, &provider_type);
+    }
+    let credentials = normalized.accounts;
     let mut added = 0usize;
     let mut updated = 0usize;
     let mut failed = 0usize;
@@ -461,6 +581,7 @@ async fn complete_import(
     }
 
     let total = credentials.len();
+    tracing::info!(%push_id, provider_id, total, added, updated, failed, "account_push_completed");
     let status = if added + updated == 0 {
         StatusCode::BAD_REQUEST
     } else {

@@ -441,6 +441,13 @@ fn apply_single_import_hints(
     payload: &serde_json::Map<String, serde_json::Value>,
     auth_config: &mut serde_json::Map<String, serde_json::Value>,
 ) {
+    if provider_type.eq_ignore_ascii_case("chatgpt_web") {
+        if let Some(client_id) = aether_oauth::provider::providers::explicit_oauth_client_id(
+            &serde_json::Value::Object(payload.clone()),
+        ) {
+            auth_config.insert("client_id".to_string(), json!(client_id));
+        }
+    }
     let provider_type = provider_type.trim().to_ascii_lowercase();
     if provider_type == "antigravity" {
         if let Some(project_id) = import_payload_project_id_any(
@@ -597,6 +604,7 @@ async fn resolve_admin_provider_oauth_single_import_tokens(
     template: Option<AdminProviderOAuthTemplate>,
     provider_type: &str,
     refresh_token: Option<&str>,
+    client_id: Option<&str>,
     access_token: Option<&str>,
     imported_expires_at: Option<u64>,
     request_proxy: Option<ProxySnapshot>,
@@ -635,6 +643,7 @@ async fn resolve_admin_provider_oauth_single_import_tokens(
             .exchange_admin_provider_oauth_refresh_token(
                 template,
                 refresh_token,
+                client_id,
                 request_proxy.clone(),
             )
             .await
@@ -1030,6 +1039,10 @@ pub(super) async fn handle_admin_provider_oauth_import_refresh_token(
             template,
             &provider_type,
             refresh_token_input.as_deref(),
+            aether_oauth::provider::providers::explicit_oauth_client_id(
+                &serde_json::Value::Object(raw_payload.clone()),
+            )
+            .as_deref(),
             access_token_input.as_deref(),
             imported_expires_at,
             request_proxy.clone(),
@@ -1293,6 +1306,20 @@ mod tests {
         let header = URL_SAFE_NO_PAD.encode(r#"{"alg":"none","typ":"JWT"}"#);
         let payload = URL_SAFE_NO_PAD.encode(payload.to_string());
         format!("{header}.{payload}.signature")
+    }
+
+    #[test]
+    fn web_single_import_keeps_explicit_client_for_at_only_accounts() {
+        let payload = json!({"access_token": "web-at", "clientId": " app-explicit-web "})
+            .as_object()
+            .cloned()
+            .expect("object");
+        let mut auth_config = serde_json::Map::new();
+        apply_single_import_hints("chatgpt_web", &payload, &mut auth_config);
+        assert_eq!(auth_config["client_id"], "app-explicit-web");
+        let mut codex_config = serde_json::Map::new();
+        apply_single_import_hints("codex", &payload, &mut codex_config);
+        assert!(codex_config.get("client_id").is_none());
     }
 
     #[test]

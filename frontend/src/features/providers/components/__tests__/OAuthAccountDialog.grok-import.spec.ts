@@ -275,13 +275,14 @@ vi.mock('lucide-vue-next', async () => {
 
 const mountedApps: Array<{ app: App, root: HTMLElement }> = []
 
-function mountDialog(providerType = 'grok') {
+function mountDialog(providerType = 'grok', handlers: { onClose?: () => void; onSaved?: () => void } = {}) {
   const root = document.createElement('div')
   document.body.appendChild(root)
   const app = createApp(OAuthAccountDialog, {
     open: true,
     providerId: 'provider-1',
     providerType,
+    ...handlers,
   })
   app.mount(root)
   mountedApps.push({ app, root })
@@ -695,6 +696,28 @@ describe('OAuthAccountDialog authorization and import', () => {
     })
   })
 
+  it.each([
+    { client_id: ' app-explicit-web ' },
+    { clientId: 'app-explicit-web' },
+    { auth_config: { client_id: 'app-explicit-web' } },
+    { authConfig: { clientId: 'app-explicit-web' } },
+  ])('keeps an explicit Web client ID on single JSON import: %j', async (clientFields) => {
+    const root = mountDialog('chatgpt_web')
+    await settle()
+    getButton(root, '导入授权')?.click()
+    await settle()
+    const textarea = getImportTextarea(root)
+    textarea.value = JSON.stringify({ refresh_token: 'web-rt', ...clientFields })
+    textarea.dispatchEvent(new Event('input'))
+    await settle()
+    getExactButton(root, '导入')?.click()
+    await settle()
+    expect(endpointMocks.importProviderRefreshToken).toHaveBeenCalledWith('provider-1', expect.objectContaining({
+      refresh_token: 'web-rt',
+      client_id: 'app-explicit-web',
+    }))
+  })
+
   it('keeps Codex imported request headers on single JSON import', async () => {
     const root = mountDialog('codex')
     await settle()
@@ -919,6 +942,76 @@ describe('OAuthAccountDialog authorization and import', () => {
       undefined,
     )
     expect(endpointMocks.importProviderRefreshToken).not.toHaveBeenCalled()
+  })
+
+  it('keeps the completed batch dialog open and lists every failed account and reason', async () => {
+    vi.useFakeTimers()
+    const onClose = vi.fn()
+    const onSaved = vi.fn()
+    endpointMocks.getBatchImportOAuthTaskStatus.mockResolvedValue({
+      task_id: 'task-1', provider_id: 'provider-1', provider_type: 'grok', status: 'completed',
+      total: 26, processed: 26, success: 1, failed: 25, created_count: 1, replaced_count: 0,
+      progress_percent: 100,
+      error_samples: Array.from({ length: 25 }, (_, i) => ({
+        index: i + 1, status: 'error', account: `failed-${i}@example.com`,
+        error: i === 24 ? 'HTTP 401: refresh_token_invalidated' : `该 OAuth 账号 (failed-${i}) 已存在于当前 Provider 中`,
+      })),
+    })
+    const root = mountDialog('grok', { onClose, onSaved })
+    await settle()
+    const textarea = getImportTextarea(root)
+    textarea.value = 'sso-1\nsso-2'
+    textarea.dispatchEvent(new Event('input'))
+    await settle()
+    getButton(root, '导入账号')?.click()
+    await settle()
+    await vi.advanceTimersByTimeAsync(500)
+    await settle()
+
+    expect(onSaved).toHaveBeenCalledOnce()
+    expect(onClose).not.toHaveBeenCalled()
+    expect(root.querySelector('[data-testid="import-result"]')?.textContent).toContain('成功 1 · 失败 25')
+    expect(root.querySelectorAll('[data-testid="import-failure-list"] tbody tr')).toHaveLength(25)
+    expect(root.textContent).toContain('failed-24@example.com')
+    expect(root.textContent).toContain('HTTP 401: refresh_token_invalidated')
+    expect(root.querySelector('[data-testid="import-failure-summary"]')?.textContent).toContain('账号已存在（重复导入） · 24')
+    getExactButton(root, '关闭')?.click()
+    expect(onClose).toHaveBeenCalledOnce()
+  })
+
+  it('keeps a failed single import visible with its account and reason', async () => {
+    const onClose = vi.fn()
+    endpointMocks.importProviderRefreshToken.mockRejectedValue(new Error('HTTP 401: refresh_token_invalidated'))
+    const root = mountDialog('grok', { onClose })
+    await settle()
+    const textarea = getImportTextarea(root)
+    textarea.value = JSON.stringify({ access_token: 'test-token', email: 'failed@example.com' })
+    textarea.dispatchEvent(new Event('input'))
+    await settle()
+    getButton(root, '导入账号')?.click()
+    await settle()
+    await settle()
+    expect(onClose).not.toHaveBeenCalled()
+    expect(root.querySelector('[data-testid="import-result"]')?.textContent).toContain('成功 0 · 失败 1')
+    expect(root.querySelector('[data-testid="import-failure-list"]')?.textContent).toContain('failed@example.com')
+    expect(root.querySelector('[data-testid="import-failure-list"]')?.textContent).toContain('refresh_token_invalidated')
+    expect(root.querySelector('[data-testid="import-failure-list"]')?.textContent).not.toContain('test-token')
+  })
+
+  it('keeps a successful single import open with a result summary', async () => {
+    const onClose = vi.fn()
+    const onSaved = vi.fn()
+    const root = mountDialog('grok', { onClose, onSaved })
+    await settle()
+    const textarea = getImportTextarea(root)
+    textarea.value = 'single-sso-token'
+    textarea.dispatchEvent(new Event('input'))
+    await settle()
+    getButton(root, '导入账号')?.click()
+    await settle()
+    expect(onSaved).toHaveBeenCalledOnce()
+    expect(onClose).not.toHaveBeenCalled()
+    expect(root.querySelector('[data-testid="import-result"]')?.textContent).toContain('成功 1 · 失败 0')
   })
 
   it('keeps Grok multiline token import on the batch task path', async () => {

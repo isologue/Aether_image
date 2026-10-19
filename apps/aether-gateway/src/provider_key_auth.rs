@@ -7,6 +7,12 @@ use aether_provider_transport::provider_types::{
 use serde_json::{Map, Value};
 use std::collections::BTreeSet;
 
+mod oauth_refresh;
+pub(crate) use oauth_refresh::{
+    oauth_refresh_failure_metadata, oauth_refresh_success_metadata,
+    provider_key_oauth_refresh_status,
+};
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum ProviderKeyCredentialKind {
     RawSecret,

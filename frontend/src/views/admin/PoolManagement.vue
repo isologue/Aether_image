@@ -276,6 +276,14 @@
                         <span class="font-mono">
                           {{ getProviderMaskedSecretLabel(key, selectedProviderType) }}
                         </span>
+                        <span
+                          v-if="isOAuthManagedCredential(key)"
+                          class="text-[10px] shrink-0"
+                          :class="key.oauth_refresh_status?.eligible ? 'text-emerald-600' : 'text-muted-foreground'"
+                          :title="keyUiStateMap[key.key_id]?.oauthStatusTitle || ''"
+                        >
+                          刷新 AT：{{ key.oauth_refresh_status?.eligible ? '可' : '否' }}
+                        </span>
                         <template v-if="keyUiStateMap[key.key_id]?.showOAuthRefreshControl">
                           <Button
                             variant="ghost"
@@ -574,6 +582,13 @@
               </div>
 
               <div class="flex flex-wrap items-center gap-1.5">
+                <span
+                  v-if="isOAuthManagedCredential(key)"
+                  class="text-[10px]"
+                  :title="keyUiStateMap[key.key_id]?.oauthStatusTitle || ''"
+                >
+                  刷新 AT：{{ key.oauth_refresh_status?.eligible ? '可' : '否' }}
+                </span>
                 <Badge
                   :variant="keyUiStateMap[key.key_id]?.schedulingBadgeVariant || 'default'"
                   class="text-[10px] shrink-0"
@@ -621,7 +636,7 @@
                     v-else
                     class="inline-flex max-w-full items-center rounded-full border px-2 py-0.5 text-[10px] font-medium leading-4"
                     :class="getMobileTagClass(item)"
-                    :title="item.label"
+                    :title="item.key === 'oauth' ? getOAuthStatusTitle(key) : item.label"
                   >
                     {{ item.label }}
                   </span>
@@ -3192,7 +3207,6 @@ async function handleAccountBatchChanged(): Promise<void> {
 }
 
 async function handleAccountDialogSaved() {
-  showImportDialog.value = false
   await Promise.all([loadKeys({ silent: true }), loadOverview({ silent: true })])
   // 导入账号后补一次静默额度刷新，避免新账号在列表里暂无额度信息
   await refreshCurrentPageQuotaInBackground({ silent: true, reloadAfter: 'silent' })
@@ -3358,6 +3372,10 @@ function getSchedulingBadgeVariant(key: PoolKeyDetail): PoolStatusVariant {
 }
 
 function getSchedulingTitle(key: PoolKeyDetail): string {
+  if (key.oauth_refresh_status && (
+    ['expired', 'rejected'].includes(key.oauth_refresh_status.at_state)
+    || ['invalid', 'failed', 'retry_wait'].includes(key.oauth_refresh_status.rt_state)
+  )) return getOAuthStatusTitle(key)
   const accountAlertTitle = getAccountAlertTitle(key)
   if (accountAlertTitle) return accountAlertTitle
   if (getBlockingOAuthStatusLabel(key)) return getOAuthStatusTitle(key)

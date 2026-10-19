@@ -52,6 +52,7 @@ export interface ProviderCookieAuthorizeBatchTaskRequest {
 export interface OAuthBatchImportResultItem {
   index: number
   status: 'success' | 'error'
+  account?: string | null
   key_id?: string
   key_name?: string
   auth_method?: string
@@ -291,6 +292,7 @@ export async function importProviderRefreshToken(
     auth_token?: string
     authToken?: string
     refresh_token?: string
+    client_id?: string
     access_token?: string
     session_token?: string
     create_agent_identity?: boolean

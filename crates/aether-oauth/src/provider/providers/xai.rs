@@ -1,6 +1,6 @@
 use super::generic::{template_for_provider_type, GenericProviderOAuthAdapter};
 use crate::core::{
-    current_unix_secs, redacted_oauth_error_body_excerpt, OAuthDeviceAuthorization, OAuthError,
+    current_unix_secs, oauth_error_body_excerpt, OAuthDeviceAuthorization, OAuthError,
 };
 use crate::network::{OAuthHttpExecutor, OAuthHttpRequest};
 use crate::provider::{
@@ -109,7 +109,7 @@ impl XaiProviderOAuthAdapter {
         if !(200..300).contains(&response.status_code) {
             return Err(OAuthError::HttpStatus {
                 status_code: response.status_code,
-                body_excerpt: redacted_oauth_error_body_excerpt(&response.body_text),
+                body_excerpt: oauth_error_body_excerpt(&response.body_text),
             });
         }
         let payload = response_json(&response)
@@ -163,7 +163,7 @@ impl XaiProviderOAuthAdapter {
         if !(200..300).contains(&response.status_code) {
             return Err(OAuthError::HttpStatus {
                 status_code: response.status_code,
-                body_excerpt: redacted_oauth_error_body_excerpt(&response.body_text),
+                body_excerpt: oauth_error_body_excerpt(&response.body_text),
             });
         }
         let payload = payload

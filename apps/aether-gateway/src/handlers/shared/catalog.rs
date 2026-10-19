@@ -3036,6 +3036,12 @@ pub(crate) fn build_admin_provider_key_response(
     };
     let auth_semantics = provider_key_auth_semantics(key, provider_type);
     let auth_config = parse_catalog_auth_config_json(state, key);
+    let oauth_refresh_status = crate::provider_key_auth::provider_key_oauth_refresh_status(
+        key,
+        provider_type,
+        auth_config.as_ref(),
+        now_unix_secs,
+    );
     let oauth_organizations = if auth_semantics.can_show_oauth_metadata() {
         auth_config
             .as_ref()
@@ -3228,6 +3234,7 @@ pub(crate) fn build_admin_provider_key_response(
         admin_secret_safe_json(Some(&serde_json::Value::Array(oauth_organizations))),
     );
     payload.insert("oauth_temporary".to_string(), json!(oauth_temporary));
+    payload.insert("oauth_refresh_status".to_string(), oauth_refresh_status);
     payload.insert(
         "oauth_invalid_at".to_string(),
         json!(auth_semantics

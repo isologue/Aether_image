@@ -14,7 +14,8 @@ pub use claude_code::{
 };
 pub use codex::{CodexProviderOAuthAdapter, CODEX_OAUTH_SCOPES};
 pub use generic::{
-    derive_codex_identity_fingerprint, GenericProviderOAuthAdapter, GenericProviderOAuthTemplate,
+    derive_codex_identity_fingerprint, explicit_oauth_client_id, GenericProviderOAuthAdapter,
+    GenericProviderOAuthTemplate,
     ANTIGRAVITY_OAUTH_CLIENT_ID_ENV, ANTIGRAVITY_OAUTH_CLIENT_SECRET_ENV,
     GEMINI_CLI_OAUTH_CLIENT_ID_ENV, GEMINI_CLI_OAUTH_CLIENT_SECRET_ENV,
     GENERIC_PROVIDER_OAUTH_TEMPLATES,

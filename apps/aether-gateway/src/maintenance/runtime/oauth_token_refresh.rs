@@ -8,7 +8,7 @@ use serde_json::Value;
 use tracing::{info, warn};
 
 use crate::admin_api::provider_oauth_maintenance_endpoint_for_provider;
-use crate::provider_key_auth::provider_key_is_oauth_managed;
+use crate::provider_key_auth::{provider_key_is_oauth_managed, provider_key_oauth_refresh_status};
 use crate::{AppState, GatewayError};
 
 use super::system_config_bool;
@@ -121,6 +121,29 @@ pub(crate) async fn perform_oauth_token_refresh_once(
             };
             let is_agent_identity =
                 crate::provider_transport::is_codex_agent_identity_transport(&transport);
+            let auth_config = transport
+                .key
+                .decrypted_auth_config
+                .as_deref()
+                .and_then(|value| serde_json::from_str::<Value>(value).ok());
+            let mut current_key = key.clone();
+            current_key.upstream_metadata = transport.key.upstream_metadata.clone();
+            current_key.expires_at_unix_secs = transport.key.expires_at_unix_secs;
+            current_key.is_active = transport.key.is_active;
+            let refresh_status = provider_key_oauth_refresh_status(
+                &current_key,
+                &provider.provider_type,
+                auth_config.as_ref().and_then(Value::as_object),
+                now_unix_secs(),
+            );
+            if refresh_status["eligible"] != true
+                || refresh_status["next_retry_at"]
+                    .as_u64()
+                    .is_some_and(|next| next > now_unix_secs())
+            {
+                summary.skipped = summary.skipped.saturating_add(1);
+                continue;
+            }
             let needs_agent_task_recovery = is_agent_identity
                 && agent_identity_needs_task_recovery(
                     transport.key.decrypted_auth_config.as_deref(),
@@ -133,10 +156,29 @@ pub(crate) async fn perform_oauth_token_refresh_once(
                 continue;
             }
 
-            let refresh_result = if needs_agent_task_recovery {
-                state
-                    .force_local_oauth_refresh_entry(&transport)
-                    .await
+            // A rejected AT may still have a future expires_at. The normal resolver
+            // would reuse it; recovery must explicitly request a refresh under the
+            // existing distributed lease and credential fence.
+            let refresh_result = if needs_agent_task_recovery
+                || key.oauth_invalid_at_unix_secs.is_some()
+                || refresh_status["at_state"] == "rejected"
+                || matches!(refresh_status["rt_state"].as_str(), Some("retry_wait"))
+            {
+                let result = state.force_local_oauth_refresh_entry(&transport).await;
+                if let Err(err) = &result {
+                    let (status, body) = match err {
+                        crate::provider_transport::LocalOAuthRefreshError::HttpStatus {
+                            status_code,
+                            body_excerpt,
+                            ..
+                        } => (*status_code, body_excerpt.as_str()),
+                        _ => (0, ""),
+                    };
+                    state
+                        .persist_local_oauth_refresh_failure_state(&transport, status, body, false)
+                        .await?;
+                }
+                result
                     .map(|entry| entry.map(|_| ()))
                     .map_err(|err| GatewayError::Internal(err.to_string()))
             } else {
@@ -306,6 +348,16 @@ fn oauth_refresh_candidate(
         && key
             .expires_at_unix_secs
             .is_some_and(|expires_at| expires_at <= refresh_cutoff_unix_secs);
+    let rejected_at_candidate = key
+        .oauth_invalid_reason
+        .as_deref()
+        .is_some_and(|reason| reason.starts_with("[OAUTH_EXPIRED]"));
+    let retry_candidate = key
+        .upstream_metadata
+        .as_ref()
+        .and_then(|metadata| metadata.pointer("/oauth_refresh/state"))
+        .and_then(Value::as_str)
+        == Some("retry_wait");
     // The catalog row is encrypted here, so exact Agent Identity validation is
     // deferred until the transport snapshot has decrypted auth_config.
     let possible_agent_candidate = provider.provider_type.trim().eq_ignore_ascii_case("codex")
@@ -317,7 +369,10 @@ fn oauth_refresh_candidate(
                 .is_some_and(|reason| reason.contains(OAUTH_REFRESH_FAILED_PREFIX)));
     key.is_active
         && has_auth_config
-        && (regular_oauth_candidate || possible_agent_candidate)
+        && (regular_oauth_candidate
+            || rejected_at_candidate
+            || retry_candidate
+            || possible_agent_candidate)
         && provider_key_is_oauth_managed(key, provider.provider_type.as_str())
 }
 
@@ -475,6 +530,33 @@ mod tests {
         key.expires_at_unix_secs = Some(120);
 
         assert!(oauth_refresh_candidate(&provider, &key, 120));
+    }
+
+    #[test]
+    fn rejected_web_at_is_selected_even_with_future_expiry() {
+        let provider = StoredProviderCatalogProvider::new(
+            "web".into(),
+            "Web".into(),
+            None,
+            "chatgpt_web".into(),
+        )
+        .unwrap();
+        let mut key = StoredProviderCatalogKey::new(
+            "key".into(),
+            provider.id.clone(),
+            "account".into(),
+            "oauth".into(),
+            None,
+            true,
+        )
+        .unwrap();
+        key.encrypted_auth_config = Some("encrypted".into());
+        key.expires_at_unix_secs = Some(9999);
+        key.oauth_invalid_at_unix_secs = Some(100);
+        key.oauth_invalid_reason = Some("[OAUTH_EXPIRED] AT rejected".into());
+        assert!(oauth_refresh_candidate(&provider, &key, 120));
+        key.is_active = false;
+        assert!(!oauth_refresh_candidate(&provider, &key, 120));
     }
 
     #[test]

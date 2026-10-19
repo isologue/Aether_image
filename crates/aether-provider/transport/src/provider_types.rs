@@ -613,7 +613,7 @@ pub fn provider_type_admin_oauth_template(provider_type: &str) -> Option<Provide
             display_name: "ChatGPT Web",
             authorize_url: "https://auth.openai.com/oauth/authorize",
             token_url: "https://auth.openai.com/oauth/token",
-            client_id: "app_EMoamEEZ73f0CkXaXp7hrann",
+            client_id: "app_2SKx67EdpoN0G6j64rFvigXD",
             scopes: &["openid", "email", "profile", "offline_access"],
             redirect_uri: "http://localhost:1455/auth/callback",
             use_pkce: true,

@@ -384,6 +384,11 @@ fn extract_admin_provider_oauth_batch_import_entry(
                     || windsurf_password.is_some())
             {
                 Some(item.clone())
+            } else if provider_type.trim().eq_ignore_ascii_case("chatgpt_web")
+                && (refresh_token.is_some() || access_token.is_some())
+            {
+                aether_oauth::provider::providers::explicit_oauth_client_id(item)
+                    .map(|client_id| json!({"client_id": client_id}))
             } else {
                 None
             };
@@ -808,6 +813,15 @@ pub(super) fn apply_admin_provider_oauth_batch_import_hints(
     auth_config: &mut serde_json::Map<String, serde_json::Value>,
 ) {
     let provider_type = provider_type.trim().to_ascii_lowercase();
+    if provider_type == "chatgpt_web" {
+        if let Some(client_id) = entry
+            .raw_credentials
+            .as_ref()
+            .and_then(aether_oauth::provider::providers::explicit_oauth_client_id)
+        {
+            auth_config.insert("client_id".to_string(), json!(client_id));
+        }
+    }
     if provider_type == "gemini_cli" {
         if let Some(project_id) = entry.project_id.as_ref() {
             auth_config
@@ -1068,6 +1082,27 @@ mod tests {
         assert!(!admin_provider_oauth_batch_contains_agent_identity(
             "ordinary-token"
         ));
+    }
+
+    #[test]
+    fn web_batch_keeps_explicit_client_for_rt_and_at_imports() {
+        for token in [
+            json!({"refresh_token": "web-rt"}),
+            json!({"access_token": "web-at"}),
+        ] {
+            let mut item = token;
+            item["authConfig"] = json!({"clientId": " app-explicit-web "});
+            let entries =
+                parse_admin_provider_oauth_batch_import_entries("chatgpt_web", &item.to_string());
+            assert_eq!(entries.len(), 1);
+            let mut auth_config = serde_json::Map::new();
+            apply_admin_provider_oauth_batch_import_hints(
+                "chatgpt_web",
+                &entries[0],
+                &mut auth_config,
+            );
+            assert_eq!(auth_config["client_id"], "app-explicit-web");
+        }
     }
 
     #[test]

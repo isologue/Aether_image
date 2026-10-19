@@ -126,7 +126,7 @@ export function useScheduledTasks(systemConfig: Ref<SystemConfig>) {
       id: 'oauth-token-refresh',
       icon: RefreshCw,
       title: 'OAuth Token 自动刷新',
-      description: '主动刷新即将过期的 OAuth Token（动态调度）',
+      description: '刷新即将过期的 AT，并尝试恢复首次认证失败的账号；RT 明确失效后停止重试，临时故障延后重试',
       enabled: systemConfig.value.enable_oauth_token_refresh,
       hasTimeConfig: false,
       hour: '',

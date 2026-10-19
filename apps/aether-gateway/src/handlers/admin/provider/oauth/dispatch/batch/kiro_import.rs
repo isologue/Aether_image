@@ -47,9 +47,10 @@ pub(super) async fn execute_admin_provider_oauth_kiro_batch_import(
             results: entries
                 .iter()
                 .enumerate()
-                .map(|(index, _)| {
+                .map(|(index, entry)| {
                     json!({
                         "index": index,
+                        "account": entry.get("email").and_then(Value::as_str).or_else(|| entry.get("name").and_then(Value::as_str)),
                         "status": "error",
                         "error": "Provider 不存在",
                         "replaced": false,
@@ -89,6 +90,7 @@ pub(super) async fn execute_admin_provider_oauth_kiro_batch_import(
             failed += 1;
             results.push(json!({
                 "index": index,
+                "account": entry.get("email").and_then(Value::as_str).or_else(|| entry.get("name").and_then(Value::as_str)),
                 "status": "error",
                 "error": "未找到有效的凭据数据",
                 "replaced": false,
@@ -113,6 +115,7 @@ pub(super) async fn execute_admin_provider_oauth_kiro_batch_import(
             failed += 1;
             results.push(json!({
                 "index": index,
+                "account": entry.get("email").and_then(Value::as_str).or_else(|| entry.get("name").and_then(Value::as_str)),
                 "status": "error",
                 "error": "缺少可用的 Kiro refresh 凭据",
                 "replaced": false,
@@ -142,6 +145,7 @@ pub(super) async fn execute_admin_provider_oauth_kiro_batch_import(
                 failed += 1;
                 results.push(json!({
                     "index": index,
+                    "account": entry.get("email").and_then(Value::as_str).or_else(|| entry.get("name").and_then(Value::as_str)),
                     "status": "error",
                     "error": "Token 验证失败",
                     "replaced": false,
@@ -188,28 +192,35 @@ pub(super) async fn execute_admin_provider_oauth_kiro_batch_import(
             auth_config.insert("email".to_string(), json!(email));
         }
 
-        let duplicate =
-            match find_duplicate_provider_oauth_key(state, provider_id, &auth_config, None).await {
-                Ok(value) => value,
-                Err(detail) => {
-                    failed += 1;
-                    results.push(json!({
+        let duplicate = match find_duplicate_provider_oauth_key(
+            state,
+            provider_id,
+            &auth_config,
+            None,
+        )
+        .await
+        {
+            Ok(value) => value,
+            Err(detail) => {
+                failed += 1;
+                results.push(json!({
                         "index": index,
+                        "account": entry.get("email").and_then(Value::as_str).or_else(|| entry.get("name").and_then(Value::as_str)),
                         "status": "error",
                         "error": detail,
                         "replaced": false,
                     }));
-                    maybe_report_admin_provider_oauth_batch_import_progress(
-                        &mut progress,
-                        entries.len(),
-                        success,
-                        failed,
-                        &results,
-                    )
-                    .await;
-                    continue;
-                }
-            };
+                maybe_report_admin_provider_oauth_batch_import_progress(
+                    &mut progress,
+                    entries.len(),
+                    success,
+                    failed,
+                    &results,
+                )
+                .await;
+                continue;
+            }
+        };
 
         let access_token = refreshed_auth_config
             .access_token
@@ -221,6 +232,7 @@ pub(super) async fn execute_admin_provider_oauth_kiro_batch_import(
             failed += 1;
             results.push(json!({
                 "index": index,
+                "account": entry.get("email").and_then(Value::as_str).or_else(|| entry.get("name").and_then(Value::as_str)),
                 "status": "error",
                 "error": "Token 验证失败: accessToken 为空",
                 "replaced": false,
@@ -255,6 +267,7 @@ pub(super) async fn execute_admin_provider_oauth_kiro_batch_import(
                     failed += 1;
                     results.push(json!({
                         "index": index,
+                        "account": entry.get("email").and_then(Value::as_str).or_else(|| entry.get("name").and_then(Value::as_str)),
                         "status": "error",
                         "error": "provider oauth write unavailable",
                         "replaced": true,
@@ -298,6 +311,7 @@ pub(super) async fn execute_admin_provider_oauth_kiro_batch_import(
                     failed += 1;
                     results.push(json!({
                         "index": index,
+                        "account": entry.get("email").and_then(Value::as_str).or_else(|| entry.get("name").and_then(Value::as_str)),
                         "status": "error",
                         "error": "provider oauth write unavailable",
                         "replaced": false,
@@ -329,6 +343,7 @@ pub(super) async fn execute_admin_provider_oauth_kiro_batch_import(
         success += 1;
         results.push(json!({
             "index": index,
+            "account": entry.get("email").and_then(Value::as_str).or_else(|| entry.get("name").and_then(Value::as_str)),
             "status": "success",
             "key_id": persisted_key.id,
             "key_name": key_name,

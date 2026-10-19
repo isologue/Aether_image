@@ -1,4 +1,7 @@
-use crate::core::{current_unix_secs, OAuthAuthorizeResponse, OAuthError, OAuthTokenSet};
+use crate::core::{
+    current_unix_secs, oauth_error_body_excerpt, oauth_error_redaction_enabled,
+    OAuthAuthorizeResponse, OAuthError, OAuthTokenSet,
+};
 use crate::network::{OAuthHttpExecutor, OAuthHttpRequest};
 use crate::provider::{
     ProviderOAuthAccount, ProviderOAuthAccountState, ProviderOAuthAdapter,
@@ -817,6 +820,9 @@ fn non_empty_str(value: &str) -> Option<&str> {
 }
 
 fn truncate_body(body: &str) -> String {
+    if !oauth_error_redaction_enabled() {
+        return oauth_error_body_excerpt(body);
+    }
     let body = body.trim();
     if body.is_empty() {
         return "-".to_string();

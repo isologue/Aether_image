@@ -1128,6 +1128,12 @@ pub(super) fn build_admin_pool_key_payload(
                 ))
     });
     let auth_config = state.parse_catalog_auth_config_json(key);
+    let oauth_refresh_status = crate::provider_key_auth::provider_key_oauth_refresh_status(
+        key,
+        provider_type,
+        auth_config.as_ref(),
+        now_unix_secs,
+    );
     let oauth_expires_at =
         admin_pool_derive_oauth_expires_at(provider_type, key, auth_config.as_ref());
     let oauth_plan_type = if auth_semantics.oauth_managed() {
@@ -1253,6 +1259,7 @@ pub(super) fn build_admin_pool_key_payload(
         json!(auth_semantics.oauth_managed()),
     );
     payload.insert("agent_identity".to_string(), json!(agent_identity));
+    payload.insert("oauth_refresh_status".to_string(), oauth_refresh_status);
     payload.insert(
         "can_refresh_oauth".to_string(),
         json!(provider_key_can_refresh_oauth(

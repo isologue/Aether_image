@@ -67,12 +67,25 @@ fn provider_oauth_service_for_template(
 fn token_payload_from_provider_oauth_result(
     result: aether_oauth::provider::ProviderOAuthTokenSet,
 ) -> Result<serde_json::Value, Response<Body>> {
-    result.token_set.raw_payload.ok_or_else(|| {
+    let mut payload = result.token_set.raw_payload.ok_or_else(|| {
         build_internal_control_error_response(
             http::StatusCode::BAD_REQUEST,
             "token exchange 返回缺少 access_token",
         )
-    })
+    })?;
+    if result
+        .auth_config
+        .get("provider_type")
+        .and_then(serde_json::Value::as_str)
+        == Some("chatgpt_web")
+    {
+        if let (Some(object), Some(client_id)) =
+            (payload.as_object_mut(), result.auth_config.get("client_id"))
+        {
+            object.insert("client_id".to_string(), client_id.clone());
+        }
+    }
+    Ok(payload)
 }
 
 pub(crate) async fn exchange_admin_provider_oauth_code(
@@ -112,6 +125,7 @@ pub(crate) async fn exchange_admin_provider_oauth_refresh_token(
     state: &AdminAppState<'_>,
     template: AdminProviderOAuthTemplate,
     refresh_token: &str,
+    client_id: Option<&str>,
     proxy: Option<ProxySnapshot>,
 ) -> Result<serde_json::Value, Response<Body>> {
     let token_url = state.provider_oauth_token_url(template.provider_type, template.token_url);
@@ -125,7 +139,7 @@ pub(crate) async fn exchange_admin_provider_oauth_refresh_token(
         provider_type: template.provider_type.to_string(),
         name: None,
         refresh_token: Some(refresh_token.to_string()),
-        raw_credentials: None,
+        raw_credentials: client_id.map(|value| serde_json::json!({"client_id": value})),
         network: ctx.network.clone(),
     };
     let result = service

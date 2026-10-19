@@ -128,6 +128,7 @@ vi.mock('lucide-vue-next', async () => {
   return {
     Search: Icon,
     Upload: Icon,
+    CloudUpload: Icon,
     ChevronDown: Icon,
     RefreshCw: Icon,
     Activity: Icon,
@@ -376,6 +377,10 @@ vi.mock('@/features/pool/components/PoolAdvancedDialog.vue', async () => {
       },
     }),
   }
+})
+vi.mock('@/features/pool/components/PoolAccountPushDialog.vue', async () => {
+  const { defineComponent } = await import('vue')
+  return { default: defineComponent({ setup: () => () => null }) }
 })
 vi.mock('@/features/pool/components/PoolDemandMetricsDialog.vue', async () => {
   const { defineComponent } = await import('vue')
@@ -1133,6 +1138,31 @@ describe('PoolManagement Codex cycle stats mode', () => {
     expect(endpointMocks.refreshProviderOAuth).toHaveBeenCalledWith(oauthKey.key_id)
     expect(endpointMocks.listPoolKeys).toHaveBeenCalledTimes(2)
     expect(root.textContent).not.toContain(oauthKey.key_name)
+  })
+
+  it('shows automatic AT refresh eligibility and both token states in desktop and mobile tooltips', async () => {
+    const key = createPoolKey('chatgpt_web', {
+      auth_type: 'oauth', oauth_managed: true, can_refresh_oauth: true,
+      oauth_refresh_status: {
+        eligible: false, at_state: 'rejected', rt_state: 'invalid',
+        reason: 'RT 已明确失效，停止自动重试', error_code: 'refresh_token_invalidated',
+      },
+      status_snapshot: {
+        account: { code: 'ok', blocked: false }, quota: { code: 'ok', exhausted: false },
+        oauth: { code: 'expired', expires_at: 1 },
+      },
+    })
+    endpointMocks.getPoolOverview.mockResolvedValue({ items: [createOverview('chatgpt_web')] })
+    endpointMocks.listPoolKeys.mockResolvedValue(createKeyPage(key))
+    endpointMocks.getProvider.mockResolvedValue(createProvider('chatgpt_web'))
+    const root = mountPoolManagement()
+    await settle()
+    expect(root.textContent?.match(/刷新 AT：否/g)).toHaveLength(2)
+    const titles = Array.from(root.querySelectorAll<HTMLElement>('[title]')).map(el => el.title)
+    expect(titles.filter(title => title.includes('AT 已被上游拒绝') && title.includes('RT 已明确失效')).length).toBeGreaterThanOrEqual(2)
+    // Automatic retries stop, while a manual diagnostic attempt stays available.
+    const refresh = Array.from(root.querySelectorAll<HTMLButtonElement>('button')).find(button => button.title === '重新授权')
+    expect(refresh?.disabled).toBe(false)
   })
 
   it('hides the stats mode switch for non-Codex providers and keeps account totals', async () => {

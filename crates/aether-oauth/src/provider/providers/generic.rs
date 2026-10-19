@@ -1,6 +1,5 @@
 use crate::core::{
-    current_unix_secs, redacted_oauth_error_body_excerpt, OAuthAuthorizeResponse, OAuthError,
-    OAuthTokenSet,
+    current_unix_secs, oauth_error_body_excerpt, OAuthAuthorizeResponse, OAuthError, OAuthTokenSet,
 };
 use crate::network::{OAuthHttpExecutor, OAuthHttpRequest};
 use crate::provider::ProviderOAuthAdapter;
@@ -8,6 +7,10 @@ use crate::provider::{
     ProviderOAuthAccount, ProviderOAuthAccountState, ProviderOAuthCapabilities,
     ProviderOAuthImportInput, ProviderOAuthProbeResult, ProviderOAuthRequestAuth,
     ProviderOAuthTokenSet, ProviderOAuthTransportContext,
+};
+use aether_contracts::{
+    ResolvedTransportProfile, TRANSPORT_BACKEND_BROWSER_WREQ, TRANSPORT_HTTP_MODE_AUTO,
+    TRANSPORT_POOL_SCOPE_KEY,
 };
 use async_trait::async_trait;
 use serde_json::{json, Value};
@@ -26,6 +29,11 @@ pub const ANTIGRAVITY_OAUTH_CLIENT_ID_ENV: &str = "AETHER_ANTIGRAVITY_OAUTH_CLIE
 pub const ANTIGRAVITY_OAUTH_CLIENT_SECRET_ENV: &str = "AETHER_ANTIGRAVITY_OAUTH_CLIENT_SECRET";
 const CODEX_IDENTITY_FINGERPRINT_FIELD: &str = "codex_identity_fingerprint";
 const CODEX_IDENTITY_FINGERPRINT_VERSION: &str = "codex-persisted-fingerprint:v1";
+const CHATGPT_WEB_OAUTH_USER_AGENT: &str = concat!(
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) ",
+    "AppleWebKit/537.36 (KHTML, like Gecko) ",
+    "Chrome/145.0.0.0 Safari/537.36"
+);
 
 pub fn derive_codex_identity_fingerprint(
     account_id: Option<&str>,
@@ -103,14 +111,14 @@ pub const GENERIC_PROVIDER_OAUTH_TEMPLATES: &[GenericProviderOAuthTemplate] = &[
         display_name: "ChatGPT Web",
         authorize_url: "https://auth.openai.com/oauth/authorize",
         token_url: "https://auth.openai.com/oauth/token",
-        client_id: "app_EMoamEEZ73f0CkXaXp7hrann",
+        client_id: "app_2SKx67EdpoN0G6j64rFvigXD",
         client_id_env: None,
         client_secret_env: None,
         scopes: &["openid", "email", "profile", "offline_access"],
         redirect_uri: "http://localhost:1455/auth/callback",
         use_pkce: true,
         uses_json_payload: false,
-        include_scope_in_token_request: true,
+        include_scope_in_token_request: false,
     },
     GenericProviderOAuthTemplate {
         provider_type: "gemini_cli",
@@ -254,6 +262,16 @@ impl GenericProviderOAuthAdapter {
             .unwrap_or_else(|| self.template.client_id.to_string())
     }
 
+    fn for_account_credentials(&self, credentials: Option<&Value>) -> Self {
+        let mut adapter = self.clone();
+        if self.template.provider_type == "chatgpt_web" {
+            if let Some(client_id) = credentials.and_then(explicit_oauth_client_id) {
+                adapter.client_id_override = Some(client_id);
+            }
+        }
+        adapter
+    }
+
     fn client_secret(&self) -> Result<Option<String>, OAuthError> {
         let Some(env_name) = self.template.client_secret_env else {
             return Ok(None);
@@ -392,12 +410,24 @@ impl GenericProviderOAuthAdapter {
                     request_id,
                     method: reqwest::Method::POST,
                     url: self.token_url(),
-                    headers: form_headers(),
+                    headers: {
+                        let mut headers = form_headers();
+                        if self.template.provider_type == "chatgpt_web" {
+                            headers.insert(
+                                "user-agent".to_string(),
+                                CHATGPT_WEB_OAUTH_USER_AGENT.to_string(),
+                            );
+                        }
+                        headers
+                    },
                     content_type: Some("application/x-www-form-urlencoded".to_string()),
                     json_body: None,
                     body_bytes: Some(form_body),
                     network: ctx.network.clone(),
-                    transport_profile: None,
+                    transport_profile: chatgpt_web_oauth_transport_profile(
+                        self.template.provider_type,
+                        ctx,
+                    ),
                 })
                 .await?
         };
@@ -426,11 +456,24 @@ impl GenericProviderOAuthAdapter {
             json!(self.template.provider_type),
         );
         auth_config.insert("updated_at".to_string(), json!(current_unix_secs()));
+        if self.template.provider_type == "chatgpt_web" {
+            auth_config.insert("client_id".to_string(), json!(self.client_id()));
+        }
         if let Some(token_type) = token_set.token_type.as_ref() {
             auth_config.insert("token_type".to_string(), json!(token_type));
         }
         if let Some(refresh_token) = token_set.refresh_token.as_ref() {
             auth_config.insert("refresh_token".to_string(), json!(refresh_token));
+        }
+        if self.template.provider_type == "chatgpt_web" {
+            if let Some(id_token) = payload
+                .get("id_token")
+                .and_then(Value::as_str)
+                .map(str::trim)
+                .filter(|value| !value.is_empty())
+            {
+                auth_config.insert("id_token".to_string(), json!(id_token));
+            }
         }
         if let Some(expires_at) = token_set.expires_at_unix_secs {
             auth_config.insert("expires_at".to_string(), json!(expires_at));
@@ -519,7 +562,8 @@ impl ProviderOAuthAdapter for GenericProviderOAuthAdapter {
             .map(str::trim)
             .filter(|value| !value.is_empty())
             .ok_or_else(|| OAuthError::invalid_request("refresh_token is required"))?;
-        self.exchange_grant(executor, ctx, "refresh_token", refresh_token, None, None)
+        self.for_account_credentials(input.raw_credentials.as_ref())
+            .exchange_grant(executor, ctx, "refresh_token", refresh_token, None, None)
             .await
     }
 
@@ -536,6 +580,7 @@ impl ProviderOAuthAdapter for GenericProviderOAuthAdapter {
             .filter(|value| !value.is_empty())
             .ok_or_else(|| OAuthError::invalid_request("auth_config missing refresh_token"))?;
         let mut refreshed = self
+            .for_account_credentials(Some(&account.auth_config))
             .exchange_grant(executor, ctx, "refresh_token", refresh_token, None, None)
             .await?;
         let existing_codex_identity_fingerprint = self
@@ -597,6 +642,24 @@ impl ProviderOAuthAdapter for GenericProviderOAuthAdapter {
     }
 }
 
+/// Read an explicitly supplied OAuth client ID, never inferred JWT claims or RT bytes.
+pub fn explicit_oauth_client_id(credentials: &Value) -> Option<String> {
+    let read = |value: &Value| {
+        ["client_id", "clientId"].into_iter().find_map(|field| {
+            let value = value.get(field)?.as_str()?.trim();
+            (!value.is_empty()
+                && value.len() <= 256
+                && value.bytes().all(|byte| byte.is_ascii_graphic()))
+            .then(|| value.to_string())
+        })
+    };
+    read(credentials).or_else(|| {
+        ["auth_config", "authConfig"]
+            .into_iter()
+            .find_map(|field| credentials.get(field).and_then(read))
+    })
+}
+
 fn non_empty_environment_value(name: &str) -> Option<String> {
     std::env::var(name).ok().and_then(non_empty_owned)
 }
@@ -625,6 +688,42 @@ pub fn template_for_provider_type(provider_type: &str) -> Option<GenericProvider
         .copied()
 }
 
+fn chatgpt_web_oauth_transport_profile(
+    provider_type: &str,
+    ctx: &ProviderOAuthTransportContext,
+) -> Option<ResolvedTransportProfile> {
+    if provider_type != "chatgpt_web" {
+        return None;
+    }
+    // Node-only proxies use the tunnel runtime, which cannot run browser_wreq.
+    let tunnel_only_proxy = ctx.network.proxy.as_ref().is_some_and(|proxy| {
+        if proxy.enabled == Some(false) {
+            return false;
+        }
+        let has_proxy_url = proxy
+            .url
+            .as_deref()
+            .is_some_and(|value| !value.trim().is_empty());
+        let has_node_id = proxy
+            .node_id
+            .as_deref()
+            .is_some_and(|value| !value.trim().is_empty());
+        let tunnel_mode = proxy
+            .mode
+            .as_deref()
+            .is_some_and(|value| value.trim().eq_ignore_ascii_case("tunnel"));
+        has_node_id && (tunnel_mode || !has_proxy_url)
+    });
+    (!tunnel_only_proxy).then(|| ResolvedTransportProfile {
+        profile_id: "chatgpt_web_oauth_chrome110".to_string(),
+        backend: TRANSPORT_BACKEND_BROWSER_WREQ.to_string(),
+        http_mode: TRANSPORT_HTTP_MODE_AUTO.to_string(),
+        pool_scope: TRANSPORT_POOL_SCOPE_KEY.to_string(),
+        header_fingerprint: None,
+        extra: Some(json!({ "browser_profile": "chrome110" })),
+    })
+}
+
 fn form_headers() -> BTreeMap<String, String> {
     BTreeMap::from([
         (
@@ -651,7 +750,7 @@ fn json_headers(provider_type: &str) -> BTreeMap<String, String> {
 }
 
 fn truncate_body(body: &str) -> String {
-    redacted_oauth_error_body_excerpt(body)
+    oauth_error_body_excerpt(body)
 }
 
 fn secret_fingerprint(value: &str) -> String {
@@ -1240,6 +1339,198 @@ mod tests {
             expires_at_unix_secs: Some(1),
             identity: BTreeMap::new(),
         }
+    }
+
+    #[tokio::test]
+    async fn chatgpt_web_import_and_refresh_keep_explicit_client_id() {
+        let seen_request = Arc::new(Mutex::new(None));
+        let executor = StaticExecutor {
+            seen_request: Arc::clone(&seen_request),
+            response_payload: json!({
+                "access_token": "web-access-token",
+                "refresh_token": "rotated-web-refresh-token",
+                "client_id": "untrusted-upstream-echo",
+                "expires_in": 3600,
+            }),
+        };
+        let adapter =
+            GenericProviderOAuthAdapter::for_provider_type("chatgpt_web").expect("web adapter");
+        let ctx = transport_context("chatgpt_web");
+        let imported = adapter
+            .import_credentials(
+                &executor,
+                &ctx,
+                crate::provider::ProviderOAuthImportInput {
+                    provider_type: "chatgpt_web".to_string(),
+                    name: None,
+                    refresh_token: Some("imported-refresh-token".to_string()),
+                    raw_credentials: Some(
+                        json!({"auth_config": {"clientId": " app-explicit-web "}}),
+                    ),
+                    network: ctx.network.clone(),
+                },
+            )
+            .await
+            .expect("import");
+        assert_eq!(imported.auth_config["client_id"], "app-explicit-web");
+        let mut account = oauth_account("chatgpt_web");
+        account.auth_config = imported.auth_config;
+        for (is_refresh, expected_rt) in [
+            (false, "imported-refresh-token"),
+            (true, "rotated-web-refresh-token"),
+        ] {
+            if is_refresh {
+                let refreshed = adapter
+                    .refresh(&executor, &ctx, &account)
+                    .await
+                    .expect("refresh");
+                assert_eq!(refreshed.auth_config["client_id"], "app-explicit-web");
+            }
+            let request = seen_request.lock().expect("lock").clone().expect("request");
+            let fields = url::form_urlencoded::parse(&request.body_bytes.expect("form body"))
+                .into_owned()
+                .collect::<BTreeMap<_, _>>();
+            assert_eq!(fields["client_id"], "app-explicit-web");
+            assert_eq!(fields["refresh_token"], expected_rt);
+        }
+    }
+
+    #[test]
+    fn explicit_client_id_requires_valid_explicit_metadata() {
+        for value in [
+            json!({}),
+            json!({"client_id": " "}),
+            json!({"client_id": 123}),
+            json!({"client_id": "bad\nclient"}),
+            json!({"client_id": "x".repeat(257)}),
+            json!({"aud": "app-guessed", "refresh_token": "app-guessed"}),
+        ] {
+            assert_eq!(super::explicit_oauth_client_id(&value), None);
+        }
+        for value in [
+            json!({"clientId": "app-explicit"}),
+            json!({"authConfig": {"client_id": "app-explicit"}}),
+            json!({"client_id": " app-explicit ", "auth_config": {"client_id": "app-other"}}),
+        ] {
+            assert_eq!(
+                super::explicit_oauth_client_id(&value).as_deref(),
+                Some("app-explicit")
+            );
+        }
+    }
+
+    #[tokio::test]
+    async fn chatgpt_web_refresh_uses_web_client_and_rotates_credentials() {
+        let seen_request = Arc::new(Mutex::new(None));
+        let executor = StaticExecutor {
+            seen_request: Arc::clone(&seen_request),
+            response_payload: json!({
+                "access_token": "new-web-access-token",
+                "refresh_token": "new-web-refresh-token",
+                "id_token": "new-web-id-token",
+                "expires_in": 3600,
+            }),
+        };
+        let adapter = GenericProviderOAuthAdapter::for_provider_type("chatgpt_web")
+            .expect("chatgpt web adapter");
+        let refreshed = adapter
+            .refresh(
+                &executor,
+                &transport_context("chatgpt_web"),
+                &oauth_account("chatgpt_web"),
+            )
+            .await
+            .expect("web refresh");
+        let seen = seen_request.lock().expect("lock").clone().expect("request");
+        assert_eq!(seen.url, "https://auth.openai.com/oauth/token");
+        assert_eq!(seen.method, reqwest::Method::POST);
+        assert_eq!(
+            seen.content_type.as_deref(),
+            Some("application/x-www-form-urlencoded")
+        );
+        assert_eq!(seen.headers["accept"], "application/json");
+        assert_eq!(
+            seen.headers["user-agent"],
+            super::CHATGPT_WEB_OAUTH_USER_AGENT
+        );
+        assert!(seen.json_body.is_none());
+        let fields = url::form_urlencoded::parse(&seen.body_bytes.expect("form body"))
+            .into_owned()
+            .collect::<BTreeMap<_, _>>();
+        assert_eq!(fields.len(), 3);
+        assert_eq!(fields["client_id"], "app_2SKx67EdpoN0G6j64rFvigXD");
+        assert_eq!(fields["grant_type"], "refresh_token");
+        assert_eq!(fields["refresh_token"], "old-refresh-token");
+        let profile = seen.transport_profile.expect("browser transport");
+        assert_eq!(profile.backend, "browser_wreq");
+        assert_eq!(
+            profile.extra.expect("browser profile")["browser_profile"],
+            "chrome110"
+        );
+        assert_eq!(refreshed.token_set.access_token, "new-web-access-token");
+        assert_eq!(
+            refreshed.auth_config["refresh_token"],
+            "new-web-refresh-token"
+        );
+        assert_eq!(refreshed.auth_config["id_token"], "new-web-id-token");
+        assert_eq!(
+            refreshed.auth_config["client_id"],
+            "app_2SKx67EdpoN0G6j64rFvigXD"
+        );
+    }
+
+    #[tokio::test]
+    async fn codex_refresh_keeps_its_client_scope_and_transport() {
+        let seen_request = Arc::new(Mutex::new(None));
+        let executor = StaticExecutor {
+            seen_request: Arc::clone(&seen_request),
+            response_payload: json!({"access_token": "new-codex-token", "expires_in": 3600}),
+        };
+        let mut account = oauth_account("codex");
+        account.auth_config["client_id"] = json!("must-not-override-codex");
+        GenericProviderOAuthAdapter::for_provider_type("codex")
+            .expect("codex adapter")
+            .refresh(&executor, &transport_context("codex"), &account)
+            .await
+            .expect("codex refresh");
+        let seen = seen_request.lock().expect("lock").clone().expect("request");
+        let fields = url::form_urlencoded::parse(&seen.body_bytes.expect("form body"))
+            .into_owned()
+            .collect::<BTreeMap<_, _>>();
+        assert_eq!(fields["client_id"], "app_EMoamEEZ73f0CkXaXp7hrann");
+        assert!(fields.contains_key("scope"));
+        assert!(seen.transport_profile.is_none());
+        assert!(!seen.headers.contains_key("user-agent"));
+    }
+
+    #[test]
+    fn chatgpt_web_refresh_preserves_tunnel_and_url_proxy_support() {
+        use aether_contracts::ProxySnapshot;
+
+        for proxy in [
+            ProxySnapshot {
+                node_id: Some("node-only".to_string()),
+                ..ProxySnapshot::default()
+            },
+            ProxySnapshot {
+                mode: Some("tunnel".to_string()),
+                node_id: Some("node-with-url".to_string()),
+                url: Some("http://127.0.0.1:9999".to_string()),
+                ..ProxySnapshot::default()
+            },
+        ] {
+            let mut ctx = transport_context("chatgpt_web");
+            ctx.network.proxy = Some(proxy);
+            assert!(super::chatgpt_web_oauth_transport_profile("chatgpt_web", &ctx).is_none());
+        }
+        let mut ctx = transport_context("chatgpt_web");
+        ctx.network.proxy = Some(ProxySnapshot {
+            mode: Some("url".to_string()),
+            node_id: Some("metadata-node".to_string()),
+            url: Some("http://127.0.0.1:9999".to_string()),
+            ..ProxySnapshot::default()
+        });
+        assert!(super::chatgpt_web_oauth_transport_profile("chatgpt_web", &ctx).is_some());
     }
 
     #[tokio::test]

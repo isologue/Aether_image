@@ -269,10 +269,19 @@ fn local_oauth_request_refresh_token_fingerprint(
 }
 
 fn local_oauth_log_excerpt(body: &str) -> String {
+    local_oauth_log_excerpt_with_redaction(
+        body,
+        aether_oauth::core::oauth_error_redaction_enabled(),
+    )
+}
+
+fn local_oauth_log_excerpt_with_redaction(body: &str, redaction_enabled: bool) -> String {
     if body.trim().is_empty() {
         "-".to_string()
-    } else {
+    } else if redaction_enabled {
         "[redacted]".to_string()
+    } else {
+        body.trim().chars().take(500).collect()
     }
 }
 
@@ -358,9 +367,7 @@ fn normalize_local_oauth_refresh_error_message(
                         .map(str::trim)
                         .filter(|value| !value.is_empty())
                         .map(|value| value.to_ascii_lowercase());
-                } else if let Some(error) = object
-                    .get("error")
-                    .and_then(serde_json::Value::as_str)
+                } else if let Some(error) = object.get("error").and_then(serde_json::Value::as_str)
                 {
                     // OAuth token endpoints commonly return {"error":"invalid_grant"}
                     // rather than a nested error object. Keep only the bounded error code.
@@ -459,13 +466,13 @@ fn merge_local_oauth_refresh_failure_reason(
         return Some(refresh_reason.to_string());
     }
     if current_reason.starts_with(OAUTH_EXPIRED_PREFIX) {
-        if refresh_reason.starts_with(OAUTH_REFRESH_FAILED_PREFIX)
-            && !current_reason
+        if refresh_reason.starts_with(OAUTH_REFRESH_FAILED_PREFIX) {
+            let at_reason = current_reason
                 .lines()
-                .map(str::trim)
-                .any(|line| line.starts_with(OAUTH_REFRESH_FAILED_PREFIX))
-        {
-            return Some(format!("{current_reason}\n{refresh_reason}"));
+                .filter(|line| !line.trim().starts_with(OAUTH_REFRESH_FAILED_PREFIX))
+                .collect::<Vec<_>>()
+                .join("\n");
+            return Some(format!("{at_reason}\n{refresh_reason}"));
         }
         return Some(current_reason.to_string());
     }
@@ -1591,6 +1598,26 @@ impl AppState {
                     return Ok(None);
                 }
                 Err(err) => {
+                    let (status_code, body) = match &err {
+                        provider_transport::LocalOAuthRefreshError::HttpStatus {
+                            status_code,
+                            body_excerpt,
+                            ..
+                        } => (*status_code, body_excerpt.as_str()),
+                        _ => (0, ""),
+                    };
+                    if self
+                        .persist_local_oauth_refresh_failure_state(
+                            &current_transport,
+                            status_code,
+                            body,
+                            false,
+                        )
+                        .await
+                        .is_err()
+                    {
+                        tracing::warn!(key_id = %current_transport.key.id, "gateway oauth refresh failure persistence failed");
+                    }
                     return Err(local_oauth_refresh_gateway_error(&err));
                 }
             };
@@ -2745,7 +2772,9 @@ impl AppState {
                     expires_at_unix_secs_update: Some(entry.expires_at_unix_secs),
                     oauth_invalid_at_unix_secs: latest_key.oauth_invalid_at_unix_secs,
                     oauth_invalid_reason: latest_key.oauth_invalid_reason.clone(),
-                    upstream_metadata_patch: None,
+                    upstream_metadata_patch: Some(json!({"oauth_refresh": crate::provider_key_auth::oauth_refresh_success_metadata(
+                        entry.metadata.as_ref().and_then(Value::as_object), latest_key.updated_at_unix_secs.unwrap_or(0),
+                    )})),
                     upstream_metadata_namespace_to_remove: None,
                     status_snapshot_patch: provider_key_oauth_status_snapshot_update(&latest_key)
                         .status_snapshot_patch,
@@ -2812,9 +2841,14 @@ impl AppState {
         else {
             return Ok(false);
         };
+        let normalized_reason = if status_code == 0 {
+            "Token 刷新遇到网络故障或无效响应".to_string()
+        } else {
+            normalize_local_oauth_refresh_error_message(Some(status_code), Some(body_excerpt))
+        };
         let refresh_reason = format!(
             "{OAUTH_REFRESH_FAILED_PREFIX}Token 续期失败 ({status_code}): {}",
-            normalize_local_oauth_refresh_error_message(Some(status_code), Some(body_excerpt))
+            normalized_reason
         );
         let now_unix_secs = SystemTime::now()
             .duration_since(UNIX_EPOCH)
@@ -3036,9 +3070,13 @@ impl AppState {
             return Ok(false);
         }
 
-        let refresh_reason = format!(
-            "{OAUTH_REFRESH_FAILED_PREFIX}Token 续期失败 ({status_code}): {}",
+        let normalized_reason = if status_code == 0 {
+            "Token 刷新遇到网络故障或无效响应".to_string()
+        } else {
             normalize_local_oauth_refresh_error_message(Some(status_code), Some(body_excerpt))
+        };
+        let refresh_reason = format!(
+            "{OAUTH_REFRESH_FAILED_PREFIX}Token 续期失败 ({status_code}): {normalized_reason}",
         );
         let Some(merged_reason) = merge_local_oauth_refresh_failure_reason(
             latest_key.oauth_invalid_reason.as_deref(),
@@ -3052,9 +3090,25 @@ impl AppState {
             .ok()
             .map(|duration| duration.as_secs())
             .unwrap_or(0);
+        let auth_config = transport
+            .key
+            .decrypted_auth_config
+            .as_deref()
+            .and_then(|value| serde_json::from_str::<Value>(value).ok());
+        let refresh_metadata = crate::provider_key_auth::oauth_refresh_failure_metadata(
+            auth_config.as_ref().and_then(Value::as_object),
+            status_code,
+            &normalized_reason,
+            now_unix_secs,
+        );
         let mut updated = false;
         if latest_key.oauth_invalid_reason.as_deref() != Some(merged_reason.as_str())
             || latest_key.oauth_invalid_at_unix_secs.is_none()
+            || latest_key
+                .upstream_metadata
+                .as_ref()
+                .and_then(|value| value.get("oauth_refresh"))
+                != Some(&refresh_metadata)
         {
             latest_key.oauth_invalid_at_unix_secs = latest_key
                 .oauth_invalid_at_unix_secs
@@ -3082,7 +3136,9 @@ impl AppState {
                             expires_at_unix_secs_update: None,
                             oauth_invalid_at_unix_secs: latest_key.oauth_invalid_at_unix_secs,
                             oauth_invalid_reason: latest_key.oauth_invalid_reason.clone(),
-                            upstream_metadata_patch: None,
+                            upstream_metadata_patch: Some(
+                                json!({"oauth_refresh": refresh_metadata}),
+                            ),
                             upstream_metadata_namespace_to_remove: None,
                             status_snapshot_patch: provider_key_oauth_status_snapshot_update(
                                 &latest_key,
@@ -3119,9 +3175,10 @@ impl AppState {
             }
         }
 
-        let should_auto_remove = admin_provider_quota_pure::provider_auto_remove_banned_keys(
-            transport.provider.config.as_ref(),
-        )
+        let should_auto_remove = matches!(status_code, 400 | 401 | 403)
+            && admin_provider_quota_pure::provider_auto_remove_banned_keys(
+                transport.provider.config.as_ref(),
+            )
             && admin_provider_quota_pure::should_auto_remove_oauth_invalid_key(
                 &latest_key,
                 None,
@@ -3240,7 +3297,12 @@ impl AppState {
             provider_api_format: "provider_oauth:local_refresh".to_string(),
             model_name: Some(provider_type.to_string()),
             proxy: proxy_snapshot,
-            transport_profile: None,
+            // Local refresh resolves its effective proxy here, after the adapter
+            // creates the request. Tunnel nodes cannot execute browser_wreq.
+            transport_profile: request.transport_profile.clone().filter(|profile| {
+                !proxy_is_tunnel
+                    || profile.backend != aether_contracts::TRANSPORT_BACKEND_BROWSER_WREQ
+            }),
             timeouts: Some(ExecutionTimeouts {
                 connect_ms: Some(LOCAL_OAUTH_HTTP_TIMEOUT_MS),
                 read_ms: Some(LOCAL_OAUTH_HTTP_TIMEOUT_MS),
@@ -4629,9 +4691,33 @@ mod tests {
 
         let normalized = super::normalize_local_oauth_refresh_error_message(Some(502), Some(body));
         assert_eq!(normalized, "HTTP 502 (upstream_error_code=unexpected)");
-        assert_eq!(super::local_oauth_log_excerpt(body), "[redacted]");
+        assert_eq!(
+            super::local_oauth_log_excerpt_with_redaction(body, false),
+            body
+        );
+        assert_eq!(
+            super::local_oauth_log_excerpt_with_redaction(body, true),
+            "[redacted]"
+        );
         for secret in ["upstream-secret", "user:pass", "q=secret"] {
             assert!(!normalized.contains(secret), "leaked {secret}");
+        }
+    }
+
+    #[test]
+    fn local_oauth_debug_excerpt_is_bounded_and_handles_empty_body() {
+        let body = "密".repeat(501);
+        assert_eq!(
+            super::local_oauth_log_excerpt_with_redaction(&body, false)
+                .chars()
+                .count(),
+            500
+        );
+        for enabled in [true, false] {
+            assert_eq!(
+                super::local_oauth_log_excerpt_with_redaction(" \n ", enabled),
+                "-"
+            );
         }
     }
 
@@ -5003,6 +5089,82 @@ mod tests {
             Some(replacement_api_key.as_str())
         );
         assert_eq!(stored.expires_at_unix_secs, None);
+    }
+
+    #[tokio::test]
+    async fn web_refresh_failure_is_visible_and_success_restores_eligibility() {
+        let config = json!({"provider_type": "chatgpt_web", "refresh_token": "test-rt", "expires_at": 4102444800_u64});
+        let (state, repository, _) = provider_oauth_state("chatgpt_web", &config, "old-at");
+        repository
+            .update_key_oauth_runtime_state(
+                "key-1",
+                Some(100),
+                Some("[OAUTH_EXPIRED] AT rejected"),
+                Some(100),
+            )
+            .await
+            .unwrap();
+        let transport = state
+            .read_provider_transport_snapshot("provider-1", "endpoint-1", "key-1")
+            .await
+            .unwrap()
+            .unwrap();
+        state.persist_local_oauth_refresh_failure_state(
+            &transport, 401, r#"{"error":{"code":"refresh_token_invalidated","message":"Your session has ended"}}"#, false,
+        ).await.unwrap();
+        let stored = repository
+            .list_keys_by_ids(&["key-1".to_string()])
+            .await
+            .unwrap()
+            .pop()
+            .unwrap();
+        let status = crate::provider_key_auth::provider_key_oauth_refresh_status(
+            &stored,
+            "chatgpt_web",
+            config.as_object(),
+            200,
+        );
+        assert_eq!(status["eligible"], false);
+        assert_eq!(status["at_state"], "rejected");
+        assert_eq!(status["rt_state"], "invalid");
+        assert_eq!(status["error_code"], "refresh_token_invalidated");
+        assert!(status["last_attempt_at"].as_u64().is_some());
+
+        let fence = state
+            .capture_provider_transport_credential_fence(&transport)
+            .await
+            .unwrap()
+            .unwrap();
+        let new_config = json!({"provider_type": "chatgpt_web", "refresh_token": "new-rt", "expires_at": 4102444800_u64});
+        let entry = crate::provider_transport::CachedOAuthEntry {
+            provider_type: "chatgpt_web".into(),
+            auth_header_name: "authorization".into(),
+            auth_header_value: "Bearer new-at".into(),
+            expires_at_unix_secs: Some(4102444800),
+            metadata: Some(new_config.clone()),
+            source_fingerprint: None,
+        };
+        state
+            .persist_local_oauth_refresh_entry(&transport, &entry, Some(&fence))
+            .await
+            .unwrap();
+        let restored = repository
+            .list_keys_by_ids(&["key-1".to_string()])
+            .await
+            .unwrap()
+            .pop()
+            .unwrap();
+        assert!(restored.oauth_invalid_reason.is_none());
+        assert!(restored.oauth_invalid_at_unix_secs.is_none());
+        let status = crate::provider_key_auth::provider_key_oauth_refresh_status(
+            &restored,
+            "chatgpt_web",
+            new_config.as_object(),
+            200,
+        );
+        assert_eq!(status["eligible"], true);
+        assert_eq!(status["rt_state"], "succeeded");
+        assert_eq!(status["error_code"], serde_json::Value::Null);
     }
 
     #[tokio::test]

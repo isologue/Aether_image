@@ -319,12 +319,14 @@ impl<'a> AdminAppState<'a> {
         &self,
         template: AdminProviderOAuthTemplate,
         refresh_token: &str,
+        client_id: Option<&str>,
         proxy: Option<ProxySnapshot>,
     ) -> Result<serde_json::Value, Response<Body>> {
         crate::handlers::admin::provider::oauth::state::exchange_admin_provider_oauth_refresh_token(
             self,
             template,
             refresh_token,
+            client_id,
             proxy,
         )
         .await

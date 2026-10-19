@@ -125,7 +125,8 @@ fn normalizes_sub2api_data_envelope_and_merges_account_metadata() {
         },
         "skip_default_group_bind": true
     }))
-    .unwrap();
+    .unwrap()
+    .accounts;
 
     assert_eq!(normalized.len(), 1);
     assert_eq!(normalized[0]["access_token"], "sub2api-access");
@@ -133,6 +134,50 @@ fn normalizes_sub2api_data_envelope_and_merges_account_metadata() {
     assert_eq!(normalized[0]["account_id"], "acct-sub2api");
     assert_eq!(normalized[0]["email"], "pool@example.test");
     assert_eq!(normalized[0]["account_name"], "pool-account");
+}
+
+#[test]
+fn sub2api_preserves_explicit_client_id_without_importing_routing_config() {
+    for client_fields in [
+        json!({"client_id": " app-source-client "}),
+        json!({"clientId": "app-source-client"}),
+        json!({"auth_config": {"client_id": "app-source-client", "proxy": "untrusted"}}),
+        json!({"authConfig": {"clientId": "app-source-client"}}),
+    ] {
+        let mut credentials = client_fields;
+        credentials["access_token"] = json!("web-access");
+        credentials["refresh_token"] = json!("web-refresh");
+        credentials["proxy"] = json!("untrusted");
+        credentials["headers"] = json!({"authorization": "untrusted"});
+        let normalized = normalize_sub2api_payload(json!({"data": {
+            "type": "sub2api-data", "version": 1,
+            "accounts": [{"platform": "openai", "type": "oauth", "credentials": credentials}]
+        }}))
+        .expect("valid Sub2API account")
+        .accounts;
+        assert_eq!(normalized[0]["client_id"], "app-source-client");
+        assert_eq!(normalized[0]["refresh_token"], "web-refresh");
+        for field in ["clientId", "auth_config", "authConfig", "proxy", "headers"] {
+            assert!(
+                normalized[0].get(field).is_none(),
+                "unexpected field: {field}"
+            );
+        }
+    }
+    for client_fields in [
+        json!({}),
+        json!({"client_id": " "}),
+        json!({"client_id": 123}),
+    ] {
+        let mut credentials = client_fields;
+        credentials["access_token"] = json!("web-access");
+        let normalized = normalize_sub2api_payload(json!({"accounts": [{
+            "platform": "openai", "type": "oauth", "credentials": credentials
+        }]}))
+        .expect("account without an explicit client ID")
+        .accounts;
+        assert!(normalized[0].get("client_id").is_none());
+    }
 }
 
 #[test]
@@ -146,6 +191,172 @@ fn rejects_sub2api_data_without_oauth_accounts() {
     ] {
         assert!(normalize_sub2api_payload(value).is_err());
     }
+}
+
+struct ClientIdLogWriter(Arc<std::sync::Mutex<Vec<u8>>>);
+
+impl std::io::Write for ClientIdLogWriter {
+    fn write(&mut self, bytes: &[u8]) -> std::io::Result<usize> {
+        self.0.lock().unwrap().extend_from_slice(bytes);
+        Ok(bytes.len())
+    }
+
+    fn flush(&mut self) -> std::io::Result<()> {
+        Ok(())
+    }
+}
+
+fn capture_client_id_logs(normalized: &NormalizedPush, provider_type: &str) -> Vec<Value> {
+    let bytes = Arc::new(std::sync::Mutex::new(Vec::new()));
+    let writer = bytes.clone();
+    let subscriber = tracing_subscriber::fmt()
+        .json()
+        .with_ansi(false)
+        .without_time()
+        .with_writer(move || ClientIdLogWriter(writer.clone()))
+        .finish();
+    tracing::subscriber::with_default(subscriber, || {
+        for diagnostic in &normalized.client_ids {
+            diagnostic.log("test-push-id", PROVIDER_ID, provider_type);
+        }
+    });
+    let captured = String::from_utf8(bytes.lock().unwrap().clone()).unwrap();
+    for secret in [
+        "secret-access-token",
+        "secret-refresh-token",
+        TEST_SECRET,
+        "invalid\nclient",
+    ] {
+        assert!(!captured.contains(secret));
+    }
+    captured
+        .lines()
+        .map(|line| serde_json::from_str::<Value>(line).unwrap()["fields"].clone())
+        .collect()
+}
+
+#[test]
+fn client_id_logs_distinguish_missing_invalid_and_explicit_default() {
+    let web_default = aether_oauth::provider::providers::GENERIC_PROVIDER_OAUTH_TEMPLATES
+        .iter()
+        .find(|template| template.provider_type == "chatgpt_web")
+        .unwrap()
+        .client_id;
+    for (client_fields, expected_state, expected_source, expected_client, expected_path) in [
+        (json!({}), "missing", "web_default", web_default, ""),
+        (
+            json!({"client_id": null}),
+            "invalid",
+            "web_default",
+            web_default,
+            "credentials.client_id",
+        ),
+        (
+            json!({"client_id": " "}),
+            "invalid",
+            "web_default",
+            web_default,
+            "credentials.client_id",
+        ),
+        (
+            json!({"client_id": 123}),
+            "invalid",
+            "web_default",
+            web_default,
+            "credentials.client_id",
+        ),
+        (
+            json!({"client_id": "invalid\nclient"}),
+            "invalid",
+            "web_default",
+            web_default,
+            "credentials.client_id",
+        ),
+        (
+            json!({"client_id": "x".repeat(257)}),
+            "invalid",
+            "web_default",
+            web_default,
+            "credentials.client_id",
+        ),
+        (
+            json!({"client_id": web_default}),
+            "valid",
+            "account",
+            web_default,
+            "credentials.client_id",
+        ),
+        (
+            json!({"clientId": " app-sender "}),
+            "valid",
+            "account",
+            "app-sender",
+            "credentials.clientId",
+        ),
+        (
+            json!({"auth_config": {"client_id": "app-sender"}}),
+            "valid",
+            "account",
+            "app-sender",
+            "credentials.auth_config.client_id",
+        ),
+        (
+            json!({"authConfig": {"clientId": "app-sender"}}),
+            "valid",
+            "account",
+            "app-sender",
+            "credentials.authConfig.clientId",
+        ),
+    ] {
+        let mut credentials = client_fields;
+        credentials["access_token"] = json!("secret-access-token");
+        credentials["refresh_token"] = json!("secret-refresh-token");
+        credentials["headers"] = json!({"x-api-key": TEST_SECRET});
+        let normalized = normalize_sub2api_payload(json!({"data": {"accounts": [{
+            "platform": "openai", "type": "oauth", "credentials": credentials
+        }]}}))
+        .unwrap();
+        let logs = capture_client_id_logs(&normalized, "chatgpt_web");
+        assert_eq!(logs.len(), 1);
+        let log = &logs[0];
+        assert_eq!(log["message"], "account_push_client_id");
+        assert_eq!(log["push_id"], "test-push-id");
+        assert_eq!(log["provider_id"], PROVIDER_ID);
+        assert_eq!(log["account_index"], 0);
+        assert_eq!(log["client_id_present"], expected_state != "missing");
+        assert_eq!(log["client_id_state"], expected_state);
+        assert_eq!(log["client_id_fields"], expected_path);
+        assert_eq!(log["client_id_source"], expected_source);
+        assert_eq!(log["selected_refresh_client_id"], expected_client);
+        if expected_state == "valid" {
+            assert_eq!(log["provided_client_id"], expected_client);
+        } else {
+            assert!(log["provided_client_id"].is_null());
+        }
+    }
+}
+
+#[test]
+fn client_id_logs_keep_raw_presence_for_duplicates_and_codex_uses_its_default() {
+    let normalized = normalize_sub2api_payload(json!({"accounts": [
+        {"platform": "openai", "type": "oauth", "credentials": {"access_token": "secret-access-token"}},
+        {"platform": "openai", "type": "oauth", "credentials": {"access_token": "secret-access-token", "client_id": "app-sender"}}
+    ]})).unwrap();
+    assert_eq!(normalized.accounts.len(), 1);
+    let logs = capture_client_id_logs(&normalized, "codex");
+    assert_eq!(logs.len(), 2);
+    assert_eq!(logs[0]["duplicate"], false);
+    assert_eq!(logs[0]["client_id_state"], "missing");
+    assert_eq!(logs[1]["duplicate"], true);
+    assert_eq!(logs[1]["account_index"], 1);
+    assert_eq!(logs[1]["provided_client_id"], "app-sender");
+    assert_eq!(logs[1]["client_id_source"], "codex_default");
+    let codex_default = aether_oauth::provider::providers::GENERIC_PROVIDER_OAUTH_TEMPLATES
+        .iter()
+        .find(|template| template.provider_type == "codex")
+        .unwrap()
+        .client_id;
+    assert_eq!(logs[1]["selected_refresh_client_id"], codex_default);
 }
 #[test]
 fn bearer_auth_rejects_duplicates_and_whitespace() {
@@ -625,7 +836,7 @@ fn normalizes_aliases_deduplicates_and_strips_transport_overrides() {
         json!({"access_token":"", "accessToken":" test-token ", "accountId":"acct-test", "accountUserId":"user-test__acct-test", "userId":"user-test", "proxy":"http://invalid", "headers":{"Authorization":"secret"}}),
         json!({"access_token":"test-token"}),
         json!({"refreshToken":"refresh-test"}),
-    ]).unwrap();
+    ]).unwrap().accounts;
     assert_eq!(normalized.len(), 2);
     assert_eq!(normalized[0]["access_token"], "test-token");
     assert_eq!(normalized[0]["accountId"], "acct-test");

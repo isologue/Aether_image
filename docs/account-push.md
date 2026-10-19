@@ -32,7 +32,8 @@ POST 使用 `Content-Type: application/json`，接受包裹 `data` 的备份对�
         "type": "oauth",
         "credentials": {
           "access_token": "账号 access token",
-          "refresh_token": "账号 refresh token"
+          "refresh_token": "账号 refresh token",
+          "client_id": "app_source_client_id"
         },
         "extra": { "email": "account@example.com" }
       }
@@ -42,6 +43,8 @@ POST 使用 `Content-Type: application/json`，接受包裹 `data` 的备份对�
 ```
 
 数据 type 支持 sub2api-data / sub2api-bundle 或省略，version 支持 0 / 1 或省略。只导入 platform=openai 且 type=oauth 的账号；空包、缺少凭据、不支持的账号类型及 Agent Identity 凭据会明确返回错误。每个账号至少包含 access token 或 refresh token；仅含 refresh token 的账号需要目标提供商能够完成凭据交换。
+
+`credentials.client_id` 是可选字段，应填写获取该账号 Refresh Token 时实际使用的客户端 ID；也接受 `clientId` 及 credentials 内 `auth_config` / `authConfig` 的同名字段。ChatGPT Web 账号会保存该值，并在导入验证和后续刷新时使用；未提供或格式无效时使用 Web 默认值。Sub2API 格式本身不保证发送程序包含此字段，Aether 不会从 RT 或 JWT 猜测。
 
 账号名称、credentials 和身份元数据会进入现有导入器。代理、请求头、分组和调度参数不会从推送包导入；联网刷新沿用目标提供商配置。重复账号按已有 OAuth 身份规则更新凭据，建议推送完整身份信息。
 
@@ -74,3 +77,22 @@ account_created 表示新增，account_updated 表示更新，account_failed 表
 超时、409 或服务暂不可用时可以稍后重试，同一账号身份会更新已有账号。大批量导入可能触发多轮联网刷新，请为发送端和反向代理设置足够的超时时间，代理请求体限制应不低于 128 MiB。
 
 并发互斥位于单个网关进程，多副本网关的 ChatGPT Web 导入暂不保证跨实例串行。
+
+## 查询推送的 client_id
+
+鉴权和数据校验通过、取得导入锁后，应用会输出 INFO 级别的 `account_push_client_id` 日志，每条对应请求中的一个原始账号：
+
+- `push_id`、`provider_id`、`provider_type`：关联本次推送及目标提供商。
+- `account_index`：原始 accounts 数组中的下标，从 0 开始；`duplicate=true` 表示该项因 Token 重复被跳过。
+- `client_id_present`、`client_id_fields`：原始 credentials 是否包含受支持的客户端字段，以及字段路径。即使字段为 null、空串或类型错误，也会记录为已携带。
+- `client_id_state`：`missing`（未携带）、`invalid`（携带但无有效值）或 `valid`（存在有效值）。
+- `provided_client_id`：发送端提供的有效值，去除首尾空白后明文记录；缺失或无效时省略，不输出无效原文。
+- `selected_refresh_client_id`、`client_id_source`：按导入时提供商类型选择的刷新客户端；ChatGPT Web 使用 `account` 或 `web_default`，Codex 固定为 `codex_default`，不使用发送端的覆盖值。
+
+以上表示收到的数据及刷新客户端选择规则，不代表已发起刷新或刷新成功；重复项不会执行导入。导入完成后，`account_push_completed` 日志使用同一个 `push_id` 记录去重后的总数、新增、更新和失败数。日志不记录完整请求体、AT、RT 或推送 API Key；历史推送无法补回这些诊断信息。
+
+部署此版本后，重新推送一次，可在服务器查询：
+
+```sh
+docker logs --since 10m aether-app 2>&1 | grep -E 'account_push_client_id|account_push_completed'
+```

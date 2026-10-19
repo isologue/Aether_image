@@ -1,3 +1,13 @@
+export interface OAuthRefreshStatus {
+  eligible: boolean
+  reason: string
+  at_state: 'valid' | 'expired' | 'rejected' | 'unknown'
+  rt_state: 'unverified' | 'unavailable' | 'invalid' | 'failed' | 'retry_wait' | 'succeeded'
+  last_attempt_at?: number | null
+  next_retry_at?: number | null
+  error_code?: string | null
+}
+
 export interface ProviderKeyAuthCarrier {
   provider_type?: string | null
   auth_type?: string | null
@@ -10,6 +20,7 @@ export interface ProviderKeyAuthCarrier {
   can_refresh_oauth?: boolean | null
   can_export_oauth?: boolean | null
   can_edit_oauth?: boolean | null
+  oauth_refresh_status?: OAuthRefreshStatus | null
 }
 
 function normalizeText(value: unknown): string | null {

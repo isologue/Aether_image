@@ -3474,7 +3474,10 @@ async fn gateway_starts_admin_provider_oauth_batch_import_task_locally_with_trus
         .header(TRUSTED_ADMIN_USER_ROLE_HEADER, "admin")
         .header(TRUSTED_ADMIN_SESSION_ID_HEADER, "session-123")
         .json(&json!({
-            "credentials": "task-batch-refresh-success"
+            "credentials": serde_json::to_string(&(0..26).map(|index| json!({
+                "refresh_token": "task-batch-refresh-success",
+                "email": format!("task-account-{index}@example.com"),
+            })).collect::<Vec<_>>()).expect("credentials should serialize")
         }))
         .send()
         .await
@@ -3486,7 +3489,7 @@ async fn gateway_starts_admin_provider_oauth_batch_import_task_locally_with_trus
         .await
         .expect("submit payload should parse");
     assert_eq!(submit_payload["status"], "submitted");
-    assert_eq!(submit_payload["total"], 1);
+    assert_eq!(submit_payload["total"], 26);
     let task_id = submit_payload["task_id"]
         .as_str()
         .expect("task id should exist")
@@ -3517,15 +3520,35 @@ async fn gateway_starts_admin_provider_oauth_batch_import_task_locally_with_trus
         status_payload["status"], "completed",
         "payload={status_payload}"
     );
-    assert_eq!(status_payload["total"], 1);
-    assert_eq!(status_payload["processed"], 1);
+    assert_eq!(status_payload["total"], 26);
+    assert_eq!(status_payload["processed"], 26);
     assert_eq!(status_payload["success"], 1);
-    assert_eq!(status_payload["failed"], 0);
+    assert_eq!(status_payload["failed"], 25);
     assert_eq!(status_payload["created_count"], 1);
     assert_eq!(status_payload["replaced_count"], 0);
     assert_eq!(status_payload["progress_percent"], 100);
+    let failures = status_payload["error_samples"]
+        .as_array()
+        .expect("failure list should exist");
+    assert_eq!(
+        failures.len(),
+        25,
+        "all failures must survive the old 20 item limit"
+    );
+    for (offset, failure) in failures.iter().enumerate() {
+        let index = offset + 1;
+        assert_eq!(failure["index"], index);
+        assert_eq!(
+            failure["account"],
+            format!("task-account-{index}@example.com")
+        );
+        assert!(failure["error"].as_str().unwrap().contains("已存在"));
+        assert!(failure.get("refresh_token").is_none());
+        assert!(failure.get("access_token").is_none());
+    }
+
     assert_eq!(*upstream_hits.lock().expect("mutex should lock"), 0);
-    assert_eq!(*token_hits.lock().expect("mutex should lock"), 1);
+    assert_eq!(*token_hits.lock().expect("mutex should lock"), 26);
 
     let keys = provider_catalog_repository
         .list_keys_by_provider_ids(&["provider-codex".to_string()])

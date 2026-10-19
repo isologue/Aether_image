@@ -126,6 +126,7 @@ export interface PoolKeyDetail {
   agent_identity?: boolean
   oauth_header_auth?: boolean
   can_refresh_oauth?: boolean
+  oauth_refresh_status?: import('@/utils/providerKeyAuth').OAuthRefreshStatus | null
   can_export_oauth?: boolean
   can_edit_oauth?: boolean
   oauth_expires_at?: number | null

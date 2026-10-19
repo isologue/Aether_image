@@ -853,8 +853,10 @@
           </template>
 
           <div
-            v-if="importTask && !isWindsurfEmailPasswordImport"
+            v-if="importTask"
             class="rounded-xl border border-border bg-muted/20 p-3 space-y-2"
+            data-testid="import-result"
+            aria-live="polite"
           >
             <div class="flex items-center justify-between text-xs">
               <span class="font-medium">
@@ -882,18 +884,76 @@
             </p>
             <div
               v-if="importTask.error_samples.length > 0"
-              class="space-y-1"
+              class="space-y-2"
             >
-              <p class="text-[11px] text-destructive">
-                {{ legacyT('最近错误') }}
-              </p>
-              <p
-                v-for="item in importTask.error_samples.slice(0, 3)"
-                :key="`${item.index}-${item.error || item.status}`"
-                class="text-[11px] text-destructive/90"
+              <div
+                class="text-xs space-y-1"
+                data-testid="import-failure-summary"
               >
-                {{ importErrorSampleText(item) }}
+                <p
+                  v-for="group in importFailureGroups"
+                  :key="group.reason"
+                  class="break-words"
+                >
+                  {{ group.reason }} · {{ group.count }} {{ legacyT('个') }}
+                </p>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-medium">{{ legacyT('失败账号及原因') }}</span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  @click="copyImportFailures"
+                >
+                  {{ legacyT('复制失败列表') }}
+                </Button>
+              </div>
+              <p
+                v-if="importTask.error_samples.length < importTask.failed"
+                class="text-xs text-muted-foreground"
+              >
+                {{ legacyT('当前仅返回部分失败明细') }} ({{ importTask.error_samples.length }}/{{ importTask.failed }})
               </p>
+              <div
+                class="max-h-64 overflow-auto rounded-md border border-border"
+                tabindex="0"
+              >
+                <table
+                  class="w-full text-xs text-left"
+                  data-testid="import-failure-list"
+                >
+                  <thead class="sticky top-0 bg-muted">
+                    <tr>
+                      <th class="p-2">
+                        #
+                      </th>
+                      <th class="p-2">
+                        {{ legacyT('账号') }}
+                      </th>
+                      <th class="p-2">
+                        {{ legacyT('失败原因') }}
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr
+                      v-for="item in importTask.error_samples"
+                      :key="item.index"
+                      class="border-t border-border align-top"
+                    >
+                      <td class="p-2 tabular-nums">
+                        {{ item.index + 1 }}
+                      </td>
+                      <td class="p-2 break-all">
+                        {{ item.account || legacyT('未提供账号标识（请按序号核对原始导入数据）') }}
+                      </td>
+                      <td class="p-2 break-words text-destructive">
+                        {{ legacyT(item.error || '导入失败') }}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>
@@ -923,7 +983,7 @@
         variant="outline"
         @click="handleClose"
       >
-        {{ legacyT('取消') }}
+        {{ legacyT(mode === 'import' && importFinished ? '关闭' : '取消') }}
       </Button>
       <Button
         v-if="mode === 'oauth' && showAuthorizationMode && !isDeviceBrowserProvider"
@@ -1399,8 +1459,49 @@ function importResultSummaryText(task: OAuthBatchImportTaskStatusResponse): stri
     : `成功 ${task.success} · 失败 ${task.failed}`
 }
 
-function importErrorSampleText(item: OAuthBatchImportTaskStatusResponse['error_samples'][number]): string {
-  return `#${item.index + 1} ${legacyT(item.error || '导入失败')}`
+const importFinished = computed(() => ['completed', 'failed'].includes(importTask.value?.status || ''))
+
+const importFailureGroups = computed(() => {
+  const counts = new Map<string, number>()
+  for (const item of importTask.value?.error_samples ?? []) {
+    const reason = item.error?.includes('已存在于当前 Provider')
+      ? legacyT('账号已存在（重复导入）')
+      : legacyT(item.error || '导入失败')
+    counts.set(reason, (counts.get(reason) ?? 0) + 1)
+  }
+  return Array.from(counts, ([reason, count]) => ({ reason, count }))
+})
+
+function copyImportFailures() {
+  void copyToClipboard((importTask.value?.error_samples ?? []).map(item =>
+    `#${item.index + 1}\t${item.account || legacyT('未提供账号标识')}\t${legacyT(item.error || '导入失败')}`,
+  ).join('\n'))
+}
+
+function setSingleImportResult(
+  account?: string | null,
+  error?: string,
+  replaced = false,
+) {
+  const now = Math.floor(Date.now() / 1000)
+  importTask.value = {
+    task_id: '',
+    provider_id: props.providerId || '',
+    provider_type: props.providerType || '',
+    status: 'completed',
+    total: 1,
+    processed: 1,
+    success: error ? 0 : 1,
+    failed: error ? 1 : 0,
+    created_count: error || replaced ? 0 : 1,
+    replaced_count: !error && replaced ? 1 : 0,
+    progress_percent: 100,
+    error_samples: error ? [{ index: 0, status: 'error', account, error }] : [],
+    created_at: now,
+    started_at: now,
+    finished_at: now,
+    updated_at: now,
+  }
 }
 
 function stopImportPolling() {
@@ -1514,7 +1615,6 @@ async function pollImportTaskStatus(taskId: string) {
       if (task.success > 0) {
         success(getBatchImportSuccessMessage(task))
         emit('saved')
-        handleClose()
       } else {
         showError(legacyT(task.error || '批量导入失败'), legacyT('导入失败'))
       }
@@ -1944,6 +2044,7 @@ function parseImportText(text: string): {
   api_key?: string
   token?: string
   refresh_token?: string
+  client_id?: string
   access_token?: string
   password?: string
   expires_at?: number
@@ -2060,6 +2161,11 @@ function parseImportText(text: string): {
       const grokCookieImport = isGrokProvider.value
         ? parseGrokCookieImport(normalizeStringField(obj.cookie) ?? normalizeStringField(obj.cookieHeader) ?? '')
         : null
+      const authConfig = isObjectRecord(obj.auth_config)
+        ? obj.auth_config
+        : (isObjectRecord(obj.authConfig) ? obj.authConfig : {})
+      const clientId = normalizeStringField(obj.client_id) ?? normalizeStringField(obj.clientId)
+        ?? normalizeStringField(authConfig.client_id) ?? normalizeStringField(authConfig.clientId)
       const refreshToken = obj.refresh_token
       const refreshTokenCamel = obj.refreshToken
       const accessToken = obj.access_token
@@ -2088,6 +2194,9 @@ function parseImportText(text: string): {
       const importedAccessToken = normalizedAccessToken ?? grokSsoToken ?? normalizedSessionToken ?? bearerTokenFromHeaders(normalizedHeaders)
       if (normalizedRefreshToken || importedAccessToken) {
         return {
+          ...((props.providerType || '').toLowerCase() === 'chatgpt_web' && clientId
+            ? { client_id: clientId }
+            : {}),
           refresh_token: normalizedRefreshToken,
           access_token: importedAccessToken,
           expires_at: normalizeExpiryField(obj.expires_at) ?? normalizeExpiryField(obj.expiresAt) ?? normalizeExpiryField(obj.expired),
@@ -2355,6 +2464,7 @@ async function handleWindsurfEmailPasswordImport() {
   }
 
   importing.value = true
+  importTask.value = null
   try {
     const result = await importProviderRefreshToken(props.providerId, {
       email,
@@ -2363,10 +2473,11 @@ async function handleWindsurfEmailPasswordImport() {
       proxy_node_id: selectedProxyNodeId.value || undefined,
     })
     success(getOAuthSuccessMessage('导入', result))
+    setSingleImportResult(result.email || email, undefined, result.replaced)
     emit('saved')
-    handleClose()
   } catch (err: unknown) {
     const errorMessage = localizedApiError(err, '导入失败')
+    setSingleImportResult(email, errorMessage)
     showError(errorMessage, legacyT('错误'))
   } finally {
     importing.value = false
@@ -2393,7 +2504,9 @@ async function handleImport() {
   }
 
   importing.value = true
+  importTask.value = null
   let keepImporting = false
+  let singleAccount: string | undefined
   try {
     const proxyNodeId = selectedProxyNodeId.value || undefined
     // Kiro, Codex Agent Identity, and sub2api exports need their full JSON on the batch path.
@@ -2432,16 +2545,20 @@ async function handleImport() {
         showError(legacyT('无法解析输入内容，请检查格式'), legacyT('格式错误'))
         return
       }
+      singleAccount = parsed.email || parsed.name || parsed.account_id
       const result = await importProviderRefreshToken(props.providerId, {
         ...parsed,
         proxy_node_id: proxyNodeId,
       })
       success(getOAuthSuccessMessage('导入', result))
+      setSingleImportResult(result.email || singleAccount, undefined, result.replaced)
       emit('saved')
-      handleClose()
     }
   } catch (err: unknown) {
     const errorMessage = localizedApiError(err, '导入失败')
+    if (!normalizedCredentials.isBatch && !isKiroProvider.value && !requiresCodexBatchImport(normalizedCredentials.credentials)) {
+      setSingleImportResult(singleAccount, errorMessage)
+    }
     showError(errorMessage, legacyT('错误'))
   } finally {
     if (!keepImporting) {

@@ -143,6 +143,7 @@ pub struct LocalOAuthHttpRequest {
     pub headers: BTreeMap<String, String>,
     pub json_body: Option<Value>,
     pub body_bytes: Option<Vec<u8>>,
+    pub transport_profile: Option<aether_contracts::ResolvedTransportProfile>,
 }
 
 impl fmt::Debug for LocalOAuthHttpRequest {
@@ -378,6 +379,7 @@ impl OAuthHttpExecutor for ProviderOAuthLocalHttpExecutor<'_> {
                     headers: request.headers,
                     json_body: request.json_body,
                     body_bytes: request.body_bytes,
+                    transport_profile: request.transport_profile,
                 },
             )
             .await
@@ -1178,6 +1180,7 @@ mod tests {
                 "refresh_token": "request-body-canary"
             })),
             body_bytes: None,
+            transport_profile: None,
         };
         let response = super::LocalOAuthHttpResponse {
             status_code: 401,

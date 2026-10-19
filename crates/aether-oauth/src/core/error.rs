@@ -2,6 +2,7 @@ use aether_contracts::redact_url_for_debug;
 use serde_json::{json, Value};
 
 const OAUTH_ERROR_BODY_EXCERPT_CHARS: usize = 500;
+const OAUTH_ERROR_REDACTION_ENABLED_ENV: &str = "AETHER_OAUTH_ERROR_REDACTION_ENABLED";
 
 pub enum OAuthError {
     UnsupportedProvider(String),
@@ -102,9 +103,39 @@ impl std::fmt::Debug for OAuthError {
 /// applied. Unstructured bodies containing credential markers are replaced as
 /// a whole because their token boundaries cannot be determined reliably.
 pub fn redacted_oauth_error_body_excerpt(body: &str) -> String {
+    oauth_error_body_excerpt_with_redaction(body, true)
+}
+
+/// Builds a bounded OAuth upstream body excerpt using the diagnostic redaction
+/// setting. Redaction is enabled unless the environment variable is exactly
+/// `false`; invalid values fail closed.
+pub fn oauth_error_body_excerpt(body: &str) -> String {
+    oauth_error_body_excerpt_with_redaction(body, oauth_error_redaction_enabled())
+}
+
+/// Whether OAuth upstream error body redaction is enabled.
+pub fn oauth_error_redaction_enabled() -> bool {
+    parse_oauth_error_redaction_enabled(
+        std::env::var(OAUTH_ERROR_REDACTION_ENABLED_ENV)
+            .ok()
+            .as_deref(),
+    )
+}
+
+fn parse_oauth_error_redaction_enabled(value: Option<&str>) -> bool {
+    value
+        .and_then(|value| value.parse::<bool>().ok())
+        .unwrap_or(true)
+}
+
+fn oauth_error_body_excerpt_with_redaction(body: &str, redaction_enabled: bool) -> String {
     let body = body.trim();
     if body.is_empty() {
         return "-".to_string();
+    }
+
+    if !redaction_enabled {
+        return body.chars().take(OAUTH_ERROR_BODY_EXCERPT_CHARS).collect();
     }
 
     if let Ok(mut value) = serde_json::from_str::<Value>(body) {
@@ -309,7 +340,54 @@ impl OAuthError {
 
 #[cfg(test)]
 mod tests {
-    use super::{redacted_oauth_error_body_excerpt, OAuthError};
+    use super::{
+        oauth_error_body_excerpt_with_redaction, parse_oauth_error_redaction_enabled,
+        redacted_oauth_error_body_excerpt, OAuthError, OAUTH_ERROR_BODY_EXCERPT_CHARS,
+    };
+
+    #[test]
+    fn oauth_error_redaction_setting_is_strict_and_fails_closed() {
+        assert!(!parse_oauth_error_redaction_enabled(Some("false")));
+        for value in [
+            None,
+            Some("true"),
+            Some("FALSE"),
+            Some("0"),
+            Some(""),
+            Some(" false "),
+        ] {
+            assert!(parse_oauth_error_redaction_enabled(value));
+        }
+    }
+
+    #[test]
+    fn disabling_oauth_error_redaction_keeps_raw_excerpt_bounded() {
+        let body = "upstream error refresh_token=debug-canary";
+        assert_eq!(oauth_error_body_excerpt_with_redaction(body, false), body);
+        let json_body = r#"{"error":"invalid_grant","refresh_token":"debug-canary"}"#;
+        assert_eq!(
+            oauth_error_body_excerpt_with_redaction(json_body, false),
+            json_body
+        );
+        assert_eq!(oauth_error_body_excerpt_with_redaction("  \n", false), "-");
+
+        let long_body = "密".repeat(OAUTH_ERROR_BODY_EXCERPT_CHARS + 20);
+        assert_eq!(
+            oauth_error_body_excerpt_with_redaction(&long_body, false)
+                .chars()
+                .count(),
+            OAUTH_ERROR_BODY_EXCERPT_CHARS
+        );
+    }
+
+    #[test]
+    fn enabling_oauth_error_redaction_masks_raw_excerpt() {
+        let body = "upstream error refresh_token=debug-canary";
+        assert_eq!(
+            oauth_error_body_excerpt_with_redaction(body, true),
+            "[REDACTED upstream OAuth error body]"
+        );
+    }
 
     #[test]
     fn oauth_error_body_excerpt_preserves_classification_and_redacts_secrets() {

@@ -10,6 +10,34 @@ import {
 } from '@/utils/providerKeyStatus'
 
 describe('providerKeyStatus', () => {
+  it('distinguishes AT rejection from a confirmed RT failure without raw error bodies', () => {
+    const title = getOAuthStatusTitle({
+      auth_type: 'oauth',
+      oauth_refresh_status: {
+        eligible: false, at_state: 'rejected', rt_state: 'invalid',
+        reason: 'RT 已明确失效，停止自动重试', error_code: 'refresh_token_invalidated',
+        last_attempt_at: 1700000000,
+      },
+    }, 0)
+    expect(title).toContain('AT 已被上游拒绝')
+    expect(title).toContain('RT 已明确失效')
+    expect(title).toContain('refresh_token_invalidated')
+    expect(title).toContain('最近刷新尝试')
+  })
+
+  it('does not call a temporary RT refresh failure an invalid RT', () => {
+    const title = getOAuthStatusTitle({
+      auth_type: 'oauth',
+      oauth_refresh_status: {
+        eligible: true, at_state: 'expired', rt_state: 'retry_wait',
+        reason: '5 分钟后自动重试；尚不能确定 RT 失效', next_retry_at: 1700000300,
+      },
+    }, 0)
+    expect(title).toContain('AT 已过期')
+    expect(title).toContain('RT 刷新遇到临时故障')
+    expect(title).toContain('下次重试不早于')
+    expect(title).not.toContain('RT 已明确失效')
+  })
   it('uses status_snapshot account state as the primary source', () => {
     expect(
       getAccountStatusDisplay({

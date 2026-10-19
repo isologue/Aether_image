@@ -99,6 +99,13 @@ pub(crate) fn build_provider_oauth_auth_config_from_token_payload(
     let mut auth_config = serde_json::Map::new();
     auth_config.insert("provider_type".to_string(), json!(provider_type));
     auth_config.insert("updated_at".to_string(), json!(now_unix_secs));
+    if provider_type.eq_ignore_ascii_case("chatgpt_web") {
+        if let Some(client_id) =
+            aether_oauth::provider::providers::explicit_oauth_client_id(token_payload)
+        {
+            auth_config.insert("client_id".to_string(), json!(client_id));
+        }
+    }
     if let Some(token_type) = token_payload.get("token_type").cloned() {
         auth_config.insert("token_type".to_string(), token_type);
     }

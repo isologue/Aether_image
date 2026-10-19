@@ -248,6 +248,16 @@ export function getOAuthStatusTitle(
   input: ProviderKeyStatusCarrier,
   tick: number,
 ): string {
+  const refresh = input.oauth_refresh_status
+  if (refresh && isOAuthManagedCredential(input)) {
+    const at = { valid: 'AT 尚未到记录的到期时间', expired: 'AT 已过期', rejected: 'AT 已被上游拒绝（记录的到期时间不代表仍可使用）', unknown: 'AT 有效期未知' }[refresh.at_state]
+    const rt = { unverified: 'RT 尚未验证', unavailable: '无可用的 RT 刷新方式', invalid: 'RT 已明确失效', failed: 'RT 刷新失败，未确认 RT 失效', retry_wait: 'RT 刷新遇到临时故障', succeeded: '最近一次 RT 刷新成功' }[refresh.rt_state]
+    const lines = [at, rt, refresh.reason]
+    if (refresh.error_code) lines.push(`错误码：${refresh.error_code}`)
+    if (refresh.last_attempt_at) lines.push(`最近刷新尝试：${new Date(refresh.last_attempt_at * 1000).toLocaleString()}`)
+    if (refresh.next_retry_at) lines.push(`下次重试不早于：${new Date(refresh.next_retry_at * 1000).toLocaleString()}`)
+    return lines.join('\n')
+  }
   if (isOAuthCredentialWithoutRefreshToken(input)) {
     return 'Refresh Token 未添加，无法自动刷新'
   }

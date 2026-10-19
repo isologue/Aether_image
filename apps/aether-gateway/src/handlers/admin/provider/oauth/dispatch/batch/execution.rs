@@ -373,6 +373,11 @@ async fn resolve_admin_provider_oauth_batch_import_tokens(
             state,
             template,
             refresh_token,
+            entry
+                .raw_credentials
+                .as_ref()
+                .and_then(aether_oauth::provider::providers::explicit_oauth_client_id)
+                .as_deref(),
             request_proxy.clone(),
         )
         .await
@@ -471,9 +476,10 @@ pub(super) async fn execute_admin_provider_oauth_batch_import(
             results: entries
                 .iter()
                 .enumerate()
-                .map(|(index, _)| {
+                .map(|(index, entry)| {
                     json!({
                         "index": index,
+                        "account": entry.email.as_deref().or(entry.account_name.as_deref()).or(entry.account_id.as_deref()),
                         "status": "error",
                         "error": "Provider 不存在",
                         "replaced": false,
@@ -495,9 +501,10 @@ pub(super) async fn execute_admin_provider_oauth_batch_import(
             results: entries
                 .iter()
                 .enumerate()
-                .map(|(index, _)| {
+                .map(|(index, entry)| {
                     json!({
                         "index": index,
+                        "account": entry.email.as_deref().or(entry.account_name.as_deref()).or(entry.account_id.as_deref()),
                         "status": "error",
                         "error": ADMIN_PROVIDER_OAUTH_DATA_UNAVAILABLE_DETAIL,
                         "replaced": false,
@@ -533,6 +540,7 @@ pub(super) async fn execute_admin_provider_oauth_batch_import(
             failed += 1;
             results.push(json!({
                 "index": index,
+                "account": entry.email.as_deref().or(entry.account_name.as_deref()).or(entry.account_id.as_deref()),
                 "status": "error",
                 "error": error,
                 "replaced": false,
@@ -562,6 +570,7 @@ pub(super) async fn execute_admin_provider_oauth_batch_import(
                 failed += 1;
                 results.push(json!({
                     "index": index,
+                    "account": entry.email.as_deref().or(entry.account_name.as_deref()).or(entry.account_id.as_deref()),
                     "status": "error",
                     "error": error,
                     "replaced": false,
@@ -601,39 +610,41 @@ pub(super) async fn execute_admin_provider_oauth_batch_import(
             && aether_provider_transport::is_codex_agent_identity_auth_config_value(
                 &Value::Object(auth_config.clone()),
             );
-        let codex_oauth_account_leases =
-            if provider_type.eq_ignore_ascii_case("codex") && !is_agent_identity {
-                match acquire_codex_oauth_account_locks(
-                    state,
-                    provider_id,
-                    &auth_config,
-                    "batch-import",
-                )
-                .await
-                {
-                    Ok(leases) => leases,
-                    Err(error) => {
-                        failed += 1;
-                        results.push(json!({
+        let codex_oauth_account_leases = if provider_type.eq_ignore_ascii_case("codex")
+            && !is_agent_identity
+        {
+            match acquire_codex_oauth_account_locks(
+                state,
+                provider_id,
+                &auth_config,
+                "batch-import",
+            )
+            .await
+            {
+                Ok(leases) => leases,
+                Err(error) => {
+                    failed += 1;
+                    results.push(json!({
                             "index": index,
+                            "account": entry.email.as_deref().or(entry.account_name.as_deref()).or(entry.account_id.as_deref()),
                             "status": "error",
                             "error": error.detail(),
                             "replaced": false,
                         }));
-                        maybe_report_admin_provider_oauth_batch_import_progress(
-                            &mut progress,
-                            entries.len(),
-                            success,
-                            failed,
-                            &results,
-                        )
-                        .await;
-                        continue;
-                    }
+                    maybe_report_admin_provider_oauth_batch_import_progress(
+                        &mut progress,
+                        entries.len(),
+                        success,
+                        failed,
+                        &results,
+                    )
+                    .await;
+                    continue;
                 }
-            } else {
-                Vec::new()
-            };
+            }
+        } else {
+            Vec::new()
+        };
 
         let duplicate_result = if replace_active_accounts {
             find_provider_oauth_key_for_push(state, provider_id, &auth_config).await
@@ -647,6 +658,7 @@ pub(super) async fn execute_admin_provider_oauth_batch_import(
                 failed += 1;
                 results.push(json!({
                     "index": index,
+                    "account": entry.email.as_deref().or(entry.account_name.as_deref()).or(entry.account_id.as_deref()),
                     "status": "error",
                     "error": detail,
                     "replaced": false,
@@ -687,6 +699,7 @@ pub(super) async fn execute_admin_provider_oauth_batch_import(
                     failed += 1;
                     results.push(json!({
                         "index": index,
+                        "account": entry.email.as_deref().or(entry.account_name.as_deref()).or(entry.account_id.as_deref()),
                         "status": "error",
                         "error": "provider oauth write unavailable",
                         "replaced": true,
@@ -731,6 +744,7 @@ pub(super) async fn execute_admin_provider_oauth_batch_import(
                     failed += 1;
                     results.push(json!({
                         "index": index,
+                        "account": entry.email.as_deref().or(entry.account_name.as_deref()).or(entry.account_id.as_deref()),
                         "status": "error",
                         "error": "provider oauth write unavailable",
                         "replaced": false,
@@ -759,6 +773,7 @@ pub(super) async fn execute_admin_provider_oauth_batch_import(
         success += 1;
         results.push(json!({
             "index": index,
+            "account": entry.email.as_deref().or(entry.account_name.as_deref()).or(entry.account_id.as_deref()),
             "status": "success",
             "key_id": persisted_key.id,
             "key_name": key_name,
