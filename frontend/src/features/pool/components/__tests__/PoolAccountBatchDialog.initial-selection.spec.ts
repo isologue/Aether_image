@@ -65,6 +65,7 @@ async function settle(): Promise<void> {
 }
 
 beforeEach(() => {
+  apiMocks.batchActionPoolKeys.mockReset()
   apiMocks.refreshProviderQuota.mockReset().mockResolvedValue({
     success: 2,
     failed: 0,
@@ -82,6 +83,79 @@ afterEach(() => {
 })
 
 describe('PoolAccountBatchDialog initial selection', () => {
+  it.each([
+    { action: 'delete', count: 100, sizes: [100] },
+    { action: 'delete', count: 101, sizes: [100, 1] },
+    { action: 'delete', count: 201, sizes: [100, 100, 1] },
+    { action: 'enable', count: 201, sizes: [100, 100, 1] },
+    { action: 'disable', count: 201, sizes: [100, 100, 1] },
+    { action: 'clear_proxy', count: 201, sizes: [100, 100, 1] },
+  ] as const)('executes $action for $count filtered accounts within the API batch limit', async ({ action, count, sizes }) => {
+    const selectedKeys = Array.from({ length: count }, (_, i) => createKey(`key-${i}`, 'oauth'))
+    const filters = { status: 'expired', oauth_refresh: 'no' } as const
+    apiMocks.resolvePoolKeySelection.mockResolvedValue({ total: count, items: selectedKeys })
+    apiMocks.batchActionPoolKeys.mockImplementation(async (_providerId, body) => {
+      if (body.key_ids.length > 100) {
+        throw { response: { data: { detail: 'key_ids 最多 100 个' } } }
+      }
+      return { affected: body.key_ids.length }
+    })
+    const changed = vi.fn()
+    const root = document.createElement('div')
+    document.body.appendChild(root)
+    const app = createApp(defineComponent({
+      setup: () => () => h(PoolAccountBatchDialog, {
+        modelValue: true,
+        providerId: 'provider-1',
+        selectedKeys: selectedKeys.slice(0, 10),
+        selectAllFiltered: true,
+        selectedCount: count,
+        selectionFilters: filters,
+        initialAction: action,
+        onChanged: changed,
+      }),
+    }))
+    app.mount(root)
+    mountedApps.push({ app, root })
+
+    await vi.waitFor(() => expect(changed).toHaveBeenCalledTimes(1))
+    expect(apiMocks.resolvePoolKeySelection).toHaveBeenCalledWith('provider-1', filters)
+    const calls = apiMocks.batchActionPoolKeys.mock.calls
+    expect(calls.map(([, body]) => body.key_ids.length)).toEqual(sizes)
+    expect(calls.flatMap(([, body]) => body.key_ids)).toEqual(selectedKeys.map(key => key.key_id))
+    expect(calls.every(([providerId, body]) => providerId === 'provider-1' && body.action === action)).toBe(true)
+    expect(document.body.textContent).toContain(`执行完成：成功 ${count}，失败 0，跳过 0`)
+  })
+
+  it('shows the API failure reason and continues with the remaining delete batches', async () => {
+    const selectedKeys = Array.from({ length: 201 }, (_, i) => createKey(`key-${i}`, 'oauth'))
+    apiMocks.batchActionPoolKeys
+      .mockResolvedValueOnce({ affected: 100 })
+      .mockRejectedValueOnce({ response: { data: { detail: '数据库暂时不可用' } } })
+      .mockResolvedValueOnce({ affected: 1 })
+    const changed = vi.fn()
+    const root = document.createElement('div')
+    document.body.appendChild(root)
+    const app = createApp(defineComponent({
+      setup: () => () => h(PoolAccountBatchDialog, {
+        modelValue: true,
+        providerId: 'provider-1',
+        selectedKeys,
+        selectAllFiltered: false,
+        selectedCount: selectedKeys.length,
+        selectionFilters: { status: 'all' },
+        initialAction: 'delete',
+        onChanged: changed,
+      }),
+    }))
+    app.mount(root)
+    mountedApps.push({ app, root })
+
+    await vi.waitFor(() => expect(changed).toHaveBeenCalledTimes(1))
+    expect(apiMocks.batchActionPoolKeys).toHaveBeenCalledTimes(3)
+    expect(document.body.textContent).toContain('执行完成：成功 101，失败 100，跳过 0；失败原因：数据库暂时不可用')
+  })
+
   it('runs the action selected from the header menu when the dialog opens', async () => {
     const selectedKeys = [createKey('oauth-key', 'oauth'), createKey('api-key', 'api_key')]
     const open = ref(false)

@@ -1,0 +1,12 @@
+{
+  "name": "aether-image-resizer",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test resize.test.mjs"
+  },
+  "dependencies": {
+    "sharp": "0.34.5"
+  }
+}

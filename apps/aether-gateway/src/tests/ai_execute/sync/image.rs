@@ -1164,6 +1164,20 @@ fn gateway_plans_chatgpt_web_image_sync_with_internal_web_executor_url() {
 }
 
 async fn gateway_plans_chatgpt_web_image_sync_with_internal_web_executor_url_impl() {
+    run_chatgpt_web_image_plan_scenario(false).await;
+}
+
+#[test]
+#[ignore = "requires Node.js and Sharp (included in image resize test Docker image)"]
+fn gateway_plans_chatgpt_web_image_native_generation_then_local_resize() {
+    run_image_sync_test(
+        "gateway_plans_chatgpt_web_image_native_generation_then_local_resize",
+        || run_chatgpt_web_image_plan_scenario(true),
+    );
+}
+
+async fn run_chatgpt_web_image_plan_scenario(resize_enabled: bool) {
+    const PNG: &str = "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAEUlEQVR4nGP4z8DwH4QZYAwAR8oH+WdZbrcAAAAASUVORK5CYII=";
     #[derive(Debug, Clone)]
     struct SeenExecutionRuntimeSyncRequest {
         trace_id: String,
@@ -1401,11 +1415,12 @@ async fn gateway_plans_chatgpt_web_image_sync_with_internal_web_executor_url_imp
                     },
                     "body": {
                         "body_bytes_b64": base64::engine::general_purpose::STANDARD.encode(
-                            concat!(
-                                "data: {\"type\":\"response.output_item.done\",\"output_index\":0,\"item\":{\"id\":\"ig_chatgpt_web_123\",\"type\":\"image_generation_call\",\"output_format\":\"png\",\"result\":\"aGVsbG8=\"}}\n\n",
-                                "data: {\"type\":\"response.completed\",\"response\":{\"id\":\"resp_chatgpt_web_123\",\"object\":\"response\",\"model\":\"gpt-image-2\",\"status\":\"completed\",\"output\":[]}}\n\n",
-                                "data: [DONE]\n\n"
-                            )
+                            format!("data: {}\n\ndata: {}\n\ndata: [DONE]\n\n",
+                                json!({"type":"response.output_item.done", "output_index":0,
+                                    "item":{"id":"ig_chatgpt_web_123", "type":"image_generation_call",
+                                    "output_format":"png", "result": if resize_enabled { PNG } else { "aGVsbG8=" }}}),
+                                json!({"type":"response.completed", "response":{"id":"resp_chatgpt_web_123",
+                                    "object":"response", "model":"gpt-image-2", "status":"completed", "output":[]}}))
                         )
                     },
                     "telemetry": {
@@ -1435,7 +1450,7 @@ async fn gateway_plans_chatgpt_web_image_sync_with_internal_web_executor_url_imp
     ));
 
     let (execution_runtime_url, execution_runtime_handle) = start_server(execution_runtime).await;
-    let gateway_state = build_state_with_execution_runtime_override(execution_runtime_url)
+    let mut gateway_state = build_state_with_execution_runtime_override(execution_runtime_url)
         .with_data_state_for_tests(
             crate::data::GatewayDataState::with_auth_candidate_selection_provider_catalog_and_request_candidate_repository_for_tests(
                 auth_repository,
@@ -1443,8 +1458,14 @@ async fn gateway_plans_chatgpt_web_image_sync_with_internal_web_executor_url_imp
                 provider_catalog_repository,
                 Arc::new(InMemoryRequestCandidateRepository::default()),
                 DEVELOPMENT_ENCRYPTION_KEY,
-            ),
+            ).with_system_config_values_for_tests([("image_storage".into(), json!({
+                "resize_enabled":resize_enabled, "storage_mode":"local", "return_format":"base64"
+            }))]),
         );
+    let storage_root =
+        std::env::temp_dir().join(format!("aether-image-plan-{}", uuid::Uuid::new_v4()));
+    gateway_state.image_storage =
+        Arc::new(crate::image_storage::ImageStorage::new(storage_root.clone()).unwrap());
     let gateway = build_router_with_state(gateway_state);
     let (gateway_url, gateway_handle) = start_server(gateway).await;
 
@@ -1456,14 +1477,29 @@ async fn gateway_plans_chatgpt_web_image_sync_with_internal_web_executor_url_imp
             format!("Bearer {client_api_key}"),
         )
         .header(TRACE_ID_HEADER, "trace-chatgpt-web-image-plan-123")
-        .body("{\"model\":\"gpt-image-2\",\"prompt\":\"生成一张测试图\",\"size\":\"1024x1024\",\"response_format\":\"b64_json\"}")
+        .json(&json!({"model":"gpt-image-2", "prompt":"生成一张测试图",
+            "size": if resize_enabled { "2048x1024" } else { "1024x1024" }, "response_format":"b64_json"}))
         .send()
         .await
         .expect("request should succeed");
 
-    assert_eq!(response.status(), StatusCode::OK);
+    let status = response.status();
     let response_json: serde_json::Value = response.json().await.expect("body should parse");
-    assert_eq!(response_json["data"][0]["b64_json"], "aGVsbG8=");
+    assert_eq!(status, StatusCode::OK, "{response_json}");
+    if resize_enabled {
+        let bytes = base64::engine::general_purpose::STANDARD
+            .decode(
+                response_json["data"][0]["b64_json"]
+                    .as_str()
+                    .expect("resized image"),
+            )
+            .unwrap();
+        assert!(bytes.starts_with(b"\x89PNG\r\n\x1a\n"));
+        assert_eq!(u32::from_be_bytes(bytes[16..20].try_into().unwrap()), 2048);
+        assert_eq!(u32::from_be_bytes(bytes[20..24].try_into().unwrap()), 1024);
+    } else {
+        assert_eq!(response_json["data"][0]["b64_json"], "aGVsbG8=");
+    }
 
     let seen_execution_runtime_request = seen_execution_runtime
         .lock()
@@ -1488,9 +1524,20 @@ async fn gateway_plans_chatgpt_web_image_sync_with_internal_web_executor_url_imp
     assert_eq!(seen_execution_runtime_request.model, "gpt-image-2");
     assert_eq!(seen_execution_runtime_request.web_model, "gpt-5-5-thinking");
     assert_eq!(seen_execution_runtime_request.prompt, "生成一张测试图");
-    assert_eq!(seen_execution_runtime_request.size, "1024x1024");
-    assert_eq!(seen_execution_runtime_request.ratio, "1:1");
+    assert_eq!(
+        seen_execution_runtime_request.size,
+        if resize_enabled {
+            "1344x768"
+        } else {
+            "1024x1024"
+        }
+    );
+    assert_eq!(
+        seen_execution_runtime_request.ratio,
+        if resize_enabled { "16:9" } else { "1:1" }
+    );
 
     gateway_handle.abort();
     execution_runtime_handle.abort();
+    let _ = tokio::fs::remove_dir_all(storage_root).await;
 }

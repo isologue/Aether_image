@@ -330,6 +330,21 @@ pub(super) fn should_switch_chatgpt_web_image_account(
             == Some("chatgpt_web_no_image")
 }
 
+pub(crate) fn chatgpt_web_image_has_local_request_error(
+    plan: &ExecutionPlan,
+    report_context: Option<&Value>,
+) -> bool {
+    // Inspect the planner's embedded validation error, not arbitrary upstream text.
+    is_chatgpt_web_image_plan(plan, report_context)
+        && plan
+            .body
+            .json_body
+            .as_ref()
+            .and_then(|body| body.pointer("/error/code"))
+            .and_then(Value::as_str)
+            == Some("chatgpt_web_image_unsupported")
+}
+
 async fn execute_chatgpt_web_image(
     state: &AppState,
     plan: &ExecutionPlan,
@@ -6115,6 +6130,22 @@ data: [DONE]
         let body = execution_result_json(&result).expect("error should be json");
         assert_eq!(body["error"]["type"], "invalid_request_error");
         assert_eq!(body["error"]["code"], "chatgpt_web_image_unsupported");
+        let failure = crate::orchestration::resolve_local_failover_analysis_for_attempt(
+            &state,
+            &plan,
+            Some(&json!({"chatgpt_web_image": true})),
+            400,
+            None,
+        )
+        .await;
+        assert_eq!(
+            failure.decision,
+            crate::orchestration::LocalFailoverDecision::StopLocalFailover
+        );
+        assert_eq!(
+            failure.classification,
+            crate::orchestration::LocalFailoverClassification::StopExecutionError
+        );
     }
 
     #[tokio::test]

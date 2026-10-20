@@ -127,6 +127,17 @@ pub fn build_chatgpt_web_image_request_body(
     body_json: &Value,
     body_base64: Option<&str>,
 ) -> Result<Value, ChatGptWebImageRequestError> {
+    build_chatgpt_web_image_request_body_with_resize_target(parts, body_json, body_base64, None)
+}
+
+/// A trusted caller may request native 1K generation followed by local resizing.
+/// The caller must retain and apply the validated output dimensions itself.
+pub fn build_chatgpt_web_image_request_body_with_resize_target(
+    parts: &http::request::Parts,
+    body_json: &Value,
+    body_base64: Option<&str>,
+    resize_target: Option<(u32, u32)>,
+) -> Result<Value, ChatGptWebImageRequestError> {
     let request = normalize_openai_image_request(parts, body_json, body_base64).ok_or_else(|| {
         ChatGptWebImageRequestError::invalid_request(
             "ChatGPT-Web image proxy only supports OpenAI image requests with prompt, n=1, supported image inputs, and supported output options",
@@ -138,7 +149,42 @@ pub fn build_chatgpt_web_image_request_body(
         ));
     }
 
-    let raw_fields = resolve_chatgpt_web_raw_image_fields(parts, body_json, body_base64)?;
+    let mut raw_fields = resolve_chatgpt_web_raw_image_fields(parts, body_json, body_base64)?;
+    if let Some((width, height)) = resize_target {
+        if width == 0 || height == 0 {
+            return Err(ChatGptWebImageRequestError::invalid_request(
+                "Local image resize dimensions must be positive",
+            ));
+        }
+        let target = format!("{width}x{height}");
+        let nearest_ratio = [
+            ("1:1", 1.0),
+            ("3:2", 1.5),
+            ("2:3", 2.0 / 3.0),
+            ("4:3", 4.0 / 3.0),
+            ("3:4", 0.75),
+            ("5:4", 1.25),
+            ("4:5", 0.8),
+            ("16:9", 16.0 / 9.0),
+            ("9:16", 9.0 / 16.0),
+            ("21:9", 21.0 / 9.0),
+        ]
+        .into_iter()
+        .min_by(|(_, left), (_, right)| {
+            let aspect = f64::from(width) / f64::from(height);
+            (aspect / left)
+                .ln()
+                .abs()
+                .total_cmp(&(aspect / right).ln().abs())
+        })
+        .map(|(ratio, _)| ratio)
+        .unwrap_or("1:1");
+        let ratio = chatgpt_web_ratio_from_size(&target, nearest_ratio);
+        raw_fields.size = Some(chatgpt_web_1k_size_for_ratio(ratio).into());
+        raw_fields.resolution = Some("1K".into());
+        raw_fields.size_tier = Some("1K".into());
+        raw_fields.ratio = Some(ratio.into());
+    }
     let resolved_size = resolve_chatgpt_web_size(&raw_fields)?;
     let prompt = request
         .prompt
@@ -150,7 +196,13 @@ pub fn build_chatgpt_web_image_request_body(
                 "Generate a high quality image."
             }
         });
-    let prompt = chatgpt_web_prompt_with_ratio(prompt, resolved_size.ratio.as_str());
+    // Local resizing is a response transformation; keep it from changing the
+    // prompt sent to ChatGPT Web, which has no structured image-size field.
+    let prompt = if resize_target.is_some() {
+        prompt.to_string()
+    } else {
+        chatgpt_web_prompt_with_ratio(prompt, resolved_size.ratio.as_str())
+    };
     let mut image_urls = Vec::new();
     for image in &request.images {
         let Some(object) = image.as_object() else {
@@ -2075,7 +2127,9 @@ mod tests {
     use serde_json::json;
 
     use super::{
-        build_chatgpt_web_image_request_body, build_codex_openai_image_api_provider_request_body,
+        build_chatgpt_web_image_request_body,
+        build_chatgpt_web_image_request_body_with_resize_target,
+        build_codex_openai_image_api_provider_request_body,
         build_openai_image_api_provider_request_body, build_openai_image_provider_request_body,
         decode_multipart_body_base64_with_limit, find_multipart_boundary,
         is_openai_image_stream_request, multipart_boundary, normalize_openai_image_quality,
@@ -3138,6 +3192,72 @@ mod tests {
             assert!(err.message.contains("ChatGPT-Web"));
             assert!(err.message.contains("resolution"));
         }
+    }
+
+    #[test]
+    fn chatgpt_web_local_resize_uses_native_size_and_keeps_generation_options() {
+        let parts = request_parts("/v1/images/generations", Some("application/json"));
+        for (target, ratio, native) in [
+            ((2048, 2048), "1:1", "1024x1024"),
+            ((3056, 2032), "3:2", "1216x832"),
+            ((3840, 2160), "16:9", "1344x768"),
+            ((2160, 3840), "9:16", "768x1344"),
+            ((2048, 1024), "16:9", "1344x768"),
+        ] {
+            let input = json!({"prompt":"draw", "size":format!("{}x{}",target.0,target.1),
+                "resolution":"4K", "size_tier":"4K", "quality":"high", "output_format":"png"});
+            assert!(build_chatgpt_web_image_request_body(&parts, &input, None).is_err());
+            let body = build_chatgpt_web_image_request_body_with_resize_target(
+                &parts,
+                &input,
+                None,
+                Some(target),
+            )
+            .unwrap();
+            assert_eq!(body["size"], native);
+            assert_eq!(body["ratio"], ratio);
+            assert_eq!(body["size_best_effort"], false);
+            assert_eq!(body["prompt"], "draw");
+            assert_eq!(body["quality"], "high");
+            assert_eq!(body["output_format"], "png");
+            assert_eq!(input["resolution"], "4K");
+        }
+        // User JSON cannot enable local resizing or bypass unsupported image inputs.
+        assert!(build_chatgpt_web_image_request_body(
+            &parts,
+            &json!({"prompt":"draw", "size":"2048x2048", "resize_target":[2048,2048]}),
+            None
+        )
+        .is_err());
+        let parts = request_parts("/v1/images/edits", Some("application/json"));
+        assert!(build_chatgpt_web_image_request_body_with_resize_target(
+            &parts,
+            &json!({"prompt":"edit", "image":{"file_id":"file_123"}, "size":"2048x2048"}),
+            None,
+            Some((2048, 2048))
+        )
+        .is_err());
+    }
+
+    #[test]
+    fn chatgpt_web_local_resize_preserves_multipart_edit_image_bytes() {
+        let parts = request_parts(
+            "/v1/images/edits",
+            Some("multipart/form-data; boundary=fixture"),
+        );
+        let bytes = b"--fixture\r\nContent-Disposition: form-data; name=\"prompt\"\r\n\r\nedit\r\n--fixture\r\nContent-Disposition: form-data; name=\"size\"\r\n\r\n2160x3840\r\n--fixture\r\nContent-Disposition: form-data; name=\"image\"; filename=\"x.png\"\r\nContent-Type: image/png\r\n\r\n\x00\xff\x80\r\n--fixture--\r\n";
+        let encoded = base64::engine::general_purpose::STANDARD.encode(bytes);
+        assert!(build_chatgpt_web_image_request_body(&parts, &json!({}), Some(&encoded)).is_err());
+        let body = build_chatgpt_web_image_request_body_with_resize_target(
+            &parts,
+            &json!({}),
+            Some(&encoded),
+            Some((2160, 3840)),
+        )
+        .unwrap();
+        assert_eq!(body["size"], "768x1344");
+        assert_eq!(body["ratio"], "9:16");
+        assert_eq!(body["images"], json!(["data:image/png;base64,AP+A"]));
     }
 
     #[test]

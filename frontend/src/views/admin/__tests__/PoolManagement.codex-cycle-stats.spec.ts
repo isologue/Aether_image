@@ -1157,7 +1157,8 @@ describe('PoolManagement Codex cycle stats mode', () => {
     endpointMocks.getProvider.mockResolvedValue(createProvider('chatgpt_web'))
     const root = mountPoolManagement()
     await settle()
-    expect(root.textContent?.match(/刷新 AT：否/g)).toHaveLength(2)
+    expect(Array.from(root.querySelectorAll('[title]'))
+      .filter(element => element.textContent?.trim() === '刷新 AT：否')).toHaveLength(2)
     const titles = Array.from(root.querySelectorAll<HTMLElement>('[title]')).map(el => el.title)
     expect(titles.filter(title => title.includes('AT 已被上游拒绝') && title.includes('RT 已明确失效')).length).toBeGreaterThanOrEqual(2)
     // Automatic retries stop, while a manual diagnostic attempt stays available.
@@ -1252,10 +1253,11 @@ describe('PoolManagement Codex cycle stats mode', () => {
     expect(batchDialog?.getAttribute('data-initial-action')).toBe('refresh_quota')
   })
 
-  it('passes the current table search and status to filtered selection actions', async () => {
+  it('passes search, status and AT refresh filters to list and filtered selection actions', async () => {
     routeMocks.query.providerId = 'codex-provider'
     routeMocks.query.search = 'inactive-account'
     routeMocks.query.status = 'inactive'
+    routeMocks.query.oauthRefresh = 'no'
     const firstKey = createPoolKey('codex', { key_id: 'codex-filtered-1', key_name: 'inactive-account one' })
     const secondKey = createPoolKey('codex', { key_id: 'codex-filtered-2', key_name: 'inactive-account two' })
     endpointMocks.getPoolOverview.mockResolvedValue({ items: [createOverview('codex')] })
@@ -1305,7 +1307,13 @@ describe('PoolManagement Codex cycle stats mode', () => {
     expect(JSON.parse(batchDialog?.getAttribute('data-selection-filters') || '{}')).toEqual({
       search: 'inactive-account',
       status: 'inactive',
+      oauth_refresh: 'no',
     })
+    expect(endpointMocks.listPoolKeys).toHaveBeenCalledWith(
+      'codex-provider',
+      expect.objectContaining({ search: 'inactive-account', status: 'inactive', oauth_refresh: 'no' }),
+      expect.anything(),
+    )
   })
 
   it('disables selection while a debounced search is waiting for fresh rows', async () => {

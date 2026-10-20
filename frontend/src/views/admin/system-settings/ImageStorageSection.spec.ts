@@ -13,12 +13,31 @@ async function mount() { host = document.createElement('div'); document.body.app
 function button(text: string) { return [...host.querySelectorAll('button')].find(b => b.textContent?.trim() === text) as HTMLButtonElement }
 beforeEach(() => {
   vi.clearAllMocks()
-  api.get.mockImplementation(async (key: string) => key === 'image_storage' ? { value: defaultImageStorageConfig() } : { value: null, is_set: true })
-  api.update.mockResolvedValue({})
+  let persistedConfig = defaultImageStorageConfig()
+  api.get.mockImplementation(async (key: string) => key === 'image_storage' ? { value: { ...persistedConfig } } : { value: null, is_set: true })
+  api.update.mockImplementation(async (key: string, value: unknown) => {
+    if (key === 'image_storage') persistedConfig = { ...persistedConfig, ...(value as typeof persistedConfig) }
+    return {}
+  })
   api.stats.mockResolvedValue({ directory: '/data/images', count: 2, bytes: 2048, disk: null, updated_at: 1, last_cleanup: null, next_cleanup_at: null, sync: { running: false, total: 0 }, failure_details: [] })
 })
 afterEach(() => { app?.unmount(); app = undefined; host?.remove() })
 describe('图片存储设置', () => {
+  it('defaults resizing off and persists the resize switch with existing preferences', async () => {
+    await mount()
+    const toggle = host.querySelector('#image-resize-enabled') as HTMLInputElement
+    expect(toggle.checked).toBe(false)
+    expect(host.textContent).toContain('Sharp / Lanczos3')
+    toggle.checked = true; toggle.dispatchEvent(new Event('change', { bubbles: true })); await flush()
+    button('保存').click(); await flush()
+    expect(api.update).toHaveBeenCalledWith('image_storage', expect.objectContaining({ resize_enabled: true, return_format: 'base64', storage_mode: 'local' }))
+    expect(api.get).toHaveBeenCalledWith('image_storage')
+    expect((host.querySelector('#image-resize-enabled') as HTMLInputElement).checked).toBe(true)
+
+    app?.unmount(); app = undefined; host.remove()
+    await mount()
+    expect((host.querySelector('#image-resize-enabled') as HTMLInputElement).checked).toBe(true)
+  })
   it('defaults to ignoring response_format and preserves an existing password when saving preferences', async () => {
     await mount()
     const toggle = host.querySelectorAll('input[type=checkbox]')[0] as HTMLInputElement

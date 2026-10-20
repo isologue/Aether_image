@@ -371,6 +371,8 @@ const emit = defineEmits<{
 }>()
 
 const ACTION_OPTIONS = POOL_BATCH_ACTION_OPTIONS
+// Keep requests within the pool batch-action API's 100-key limit.
+const BATCH_ACTION_CHUNK_SIZE = 100
 
 const { success, warning, error: showError } = useToast()
 const { confirm } = useConfirm()
@@ -609,6 +611,7 @@ async function executeAction(actionOverride?: PoolBatchActionValue): Promise<voi
   let successCount = 0
   let failedCount = 0
   let skippedCount = 0
+  const failureReasons = new Set<string>()
   let resolvedCount = 0
   const actionStartedAt = performance.now()
   let actionPhaseMs = 0
@@ -689,7 +692,7 @@ async function executeAction(actionOverride?: PoolBatchActionValue): Promise<voi
       }
     } else if (selectedAction.value === 'delete') {
       const targetIds = selectedKeys.map((key) => key.key_id)
-      const BATCH_SIZE = 2000
+      const BATCH_SIZE = BATCH_ACTION_CHUNK_SIZE
       const totalBatches = Math.ceil(targetIds.length / BATCH_SIZE)
 
       for (let i = 0; i < targetIds.length; i += BATCH_SIZE) {
@@ -717,6 +720,7 @@ async function executeAction(actionOverride?: PoolBatchActionValue): Promise<voi
           }
         } catch (err) {
           log.error('Pool account batch delete failed', err)
+          failureReasons.add(parseApiError(err, '批量删除失败'))
           failedCount += batch.length
         }
 
@@ -724,7 +728,7 @@ async function executeAction(actionOverride?: PoolBatchActionValue): Promise<voi
       }
     } else if (['enable', 'disable', 'clear_proxy', 'set_proxy', 'update_settings'].includes(selectedAction.value)) {
       const targetIds = selectedKeys.map((key) => key.key_id)
-      const BATCH_SIZE = 2000
+      const BATCH_SIZE = BATCH_ACTION_CHUNK_SIZE
       const totalBatches = Math.ceil(targetIds.length / BATCH_SIZE)
 
       for (let i = 0; i < targetIds.length; i += BATCH_SIZE) {
@@ -749,6 +753,7 @@ async function executeAction(actionOverride?: PoolBatchActionValue): Promise<voi
           successCount += result.affected
         } catch (err) {
           log.error('Pool account batch action failed', err)
+          failureReasons.add(parseApiError(err, '批量操作失败'))
           failedCount += batch.length
         }
 
@@ -785,6 +790,9 @@ async function executeAction(actionOverride?: PoolBatchActionValue): Promise<voi
     }
 
     lastResultMessage.value = `执行完成：成功 ${successCount}，失败 ${failedCount}，跳过 ${skippedCount}`
+    if (failureReasons.size > 0) {
+      lastResultMessage.value += `；失败原因：${[...failureReasons].slice(0, 3).join('；')}`
+    }
     if (failedCount > 0 || (selectedAction.value === 'export' && successCount === 0)) warning(lastResultMessage.value)
     else success(lastResultMessage.value)
 

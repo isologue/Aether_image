@@ -106,6 +106,17 @@ pub(crate) fn parse_admin_pool_status_filter(query: Option<&str>) -> Result<Stri
     parse_admin_pool_status_value(value.as_deref())
 }
 
+pub(crate) fn parse_admin_pool_oauth_refresh_value(
+    value: Option<&str>,
+) -> Result<Option<bool>, String> {
+    match value.unwrap_or("all").trim().to_ascii_lowercase().as_str() {
+        "all" => Ok(None),
+        "yes" => Ok(Some(true)),
+        "no" => Ok(Some(false)),
+        _ => Err("oauth_refresh must be one of: all, yes, no".to_string()),
+    }
+}
+
 pub(crate) fn parse_admin_pool_status_value(value: Option<&str>) -> Result<String, String> {
     let value = value.unwrap_or("all").trim().to_ascii_lowercase();
     match value.as_str() {

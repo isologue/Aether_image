@@ -46,7 +46,212 @@ fn request_config(config: ImageConfig, use_url: bool) -> ImageRequest {
         config,
         use_url,
         public_base: Some("https://images.example.test".into()),
+        target_size: None,
     }
+}
+
+#[test]
+fn resize_size_validation_and_legacy_config_defaults() {
+    use super::resize::ImageSize;
+    assert!(
+        !parse_config(json!({"return_format":"url"}))
+            .unwrap()
+            .resize_enabled
+    );
+    for value in [None, Some(""), Some("auto")] {
+        assert_eq!(ImageSize::parse(value).unwrap(), None);
+    }
+    assert_eq!(
+        ImageSize::parse(Some("2048x1024")).unwrap(),
+        Some(ImageSize {
+            width: 2048,
+            height: 1024
+        })
+    );
+    for value in [
+        "0x100",
+        "-1x10",
+        "10.5x10",
+        "8193x1",
+        "8192x8192",
+        "1x2x3",
+        "100",
+        "autoo",
+    ] {
+        assert!(ImageSize::parse(Some(value)).is_err(), "{value}");
+    }
+}
+
+#[tokio::test]
+async fn resize_capture_is_opt_in_hot_configured_and_reads_json_and_multipart_size() {
+    let temp = TempDir::new();
+    let mut config = ImageConfig::default();
+    let slot = ImageRequestSlot::default();
+    let mut headers = HeaderMap::new();
+    headers.insert("content-type", "application/json".parse().unwrap());
+    let body = Bytes::from_static(br#"{"size":"invalid","prompt":"test"}"#);
+    slot.capture(&app(&temp.0, &config), &headers, &body, false)
+        .await
+        .unwrap();
+    assert!(slot
+        .0
+        .lock()
+        .unwrap()
+        .as_ref()
+        .unwrap()
+        .target_size
+        .is_none());
+    config.resize_enabled = true;
+    let state = app(&temp.0, &config);
+    assert!(slot.capture(&state, &headers, &body, false).await.is_err());
+    let body =
+        Bytes::from_static(br#"{"size":"2048x1024","response_format":"url","prompt":"test"}"#);
+    let normalized = slot.capture(&state, &headers, &body, false).await.unwrap();
+    assert_eq!(
+        serde_json::from_slice::<Value>(&normalized).unwrap()["size"],
+        "2048x1024"
+    );
+    assert_eq!(
+        slot.0
+            .lock()
+            .unwrap()
+            .as_ref()
+            .unwrap()
+            .target_size
+            .unwrap()
+            .width,
+        2048
+    );
+    headers.insert(
+        "content-type",
+        "multipart/form-data; boundary=fixture".parse().unwrap(),
+    );
+    let body = Bytes::from_static(b"--fixture\r\nContent-Disposition: form-data; name=\"image\"; filename=\"x.png\"\r\n\r\n\x00\xff\x80\r\n--fixture\r\nContent-Disposition: form-data; name=\"size\"\r\n\r\n1024x2048\r\n--fixture--\r\n");
+    let normalized = slot.capture(&state, &headers, &body, false).await.unwrap();
+    assert_eq!(normalized, body);
+    assert_eq!(
+        slot.0
+            .lock()
+            .unwrap()
+            .as_ref()
+            .unwrap()
+            .target_size
+            .unwrap()
+            .height,
+        2048
+    );
+}
+
+const RESIZE_PNG: &str = "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAEUlEQVR4nGP4z8DwH4QZYAwAR8oH+WdZbrcAAAAASUVORK5CYII=";
+
+fn assert_png_size(bytes: &[u8], width: u32, height: u32) {
+    assert!(bytes.starts_with(b"\x89PNG\r\n\x1a\n"));
+    assert_eq!(u32::from_be_bytes(bytes[16..20].try_into().unwrap()), width);
+    assert_eq!(
+        u32::from_be_bytes(bytes[20..24].try_into().unwrap()),
+        height
+    );
+}
+
+#[tokio::test]
+#[ignore = "requires Node.js and tools/image-resizer npm ci (included in Docker images)"]
+async fn resize_pipeline_returns_and_stores_identical_target_sized_images() {
+    let temp = TempDir::new();
+    let mut config = ImageConfig::default();
+    config.resize_enabled = true;
+    let state = app(&temp.0, &config);
+    let mut request = request_config(config, false);
+    request.target_size = super::resize::ImageSize::parse(Some("48x32")).unwrap();
+    let mut value = json!({"data":[{"b64_json":RESIZE_PNG,"width":2,"height":2,"size":"2x2","revised_prompt":"preserved"}],"usage":{"total_tokens":7}});
+    transform_json(&state, &request, &mut value).await.unwrap();
+    let bytes = base64::engine::general_purpose::STANDARD
+        .decode(value["data"][0]["b64_json"].as_str().unwrap())
+        .unwrap();
+    assert_png_size(&bytes, 48, 32);
+    assert_eq!(value["data"][0]["width"], 48);
+    assert_eq!(value["data"][0]["height"], 32);
+    assert_eq!(value["data"][0]["size"], "48x32");
+    assert_eq!(value["usage"]["total_tokens"], 7);
+    assert_eq!(value["data"][0]["revised_prompt"], "preserved");
+    let index = state.image_storage.index().await.unwrap();
+    let path = index
+        .read()
+        .await
+        .records
+        .values()
+        .next()
+        .unwrap()
+        .path
+        .clone();
+    assert_eq!(
+        tokio::fs::read(temp.0.join("objects").join(path))
+            .await
+            .unwrap(),
+        bytes
+    );
+
+    request.use_url = true;
+    let mut value = json!({"data":[{"b64_json":RESIZE_PNG}]});
+    transform_json(&state, &request, &mut value).await.unwrap();
+    assert!(value["data"][0].get("b64_json").is_none());
+    let url = url::Url::parse(value["data"][0]["url"].as_str().unwrap()).unwrap();
+    let relative = url.path().strip_prefix("/media/images/").unwrap();
+    assert_png_size(
+        &tokio::fs::read(temp.0.join("objects").join(relative))
+            .await
+            .unwrap(),
+        48,
+        32,
+    );
+}
+
+#[tokio::test]
+#[ignore = "requires Node.js and tools/image-resizer npm ci (included in Docker images)"]
+async fn resize_stream_completion_is_scaled_and_failures_are_reported() {
+    let temp = TempDir::new();
+    let config = ImageConfig::default();
+    let state = app(&temp.0, &config);
+    let mut request = request_config(config, false);
+    request.target_size = super::resize::ImageSize::parse(Some("32x48")).unwrap();
+    let slot = ImageRequestSlot::default();
+    *slot.0.lock().unwrap() = Some(request.clone());
+    let frame =
+        format!("event: image_generation.completed\ndata: {{\"b64_json\":\"{RESIZE_PNG}\"}}\n\n");
+    let response = Response::builder()
+        .header("content-type", "text/event-stream")
+        .body(Body::from(frame))
+        .unwrap();
+    let response = transform_response(state.clone(), slot.clone(), response)
+        .await
+        .unwrap();
+    let bytes = to_bytes(response.into_body(), 1024 * 1024).await.unwrap();
+    let text = String::from_utf8(bytes.to_vec()).unwrap();
+    let value: Value = serde_json::from_str(
+        text.lines()
+            .find_map(|line| line.strip_prefix("data: "))
+            .unwrap(),
+    )
+    .unwrap();
+    let bytes = base64::engine::general_purpose::STANDARD
+        .decode(value["b64_json"].as_str().unwrap())
+        .unwrap();
+    assert_png_size(&bytes, 32, 48);
+
+    let response = Response::builder()
+        .header("content-type", "application/json")
+        .body(Body::from(
+            json!({"data":[{"b64_json":"bm90IGFuIGltYWdl"}]}).to_string(),
+        ))
+        .unwrap();
+    let response = transform_response(state, slot, response).await.unwrap();
+    assert_eq!(response.status(), StatusCode::BAD_GATEWAY);
+    let bytes = to_bytes(response.into_body(), 1024 * 1024).await.unwrap();
+    let value: Value = serde_json::from_slice(&bytes).unwrap();
+    assert!(value["error"]["message"]
+        .as_str()
+        .unwrap()
+        .contains("Sharp"));
+    assert!(value.get("data").is_none());
 }
 
 #[test]

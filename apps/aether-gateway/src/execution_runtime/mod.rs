@@ -30,7 +30,9 @@ mod windsurf;
 pub(crate) use self::admission::{
     acquire_upstream_execution_gate, UpstreamExecutionGateProvider, UPSTREAM_EXECUTION_GATE_NAME,
 };
-pub(crate) use self::chatgpt_web_image::maybe_execute_chatgpt_web_image_sync;
+pub(crate) use self::chatgpt_web_image::{
+    chatgpt_web_image_has_local_request_error, maybe_execute_chatgpt_web_image_sync,
+};
 pub(crate) use self::constants::{
     MAX_ERROR_BODY_BYTES, MAX_EXECUTION_STREAM_FRAME_LINE_BYTES, MAX_STREAM_BODY_CAPTURE_BYTES,
     MAX_STREAM_PREFETCH_BYTES, MAX_STREAM_PREFETCH_FRAMES,

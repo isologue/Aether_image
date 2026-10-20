@@ -19,6 +19,7 @@ pub(crate) struct ImageRequest {
     pub config: ImageConfig,
     pub use_url: bool,
     pub public_base: Option<String>,
+    pub target_size: Option<super::resize::ImageSize>,
 }
 pub(crate) fn is_image_path(path: &str) -> bool {
     matches!(
@@ -27,6 +28,15 @@ pub(crate) fn is_image_path(path: &str) -> bool {
     )
 }
 impl ImageRequestSlot {
+    pub(crate) fn resize_target(&self) -> Option<(u32, u32)> {
+        self.0
+            .lock()
+            .unwrap_or_else(|e| e.into_inner())
+            .as_ref()?
+            .target_size
+            .map(|size| (size.width, size.height))
+    }
+
     pub async fn capture(
         &self,
         state: &AppState,
@@ -56,6 +66,20 @@ impl ImageRequestSlot {
         } else {
             multipart_response_format(body, content_type).map(|(_, _, value)| value)
         };
+        let target_size = if config.resize_enabled {
+            let size = if let Some(value) = &body_json {
+                match value.get("size") {
+                    Some(Value::String(value)) => Some(value.clone()),
+                    Some(Value::Null) | None => None,
+                    Some(_) => return Err("启用图片缩放时 size 必须为宽x高或 auto".into()),
+                }
+            } else {
+                multipart_text_field(body, content_type, "size").map(|(_, _, value)| value)
+            };
+            super::resize::ImageSize::parse(size.as_deref())?
+        } else {
+            None
+        };
         let use_url = config.use_url(requested.as_deref())?;
         let public_base = if !config.public_base_url.is_empty() {
             Some(config.public_base_url.clone())
@@ -82,6 +106,7 @@ impl ImageRequestSlot {
             config,
             use_url,
             public_base,
+            target_size,
         });
         // Only the gateway decides the caller's format. Ask providers for their normal Base64 output.
         if let Some(value) = &mut body_json {
@@ -107,6 +132,13 @@ impl ImageRequestSlot {
 pub(crate) fn multipart_response_format(
     body: &[u8],
     content_type: &str,
+) -> Option<(usize, usize, String)> {
+    multipart_text_field(body, content_type, "response_format")
+}
+fn multipart_text_field(
+    body: &[u8],
+    content_type: &str,
+    field: &str,
 ) -> Option<(usize, usize, String)> {
     if !content_type
         .to_ascii_lowercase()
@@ -151,7 +183,10 @@ pub(crate) fn multipart_response_format(
                 .starts_with("content-disposition:")
                 && line
                     .split(';')
-                    .any(|part| part.trim() == "name=\"response_format\"")
+                    .any(|part| part.trim() == format!("name=\"{field}\""))
+                && !line
+                    .split(';')
+                    .any(|part| part.trim().starts_with("filename="))
         }) {
             if data_end - data_start > 64 {
                 return Some((data_start, data_end, "invalid".into()));
@@ -291,6 +326,23 @@ async fn transform_item(
             .image_storage
             .download(provider_url.as_deref().ok_or("缺少图片 URL")?)
             .await?
+    };
+    let bytes = if let Some(size) = request.target_size {
+        let bytes = state.image_storage.resize(bytes, size).await?;
+        for (field, dimension) in [("width", size.width), ("height", size.height)] {
+            if object.contains_key(field) {
+                object.insert(field.into(), json!(dimension));
+            }
+        }
+        if object.contains_key("size") {
+            object.insert(
+                "size".into(),
+                json!(format!("{}x{}", size.width, size.height)),
+            );
+        }
+        bytes
+    } else {
+        bytes
     };
     let saved = if request.config.stores_local() {
         Some(state.image_storage.save(&bytes).await)

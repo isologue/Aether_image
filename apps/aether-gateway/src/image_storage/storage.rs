@@ -56,6 +56,7 @@ pub(crate) struct ImageStorage {
     pub operation: tokio::sync::Mutex<()>,
     pub sync_gate: Arc<Semaphore>,
     pub response_gate: Arc<Semaphore>,
+    pub resize_gate: Semaphore,
     pub upload_gate: Arc<Semaphore>,
     pub dav_client: reqwest::Client,
     pub public_client: reqwest::Client,
@@ -113,6 +114,7 @@ impl ImageStorage {
             operation: tokio::sync::Mutex::new(()),
             sync_gate: Arc::new(Semaphore::new(1)),
             response_gate: Arc::new(Semaphore::new(8)),
+            resize_gate: Semaphore::new(2),
             upload_gate: Arc::new(Semaphore::new(4)),
             dav_client: reqwest::Client::builder()
                 .no_proxy()

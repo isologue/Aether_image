@@ -23,7 +23,7 @@
         </p>
       </div>
 
-      <div class="grid grid-cols-3 items-center gap-2">
+      <div class="grid grid-cols-2 items-center gap-2">
         <Select
           v-model="providerModel"
           :disabled="providerSelectDisabled"
@@ -58,6 +58,25 @@
             <SelectItem
               v-for="item in statusOptions"
               :key="`mobile-${item.value}`"
+              :value="item.value"
+            >
+              {{ legacyT(item.label) }}
+            </SelectItem>
+          </SelectContent>
+        </Select>
+
+        <Select v-model="oauthRefreshModel">
+          <SelectTrigger
+            class="h-9 w-full text-xs border-border/60"
+            aria-label="筛选刷新 AT"
+            data-testid="pool-oauth-refresh-filter-mobile"
+          >
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem
+              v-for="item in oauthRefreshOptions"
+              :key="item.value"
               :value="item.value"
             >
               {{ legacyT(item.label) }}
@@ -162,7 +181,7 @@
       </div>
     </div>
 
-    <div class="hidden xl:flex items-center justify-between gap-4">
+    <div class="hidden xl:flex flex-wrap items-center justify-between gap-4">
       <div class="flex items-center gap-2">
         <h3 class="text-base font-semibold">
           {{ legacyT('号池管理') }}
@@ -206,6 +225,28 @@
         </Select>
 
         <div class="h-4 w-px bg-border" />
+
+        <Select
+          v-if="hasSelectedProvider"
+          v-model="oauthRefreshModel"
+        >
+          <SelectTrigger
+            class="w-32 h-8 text-xs border-border/60"
+            aria-label="筛选刷新 AT"
+            data-testid="pool-oauth-refresh-filter-desktop"
+          >
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem
+              v-for="item in oauthRefreshOptions"
+              :key="item.value"
+              :value="item.value"
+            >
+              {{ legacyT(item.label) }}
+            </SelectItem>
+          </SelectContent>
+        </Select>
 
         <div
           v-if="hasSelectedProvider"
@@ -352,6 +393,7 @@ import {
 import RefreshButton from '@/components/ui/refresh-button.vue'
 import { useI18n } from '@/i18n'
 import type { PoolOverviewItem } from '@/api/endpoints/pool'
+import type { PoolOAuthRefreshFilter } from '@/features/pool/utils/poolManagementState'
 import {
   POOL_BATCH_ACTION_OPTIONS,
   type PoolBatchActionValue,
@@ -385,6 +427,7 @@ const props = withDefaults(defineProps<{
   providerId: string
   providerSelectDisabled: boolean
   status: string
+  oauthRefresh?: PoolOAuthRefreshFilter
   statusOptions: Array<{ value: string, label: string }>
   search: string
   metaText?: string
@@ -399,11 +442,13 @@ const props = withDefaults(defineProps<{
 }>(), {
   metaText: '',
   selectedCount: 0,
+  oauthRefresh: 'all',
 })
 
 const emit = defineEmits<{
   'update:providerId': [value: string]
   'update:status': [value: string]
+  'update:oauthRefresh': [value: PoolOAuthRefreshFilter]
   'update:search': [value: string]
   import: []
   accountPush: []
@@ -439,6 +484,16 @@ const providerModel = computed({
 const statusModel = computed({
   get: () => props.status,
   set: value => emit('update:status', value),
+})
+
+const oauthRefreshOptions: Array<{ value: PoolOAuthRefreshFilter, label: string }> = [
+  { value: 'all', label: '刷新 AT：全部' },
+  { value: 'yes', label: '刷新 AT：是' },
+  { value: 'no', label: '刷新 AT：否' },
+]
+const oauthRefreshModel = computed({
+  get: () => props.oauthRefresh,
+  set: (value: string) => emit('update:oauthRefresh', value === 'yes' || value === 'no' ? value : 'all'),
 })
 
 const searchModel = computed({

@@ -2231,7 +2231,7 @@ pub fn admin_system_config_default_value(key: &str) -> Option<serde_json::Value>
         "account_push_last_result" => Some(serde_json::Value::Null),
         "image_webdav_password" => Some(json!("")),
         "image_storage" => Some(
-            json!({"return_format":"base64", "honor_response_format":false,
+            json!({"resize_enabled":false, "return_format":"base64", "honor_response_format":false,
             "public_base_url":"", "storage_mode":"local", "webdav_url":"", "webdav_username":"",
             "webdav_root":"aether/images", "webdav_public_url":"", "cleanup_enabled":false,
             "retention_hours":168, "cleanup_interval_hours":6}),

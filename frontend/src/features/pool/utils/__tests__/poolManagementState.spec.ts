@@ -36,6 +36,7 @@ describe('poolManagementState', () => {
         providerId: 'provider-a',
         search: 'stored search',
         status: 'cooldown',
+        oauthRefresh: 'all',
         page: 5,
         pageSize: 20,
         sortBy: 'last_used_at',
@@ -50,6 +51,7 @@ describe('poolManagementState', () => {
         providerId: 'provider-b',
         search: 'query search',
         status: 'inactive',
+        oauthRefresh: 'all',
         page: '3',
         pageSize: '100',
         sortBy: 'imported_at',
@@ -63,6 +65,7 @@ describe('poolManagementState', () => {
       providerId: 'provider-b',
       search: 'query search',
       status: 'inactive',
+      oauthRefresh: 'all',
       page: 3,
       pageSize: 100,
       sortBy: 'imported_at',
@@ -78,6 +81,7 @@ describe('poolManagementState', () => {
         providerId: 'provider-c',
         search: 'stored only',
         status: 'active',
+        oauthRefresh: 'all',
         page: 2,
         pageSize: 50,
         sortBy: 'last_used_at',
@@ -92,6 +96,7 @@ describe('poolManagementState', () => {
       providerId: 'provider-c',
       search: 'stored only',
       status: 'available',
+      oauthRefresh: 'all',
       page: 2,
       pageSize: 50,
       sortBy: 'last_used_at',
@@ -106,6 +111,7 @@ describe('poolManagementState', () => {
         providerId: 'provider-g',
         search: 'score search',
         status: 'cooldown',
+        oauthRefresh: 'all',
         page: 3,
         pageSize: 25,
         sortBy: 'score',
@@ -119,6 +125,7 @@ describe('poolManagementState', () => {
       providerId: 'provider-g',
       search: 'score search',
       status: 'cooldown',
+      oauthRefresh: 'all',
       page: 3,
       pageSize: 25,
       sortBy: 'score',
@@ -131,6 +138,7 @@ describe('poolManagementState', () => {
         providerId: 'provider-g',
         search: 'score search',
         status: 'cooldown',
+        oauthRefresh: 'all',
         page: 3,
         pageSize: 25,
         sortBy: 'score',
@@ -149,6 +157,7 @@ describe('poolManagementState', () => {
         providerId: 'provider-d',
         search: '  ',
         status: 'all',
+        oauthRefresh: 'all',
         page: 1,
         pageSize: 50,
         sortBy: 'imported_at',
@@ -159,6 +168,7 @@ describe('poolManagementState', () => {
       providerId: 'provider-d',
       search: undefined,
       status: undefined,
+      oauthRefresh: undefined,
       page: undefined,
       pageSize: undefined,
       sortBy: undefined,
@@ -173,6 +183,7 @@ describe('poolManagementState', () => {
         providerId: 'provider-e',
         search: '',
         status: 'all',
+        oauthRefresh: 'all',
         page: 1,
         pageSize: 50,
         sortBy: 'score',
@@ -192,6 +203,7 @@ describe('poolManagementState', () => {
         providerId: 'provider-f',
         search: '',
         status: 'all',
+        oauthRefresh: 'all',
         page: 1,
         pageSize: 50,
         sortBy: null,
@@ -205,6 +217,16 @@ describe('poolManagementState', () => {
     expect(
       readPoolManagementViewState({ statsMode: 'current_cycle' }, storage).statsMode,
     ).toBe('current_cycle')
+  })
+
+  it('persists the AT refresh filter and allows query overrides and clearing', () => {
+    writePoolManagementViewState({ ...readPoolManagementViewState({}), oauthRefresh: 'no' }, storage)
+    expect(readPoolManagementViewState({}, storage).oauthRefresh).toBe('no')
+    const state = readPoolManagementViewState({ oauthRefresh: 'yes' }, storage)
+    expect(state.oauthRefresh).toBe('yes')
+    expect(buildPoolManagementQueryPatch(state).oauthRefresh).toBe('yes')
+    expect(buildPoolManagementQueryPatch({ ...state, oauthRefresh: 'all' }).oauthRefresh).toBeUndefined()
+    expect(readPoolManagementViewState({ oauthRefresh: 'invalid' }, storage).oauthRefresh).toBe('all')
   })
 
   it('clamps a restored page to the last available page after load', () => {

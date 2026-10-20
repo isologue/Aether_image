@@ -1,3 +1,4 @@
+use super::support::parse_admin_pool_oauth_refresh_value;
 use super::{
     admin_pool_provider_id_from_path, admin_provider_pool_config, build_admin_pool_error_response,
     parse_admin_pool_key_sort, parse_admin_pool_page, parse_admin_pool_page_size,
@@ -10,8 +11,8 @@ use super::{
 use crate::ai_serving::{provider_key_pool_score_id, provider_key_pool_score_scope};
 use crate::handlers::admin::provider::shared::support::AdminProviderPoolConfig;
 use crate::handlers::admin::request::{AdminAppState, AdminRequestContext};
-use crate::handlers::admin::shared::provider_key_status_snapshot_payload;
-use crate::provider_key_auth::provider_key_auth_semantics;
+use crate::handlers::admin::shared::{provider_key_status_snapshot_payload, query_param_value};
+use crate::provider_key_auth::{provider_key_auth_semantics, provider_key_oauth_refresh_status};
 use crate::GatewayError;
 use aether_admin::provider::pool as admin_provider_pool_pure;
 use aether_data_contracts::repository::pool_scores::{
@@ -512,6 +513,21 @@ pub(super) fn admin_pool_key_visible_status_filter(
     "available"
 }
 
+pub(super) fn admin_pool_key_matches_oauth_refresh(
+    state: &AdminAppState<'_>,
+    key: &StoredProviderCatalogKey,
+    provider_type: &str,
+    expected: Option<bool>,
+    now: u64,
+) -> bool {
+    let Some(expected) = expected else {
+        return true;
+    };
+    let auth_config = state.parse_catalog_auth_config_json(key);
+    let status = provider_key_oauth_refresh_status(key, provider_type, auth_config.as_ref(), now);
+    status.get("eligible").and_then(Value::as_bool) == Some(expected)
+}
+
 pub(super) async fn build_admin_pool_list_keys_response(
     state: &AdminAppState<'_>,
     request_context: &AdminRequestContext<'_>,
@@ -559,6 +575,17 @@ pub(super) async fn build_admin_pool_list_keys_response(
                 http::StatusCode::BAD_REQUEST,
                 detail,
             ));
+        }
+    };
+    let oauth_refresh = match parse_admin_pool_oauth_refresh_value(
+        query_param_value(query, "oauth_refresh").as_deref(),
+    ) {
+        Ok(value) => value,
+        Err(detail) => {
+            return Ok(build_admin_pool_error_response(
+                http::StatusCode::BAD_REQUEST,
+                detail,
+            ))
         }
     };
     let sort = match parse_admin_pool_key_sort(query) {
@@ -632,7 +659,13 @@ pub(super) async fn build_admin_pool_list_keys_response(
             _ => AdminProviderPoolRuntimeState::default(),
         };
         keys.retain(|key| {
-            admin_pool_key_visible_status_filter(
+            admin_pool_key_matches_oauth_refresh(
+                state,
+                key,
+                &provider.provider_type,
+                oauth_refresh,
+                now_unix_secs,
+            ) && admin_pool_key_visible_status_filter(
                 state,
                 key,
                 &provider.provider_type,
@@ -660,7 +693,7 @@ pub(super) async fn build_admin_pool_list_keys_response(
             .take(page_size)
             .collect::<Vec<_>>();
         (keys, total, preloaded_pool_scores_by_key_id)
-    } else if !quick_selectors.is_empty() || sort_by_score {
+    } else if !quick_selectors.is_empty() || sort_by_score || oauth_refresh.is_some() {
         let use_full_search = !quick_selectors.is_empty();
         let mut keys = state
             .list_provider_catalog_keys_by_provider_ids(std::slice::from_ref(&provider.id))
@@ -687,6 +720,15 @@ pub(super) async fn build_admin_pool_list_keys_response(
                         selector,
                     )
                 })
+            })
+            .filter(|key| {
+                admin_pool_key_matches_oauth_refresh(
+                    state,
+                    key,
+                    &provider.provider_type,
+                    oauth_refresh,
+                    now_unix_secs,
+                )
             })
             .collect::<Vec<_>>();
         let preloaded_pool_scores_by_key_id = if sort_by_score {

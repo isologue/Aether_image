@@ -1,6 +1,7 @@
 import client from '../client'
 
 export interface ImageStorageConfig {
+  resize_enabled: boolean
   return_format: 'base64' | 'url'
   honor_response_format: boolean
   public_base_url: string
@@ -14,6 +15,7 @@ export interface ImageStorageConfig {
   cleanup_interval_hours: number
 }
 export const defaultImageStorageConfig = (): ImageStorageConfig => ({
+  resize_enabled: false,
   return_format: 'base64', honor_response_format: false, public_base_url: '',
   storage_mode: 'local', webdav_url: '', webdav_username: '', webdav_root: 'aether/images',
   webdav_public_url: '', cleanup_enabled: false, retention_hours: 168, cleanup_interval_hours: 6,

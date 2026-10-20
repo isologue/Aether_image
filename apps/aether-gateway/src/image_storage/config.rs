@@ -8,6 +8,7 @@ pub(crate) const PASSWORD_KEY: &str = "image_webdav_password";
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(default, deny_unknown_fields)]
 pub(crate) struct ImageConfig {
+    pub resize_enabled: bool,
     pub return_format: String,
     pub honor_response_format: bool,
     pub public_base_url: String,
@@ -23,6 +24,7 @@ pub(crate) struct ImageConfig {
 impl Default for ImageConfig {
     fn default() -> Self {
         Self {
+            resize_enabled: false,
             return_format: "base64".into(),
             honor_response_format: false,
             public_base_url: String::new(),

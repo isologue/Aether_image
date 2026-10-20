@@ -2,6 +2,7 @@
 mod admin;
 mod config;
 mod response;
+mod resize;
 mod storage;
 #[cfg(test)]
 mod tests;

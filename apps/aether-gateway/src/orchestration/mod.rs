@@ -81,6 +81,15 @@ pub(crate) async fn resolve_local_failover_analysis_for_attempt(
     status_code: u16,
     response_text: Option<&str>,
 ) -> LocalFailoverAnalysis {
+    if status_code == 400
+        && crate::execution_runtime::chatgpt_web_image_has_local_request_error(plan, report_context)
+    {
+        // Rotating credentials cannot fix a local request validation error.
+        return LocalFailoverAnalysis {
+            classification: LocalFailoverClassification::StopExecutionError,
+            decision: LocalFailoverDecision::StopLocalFailover,
+        };
+    }
     if attempt_identity_from_report_context(report_context).is_none() {
         return LocalFailoverAnalysis::use_default();
     }

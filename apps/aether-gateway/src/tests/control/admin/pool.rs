@@ -3624,6 +3624,121 @@ async fn gateway_handles_admin_pool_resolve_selection_locally_with_trusted_admin
 }
 
 #[tokio::test]
+async fn gateway_pool_oauth_refresh_filter_matches_paging_status_and_selection() {
+    let mut provider = sample_provider("provider-refresh-filter", "chatgpt_web", 10);
+    provider.provider_type = "chatgpt_web".into();
+    let mut keys = Vec::new();
+    for id in [
+        "a-recoverable",
+        "b-healthy",
+        "c-invalid-rt",
+        "d-no-rt",
+        "e-inactive",
+    ] {
+        let mut key = sample_key(id, &provider.id, "openai:image", "test-at");
+        key.name = id.into();
+        key.auth_type = "oauth".into();
+        key.expires_at_unix_secs = Some(if id == "b-healthy" || id == "e-inactive" {
+            u64::MAX / 2
+        } else {
+            1
+        });
+        let config = if id == "d-no-rt" {
+            r#"{"provider_type":"chatgpt_web","access_token":"test-at"}"#
+        } else {
+            r#"{"provider_type":"chatgpt_web","access_token":"test-at","refresh_token":"test-rt"}"#
+        };
+        key.encrypted_auth_config = Some(sample_bound_auth_config(&provider.id, id, config));
+        if id == "a-recoverable" {
+            key.oauth_invalid_reason = Some("[OAUTH_EXPIRED] AT rejected".into());
+        }
+        if id == "c-invalid-rt" {
+            key.oauth_invalid_reason = Some("[OAUTH_EXPIRED] AT rejected\n[REFRESH_FAILED] Token 续期失败 (401): refresh_token_invalidated".into());
+        }
+        key.is_active = id != "e-inactive";
+        keys.push(key);
+    }
+    let repository = Arc::new(InMemoryProviderCatalogReadRepository::seed(
+        vec![provider],
+        Vec::new(),
+        keys,
+    ));
+    let state = AppState::new().unwrap().with_data_state_for_tests(
+        GatewayDataState::with_provider_catalog_reader_for_tests(repository)
+            .with_encryption_key_for_tests(DEVELOPMENT_ENCRYPTION_KEY),
+    );
+    for (status, refresh, expected) in [
+        (
+            "all",
+            "all",
+            vec![
+                "a-recoverable",
+                "b-healthy",
+                "c-invalid-rt",
+                "d-no-rt",
+                "e-inactive",
+            ],
+        ),
+        ("all", "yes", vec!["a-recoverable", "b-healthy"]),
+        ("all", "no", vec!["c-invalid-rt", "d-no-rt", "e-inactive"]),
+        ("expired", "yes", vec!["a-recoverable"]),
+        ("expired", "no", vec!["c-invalid-rt", "d-no-rt"]),
+        ("inactive", "no", vec!["e-inactive"]),
+    ] {
+        for (index, id) in expected.iter().enumerate() {
+            let response = local_admin_pool_response(&state, http::Method::GET,
+                &format!("/api/admin/pool/provider-refresh-filter/keys?page={}&page_size=1&sort_by=name&sort_order=asc&status={status}&oauth_refresh={refresh}", index + 1), None).await;
+            assert_eq!(response.status(), StatusCode::OK);
+            let body: serde_json::Value =
+                serde_json::from_slice(&to_bytes(response.into_body(), usize::MAX).await.unwrap())
+                    .unwrap();
+            assert_eq!(body["total"], expected.len(), "{status}/{refresh}");
+            assert_eq!(body["keys"][0]["key_id"], *id, "{status}/{refresh}");
+            if refresh != "all" {
+                assert_eq!(
+                    body["keys"][0]["oauth_refresh_status"]["eligible"],
+                    refresh == "yes"
+                );
+            }
+        }
+        let response = local_admin_pool_response(
+            &state,
+            http::Method::POST,
+            "/api/admin/pool/provider-refresh-filter/keys/resolve-selection",
+            Some(json!({"status":status,"oauth_refresh":refresh})),
+        )
+        .await;
+        assert_eq!(response.status(), StatusCode::OK);
+        let body: serde_json::Value =
+            serde_json::from_slice(&to_bytes(response.into_body(), usize::MAX).await.unwrap())
+                .unwrap();
+        let ids = body["items"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|item| item["key_id"].as_str().unwrap())
+            .collect::<Vec<_>>();
+        assert_eq!(ids, expected, "{status}/{refresh}");
+    }
+    let response = local_admin_pool_response(
+        &state,
+        http::Method::GET,
+        "/api/admin/pool/provider-refresh-filter/keys?oauth_refresh=invalid",
+        None,
+    )
+    .await;
+    assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+    let response = local_admin_pool_response(
+        &state,
+        http::Method::POST,
+        "/api/admin/pool/provider-refresh-filter/keys/resolve-selection",
+        Some(json!({"oauth_refresh":"invalid"})),
+    )
+    .await;
+    assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+}
+
+#[tokio::test]
 async fn gateway_pool_resolve_selection_matches_list_search_scope_for_status() {
     let provider = sample_provider("provider-search-scope", "openai", 10);
     let mut key = sample_key(

@@ -8,6 +8,15 @@
 #   dist/aether-gateway-arm64   (aarch64-unknown-linux-musl cross-compiled binary)
 #   dist/frontend/              (npm run build output)
 
+# Sharp / Lanczos3 runtime
+FROM node:22-bookworm-slim AS image-resizer-builder
+WORKDIR /opt/aether/image-resizer
+COPY tools/image-resizer/package*.json ./
+RUN --mount=type=cache,id=aether-npm-cache,target=/root/.npm,sharing=locked \
+    npm ci --omit=dev --no-audit --no-fund
+COPY tools/image-resizer/resize.mjs tools/image-resizer/package-runtime.sh ./
+RUN sh package-runtime.sh
+
 # --- layout stage: create /opt/aether directory structure with symlink ---
 # distroless has no shell, so we use busybox to set up the symlink.
 FROM busybox:1.37.0-musl@sha256:fc6dddc4c44b1bfe37f41cae8e67d1693828e8f42a91862816d7953e2c9d3f23 AS layout
@@ -29,6 +38,7 @@ RUN ln -s /opt/aether/releases/image /opt/aether/current
 # --- final stage: distroless runtime ---
 FROM gcr.io/distroless/static-debian12@sha256:6447365a6337c3732f412d1b74357b30a633831955b2bc45552b0086be907687
 
+COPY --from=image-resizer-builder /runtime-root/ /
 COPY --from=layout /opt/aether /opt/aether
 
 WORKDIR /opt/aether

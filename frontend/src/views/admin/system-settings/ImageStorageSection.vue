@@ -89,6 +89,20 @@
           </p>
         </div>
       </div>
+      <div class="space-y-2 border-t border-border pt-5">
+        <label class="flex items-center gap-2 text-sm font-medium"><input
+          type="checkbox"
+          id="image-resize-enabled"
+          v-model="form.resize_enabled"
+          class="h-4 w-4 rounded border-border/60 bg-card/80 text-primary shadow-sm focus:ring-2 focus:ring-primary/40 focus:ring-offset-1 accent-primary"
+        >按请求分辨率自动缩放</label>
+        <p class="text-xs text-muted-foreground">
+          使用 Sharp / Lanczos3，在返回和存储前按 size（如 2048x2048）缩放。未传 size 或为 auto 时保留原图；尺寸相同不重复处理。保存后对新请求生效。
+        </p>
+        <p class="text-xs text-muted-foreground">
+          保持原图比例，比例不同时居中补边；支持 PNG、JPEG、WebP。单边最多 8192 像素，总计最多 3200 万像素。传统插值放大不会生成新的细节。
+        </p>
+      </div>
       <div
         v-if="storesWebdav"
         class="space-y-4 border-t border-border pt-5"
@@ -389,7 +403,11 @@ async function save() {
       await adminApi.updateSystemConfig('image_webdav_password', clearPassword.value ? '' : password.value)
       passwordSet.value = !clearPassword.value; password.value = ''; clearPassword.value = false
     }
-    await adminApi.updateSystemConfig('image_storage', form.value)
+    // All config fields are primitives; spread the Vue proxy into a plain object.
+    const configToSave = { ...form.value }
+    await adminApi.updateSystemConfig('image_storage', configToSave)
+    const persisted = await adminApi.getSystemConfig('image_storage')
+    form.value = normalizeImageStorageConfig((persisted.value as Partial<ImageStorageConfig> & { webdav_enabled?: boolean }) || {})
     saved.value = JSON.stringify(form.value); testResult.value = null
     success('图片存储配置已保存'); await refreshStats()
   } catch (e) { error(message(e)) } finally { busy.value = '' }

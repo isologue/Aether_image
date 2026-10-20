@@ -1,6 +1,7 @@
 use std::collections::BTreeMap;
 use std::sync::Arc;
 
+use aether_ai_formats::api::build_chatgpt_web_image_request_body_with_resize_target;
 use aether_contracts::ResolvedTransportProfile;
 use serde_json::Value;
 
@@ -18,7 +19,7 @@ use crate::ai_serving::transport::{
 };
 use crate::ai_serving::{
     apply_codex_openai_special_headers, apply_xai_upstream_payload_edits,
-    build_chatgpt_web_image_request_body, build_codex_openai_image_api_provider_request_body,
+    build_codex_openai_image_api_provider_request_body,
     build_gemini_image_request_body_from_openai_image_request,
     build_openai_image_api_provider_request_body, build_openai_image_provider_request_body,
     default_model_for_openai_image_operation, normalize_openai_image_request,
@@ -188,8 +189,18 @@ pub(super) async fn resolve_local_openai_image_candidate_payload_parts(
             false,
         );
     let provider_request_body = if is_chatgpt_web {
+        // Only capture() can authorize a resize; never trust request body flags.
+        let resize_target = parts
+            .extensions
+            .get::<crate::image_storage::ImageRequestSlot>()
+            .and_then(|slot| slot.resize_target());
         Some(
-            match build_chatgpt_web_image_request_body(parts, body_json, body_base64) {
+            match build_chatgpt_web_image_request_body_with_resize_target(
+                parts,
+                body_json,
+                body_base64,
+                resize_target,
+            ) {
                 Ok(body) => body,
                 Err(err) => err.to_error_json(),
             },

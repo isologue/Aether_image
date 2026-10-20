@@ -7,6 +7,7 @@
       <PoolManagementHeader
         v-model:provider-id="selectedProviderIdProxy"
         v-model:status="statusFilter"
+        v-model:oauth-refresh="oauthRefreshFilter"
         v-model:search="searchQuery"
         :providers="poolProviders"
         :provider-select-disabled="providerSelectDisabled"
@@ -282,7 +283,7 @@
                           :class="key.oauth_refresh_status?.eligible ? 'text-emerald-600' : 'text-muted-foreground'"
                           :title="keyUiStateMap[key.key_id]?.oauthStatusTitle || ''"
                         >
-                          刷新 AT：{{ key.oauth_refresh_status?.eligible ? '可' : '否' }}
+                          刷新 AT：{{ key.oauth_refresh_status?.eligible ? '是' : '否' }}
                         </span>
                         <template v-if="keyUiStateMap[key.key_id]?.showOAuthRefreshControl">
                           <Button
@@ -587,7 +588,7 @@
                   class="text-[10px]"
                   :title="keyUiStateMap[key.key_id]?.oauthStatusTitle || ''"
                 >
-                  刷新 AT：{{ key.oauth_refresh_status?.eligible ? '可' : '否' }}
+                  刷新 AT：{{ key.oauth_refresh_status?.eligible ? '是' : '否' }}
                 </span>
                 <Badge
                   :variant="keyUiStateMap[key.key_id]?.schedulingBadgeVariant || 'default'"
@@ -1231,6 +1232,7 @@ const restoredViewState = readPoolManagementViewState(
     providerId: getQueryValue('providerId'),
     search: getQueryValue('search'),
     status: getQueryValue('status'),
+    oauthRefresh: getQueryValue('oauthRefresh'),
     page: getQueryValue('page'),
     pageSize: getQueryValue('pageSize'),
     sortBy: getQueryValue('sortBy'),
@@ -1791,6 +1793,7 @@ async function selectProvider(
   }
   if (!options.preserveStatus) {
     statusFilter.value = 'all'
+    oauthRefreshFilter.value = 'all'
   }
   suppressFiltersWatch = false
   if (keysSearchDebounceTimer !== null) {
@@ -1892,18 +1895,21 @@ function getPoolKeyRowClass(keyId: string): string {
 const refreshingCurrentPageQuota = ref(false)
 const searchQuery = ref(restoredViewState.search)
 const statusFilter = ref(restoredViewState.status)
+const oauthRefreshFilter = ref(restoredViewState.oauthRefresh)
 const poolKeySelectionFilters = computed<PoolKeySelectionRequest>(() => {
   const search = searchQuery.value.trim()
   return {
     ...(search ? { search } : {}),
     status: statusFilter.value,
+    ...(oauthRefreshFilter.value === 'all' ? {} : { oauth_refresh: oauthRefreshFilter.value }),
   }
 })
 const currentPage = ref(restoredViewState.page)
 const pageSize = ref(restoredViewState.pageSize)
 const sortBy = ref<PoolManagementSortBy | null>(restoredViewState.sortBy)
 const sortOrder = ref<PoolManagementSortOrder>(restoredViewState.sortOrder)
-const hasPoolKeyFilters = computed(() => searchQuery.value.trim().length > 0 || statusFilter.value !== 'all')
+const hasPoolKeyFilters = computed(() => searchQuery.value.trim().length > 0
+  || statusFilter.value !== 'all' || oauthRefreshFilter.value !== 'all')
 const MANUAL_QUOTA_REFRESH_COOLDOWN_SECONDS = 5 * 60
 const refreshingOAuthKeyId = ref<string | null>(null)
 const consumingCodexResetCreditKeyId = ref<string | null>(null)
@@ -1937,6 +1943,7 @@ function clearPoolKeyFilters() {
   suppressFiltersWatch = true
   searchQuery.value = ''
   statusFilter.value = 'all'
+  oauthRefreshFilter.value = 'all'
   suppressFiltersWatch = false
   if (currentPage.value !== 1) {
     currentPage.value = 1
@@ -1963,6 +1970,14 @@ watch(
     suppressFiltersWatch = false
   },
   { immediate: true },
+)
+
+watch(
+  () => readPoolManagementViewState({ oauthRefresh: getQueryValue('oauthRefresh') }).oauthRefresh,
+  (value) => {
+    if (oauthRefreshFilter.value === value) return
+    oauthRefreshFilter.value = value
+  },
 )
 
 watch(
@@ -2012,12 +2027,13 @@ watch(
 )
 
 watch(
-  [selectedProviderId, searchQuery, statusFilter, currentPage, pageSize, sortBy, sortOrder],
-  ([providerId, search, status, page, pageSizeValue, sortByValue, sortOrderValue]) => {
+  [selectedProviderId, searchQuery, statusFilter, oauthRefreshFilter, currentPage, pageSize, sortBy, sortOrder],
+  ([providerId, search, status, oauthRefresh, page, pageSizeValue, sortByValue, sortOrderValue]) => {
     const nextState: PoolManagementViewState = {
       providerId,
       search,
       status: status as PoolManagementViewState['status'],
+      oauthRefresh,
       page,
       pageSize: pageSizeValue,
       sortBy: sortByValue,
@@ -2535,6 +2551,7 @@ async function loadKeys(options: { cacheTtlMs?: number, silent?: boolean } = {})
       page_size: pageSizeValue,
       search,
       status,
+      ...(oauthRefreshFilter.value === 'all' ? {} : { oauth_refresh: oauthRefreshFilter.value }),
       sort_by: sortByValue || undefined,
       sort_order: sortByValue ? sortOrder.value : undefined,
     }, {
@@ -2576,7 +2593,7 @@ watch(pageSize, () => {
   void loadKeys({ cacheTtlMs: POOL_KEYS_CACHE_TTL_MS })
 })
 
-watch(statusFilter, () => {
+watch([statusFilter, oauthRefreshFilter], () => {
   if (suppressFiltersWatch) return
   resetPoolKeySelection(true)
   if (keysSearchDebounceTimer !== null) {

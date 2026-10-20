@@ -245,6 +245,7 @@ pub use crate::formats::{
     openai::image::{
         request::{
             build_chatgpt_web_image_request_body,
+            build_chatgpt_web_image_request_body_with_resize_target,
             build_codex_openai_image_api_provider_request_body,
             build_openai_image_api_provider_request_body, build_openai_image_provider_request_body,
             default_model_for_openai_image_operation, is_openai_image_stream_request,

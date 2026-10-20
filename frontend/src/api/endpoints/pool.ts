@@ -278,6 +278,7 @@ export interface PoolKeysQuery {
   page?: number
   page_size?: number
   search?: string
+  oauth_refresh?: 'yes' | 'no'
   status?:
     | 'all'
     | 'available'
@@ -313,6 +314,7 @@ export interface PoolScoresQuery {
 export interface PoolKeySelectionRequest {
   search?: string
   status?: PoolKeysQuery['status']
+  oauth_refresh?: PoolKeysQuery['oauth_refresh']
   quick_selectors?: string[]
 }
 

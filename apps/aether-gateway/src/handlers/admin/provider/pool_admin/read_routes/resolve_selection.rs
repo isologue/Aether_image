@@ -1,4 +1,7 @@
-use super::read_keys::admin_pool_key_visible_status_filter;
+use super::read_keys::{
+    admin_pool_key_matches_oauth_refresh, admin_pool_key_visible_status_filter,
+};
+use super::support::parse_admin_pool_oauth_refresh_value;
 use super::{
     admin_pool_provider_id_from_path, admin_provider_pool_config, build_admin_pool_error_response,
     parse_admin_pool_status_value, pool_selection, read_admin_provider_pool_runtime_state,
@@ -62,6 +65,18 @@ pub(super) async fn build_admin_pool_resolve_selection_response(
         }
     };
 
+    let oauth_refresh = match parse_admin_pool_oauth_refresh_value(payload.oauth_refresh.as_deref())
+    {
+        Ok(value) => value,
+        Err(detail) => {
+            return Ok(build_admin_pool_error_response(
+                http::StatusCode::BAD_REQUEST,
+                detail,
+            ))
+        }
+    };
+    let now_unix_secs = admin_provider_pool_pure::admin_pool_now_unix_secs();
+
     let Some(provider) = state
         .read_provider_catalog_providers_by_ids(std::slice::from_ref(&provider_id))
         .await?
@@ -101,6 +116,15 @@ pub(super) async fn build_admin_pool_resolve_selection_response(
                         selector,
                     )
                 })
+        })
+        .filter(|key| {
+            admin_pool_key_matches_oauth_refresh(
+                state,
+                key,
+                &provider_type,
+                oauth_refresh,
+                now_unix_secs,
+            )
         })
         .collect::<Vec<_>>();
 
