@@ -36,7 +36,7 @@ impl PushConfig {
         }
         if !self.provider_id.is_empty() {
             let provider = state
-                .read_provider_catalog_providers_by_ids(&[self.provider_id.clone()])
+                .read_provider_catalog_providers_by_ids(std::slice::from_ref(&self.provider_id))
                 .await
                 .map_err(|_| "读取提供商失败".to_string())?
                 .into_iter()

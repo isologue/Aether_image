@@ -1,8 +1,8 @@
 //! Image persistence is owned by the gateway, outside pure protocol converters and billing.
 mod admin;
 mod config;
-mod response;
 mod resize;
+mod response;
 mod storage;
 #[cfg(test)]
 mod tests;

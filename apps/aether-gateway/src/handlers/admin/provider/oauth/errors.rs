@@ -61,9 +61,7 @@ pub(crate) fn normalize_provider_oauth_refresh_error_message(
                         .map(str::trim)
                         .filter(|value| !value.is_empty())
                         .map(|value| value.to_ascii_lowercase());
-                } else if let Some(error) = object
-                    .get("error")
-                    .and_then(serde_json::Value::as_str)
+                } else if let Some(error) = object.get("error").and_then(serde_json::Value::as_str)
                 {
                     // OAuth token endpoints commonly return {"error":"invalid_grant"}
                     // rather than a nested error object. Keep only the bounded error code.

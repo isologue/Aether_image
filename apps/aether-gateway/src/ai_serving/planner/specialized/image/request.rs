@@ -1,7 +1,6 @@
 use std::collections::BTreeMap;
 use std::sync::Arc;
 
-use aether_ai_formats::api::build_chatgpt_web_image_request_body_with_resize_target;
 use aether_contracts::ResolvedTransportProfile;
 use serde_json::Value;
 
@@ -9,7 +8,10 @@ use crate::ai_serving::planner::candidate_preparation::{
     prepare_header_authenticated_candidate, OauthPreparationContext,
 };
 use crate::ai_serving::planner::spec_metadata::local_openai_image_spec_metadata;
-use crate::ai_serving::pure::normalize_openai_image_request_with_options;
+use crate::ai_serving::pure::{
+    build_chatgpt_web_image_request_body_with_resize_target,
+    normalize_openai_image_request_with_options,
+};
 use crate::ai_serving::transport::antigravity::is_antigravity_provider_transport;
 use crate::ai_serving::transport::{
     build_grok_browser_headers, build_grok_upstream_url, build_openai_image_headers,

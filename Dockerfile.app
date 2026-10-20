@@ -9,7 +9,7 @@
 #   dist/frontend/              (npm run build output)
 
 # Sharp / Lanczos3 runtime
-FROM node:22-bookworm-slim AS image-resizer-builder
+FROM node:22-bookworm-slim@sha256:c3de60bf2f9dd0ac6370e6117950ff62d6e339527e7472301c9c78a017978392 AS image-resizer-builder
 WORKDIR /opt/aether/image-resizer
 COPY tools/image-resizer/package*.json ./
 RUN --mount=type=cache,id=aether-npm-cache,target=/root/.npm,sharing=locked \
