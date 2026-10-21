@@ -600,13 +600,26 @@ async fn find_matching_provider_oauth_key(
         return Ok(None);
     }
 
-    // Duplicate checks are write admission checks. Never let a process-local
-    // read-through cache hide a row committed by the previous lock holder.
-    state.app().data.clear_provider_catalog_cache();
-    let existing_keys = state
-        .list_provider_catalog_keys_by_provider_ids(&[provider_id.to_string()])
+    let hashes =
+        aether_data_contracts::repository::provider_catalog::provider_oauth_identity_hashes(
+            auth_config,
+        );
+    let existing_keys = match state
+        .app()
+        .find_provider_oauth_identity_candidates(provider_id, &hashes)
         .await
-        .map_err(|err| format!("{err:?}"))?;
+        .map_err(|error| format!("{error:?}"))?
+    {
+        Some(keys) => keys,
+        None => {
+            // Compatibility for repositories without a persistent identity index.
+            state.app().data.clear_provider_catalog_cache();
+            state
+                .list_provider_catalog_keys_by_provider_ids(&[provider_id.to_string()])
+                .await
+                .map_err(|error| format!("{error:?}"))?
+        }
+    };
 
     let provider_type = auth_config
         .get("provider_type")

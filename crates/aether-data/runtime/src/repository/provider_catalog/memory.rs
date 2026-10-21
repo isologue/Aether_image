@@ -31,6 +31,7 @@ struct MemoryProviderCatalogIndex {
 #[derive(Debug, Default)]
 pub struct InMemoryProviderCatalogReadRepository {
     index: RwLock<MemoryProviderCatalogIndex>,
+    identity_locks: std::sync::Mutex<BTreeMap<String, Arc<tokio::sync::Mutex<()>>>>,
     routing_groups:
         Option<Arc<crate::repository::routing_profiles::InMemoryRoutingGroupRepository>>,
 }
@@ -43,6 +44,7 @@ impl InMemoryProviderCatalogReadRepository {
     ) -> Self {
         Self {
             routing_groups: None,
+            identity_locks: Default::default(),
             index: RwLock::new(MemoryProviderCatalogIndex {
                 providers: providers
                     .into_iter()
@@ -350,8 +352,73 @@ fn apply_codex_window_usage_stats_delta(
     }
 }
 
+struct MemoryOAuthIdentityLock {
+    _guard: tokio::sync::OwnedMutexGuard<()>,
+}
+impl aether_data_contracts::repository::provider_catalog::ProviderOAuthIdentityLock
+    for MemoryOAuthIdentityLock
+{
+}
+
 #[async_trait]
 impl ProviderCatalogReadRepository for InMemoryProviderCatalogReadRepository {
+    async fn acquire_oauth_identity_lock(
+        &self,
+        provider_id: &str,
+    ) -> Result<
+        Option<
+            Box<dyn aether_data_contracts::repository::provider_catalog::ProviderOAuthIdentityLock>,
+        >,
+        DataLayerError,
+    > {
+        let lock = self
+            .identity_locks
+            .lock()
+            .expect("identity lock map")
+            .entry(provider_id.to_owned())
+            .or_default()
+            .clone();
+        Ok(Some(Box::new(MemoryOAuthIdentityLock {
+            _guard: lock.lock_owned().await,
+        })))
+    }
+    async fn list_unindexed_oauth_keys(
+        &self,
+        provider_id: &str,
+        limit: usize,
+    ) -> Result<Option<Vec<StoredProviderCatalogKey>>, DataLayerError> {
+        let index = self.index.read().expect("provider catalog repository lock");
+        Ok(Some(
+            index
+                .keys
+                .values()
+                .filter(|key| key.provider_id == provider_id && key.oauth_identity_hashes.is_none())
+                .take(limit)
+                .cloned()
+                .collect(),
+        ))
+    }
+    async fn find_oauth_identity_key_ids(
+        &self,
+        provider_id: &str,
+        hashes: &[String],
+    ) -> Result<Option<Vec<String>>, DataLayerError> {
+        let index = self.index.read().expect("provider catalog repository lock");
+        Ok(Some(
+            index
+                .keys
+                .values()
+                .filter(|key| {
+                    key.provider_id == provider_id
+                        && key
+                            .oauth_identity_hashes
+                            .as_ref()
+                            .is_none_or(|stored| stored.iter().any(|hash| hashes.contains(hash)))
+                })
+                .map(|key| key.id.clone())
+                .collect(),
+        ))
+    }
     async fn list_providers(
         &self,
         active_only: bool,
@@ -427,6 +494,25 @@ impl ProviderCatalogReadRepository for InMemoryProviderCatalogReadRepository {
 
 #[async_trait]
 impl ProviderCatalogWriteRepository for InMemoryProviderCatalogReadRepository {
+    async fn index_oauth_key(
+        &self,
+        key: &StoredProviderCatalogKey,
+    ) -> Result<bool, DataLayerError> {
+        let mut index = self
+            .index
+            .write()
+            .expect("provider catalog repository lock");
+        let Some(stored) = index.keys.get_mut(&key.id) else {
+            return Ok(false);
+        };
+        if stored.provider_id != key.provider_id
+            || stored.encrypted_auth_config != key.encrypted_auth_config
+        {
+            return Ok(false);
+        }
+        stored.oauth_identity_hashes = key.oauth_identity_hashes.clone();
+        Ok(true)
+    }
     async fn create_provider_in_routing_group(
         &self,
         provider: &StoredProviderCatalogProvider,
@@ -701,6 +787,7 @@ impl ProviderCatalogWriteRepository for InMemoryProviderCatalogReadRepository {
         }
         key.encrypted_api_key = update.encrypted_api_key.clone();
         key.encrypted_auth_config = update.encrypted_auth_config.clone();
+        key.oauth_identity_hashes = None;
         Ok(true)
     }
 
@@ -1190,6 +1277,7 @@ impl ProviderCatalogWriteRepository for InMemoryProviderCatalogReadRepository {
             key.encrypted_api_key = Some(encrypted_api_key.clone());
         }
         key.encrypted_auth_config = Some(update.encrypted_auth_config.clone());
+        key.oauth_identity_hashes = None;
         if let Some(expires_at_unix_secs) = update.expires_at_unix_secs_update {
             key.expires_at_unix_secs = expires_at_unix_secs;
         }

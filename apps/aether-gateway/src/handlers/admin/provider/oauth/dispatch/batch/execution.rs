@@ -646,6 +646,18 @@ pub(super) async fn execute_admin_provider_oauth_batch_import(
             Vec::new()
         };
 
+        let identity_admission = match state
+            .app()
+            .acquire_provider_oauth_identity_lock(provider_id)
+            .await
+        {
+            Ok(guard) => guard,
+            Err(error) => {
+                release_codex_oauth_account_locks(state, codex_oauth_account_leases).await;
+                return Err(error);
+            }
+        };
+
         let duplicate_result = if replace_active_accounts {
             find_provider_oauth_key_for_push(state, provider_id, &auth_config).await
         } else {
@@ -761,6 +773,7 @@ pub(super) async fn execute_admin_provider_oauth_batch_import(
                 }
             }
         };
+        drop(identity_admission);
         release_codex_oauth_account_locks(state, codex_oauth_account_leases).await;
 
         spawn_provider_oauth_account_state_refresh_after_update(

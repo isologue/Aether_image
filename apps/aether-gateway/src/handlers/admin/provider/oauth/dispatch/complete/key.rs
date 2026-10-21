@@ -321,6 +321,17 @@ pub(super) async fn handle_admin_provider_oauth_complete_key(
     } else {
         Vec::new()
     };
+    let identity_admission = match state
+        .app()
+        .acquire_provider_oauth_identity_lock(&provider_id)
+        .await
+    {
+        Ok(guard) => guard,
+        Err(error) => {
+            release_codex_oauth_account_locks(state, codex_oauth_account_leases).await;
+            return Err(error);
+        }
+    };
     if provider_type == "codex" {
         let duplicate = match state
             .find_duplicate_provider_oauth_key(&provider_id, &auth_config, Some(&key_id))
@@ -541,6 +552,7 @@ pub(super) async fn handle_admin_provider_oauth_complete_key(
     seed_provider_oauth_pool_score(state, &provider.id, &recovered_key, now_unix_secs).await;
     release_codex_oauth_account_locks(state, codex_oauth_account_leases).await;
 
+    drop(identity_admission);
     spawn_provider_oauth_account_state_refresh_after_update(
         state.cloned_app(),
         provider.clone(),

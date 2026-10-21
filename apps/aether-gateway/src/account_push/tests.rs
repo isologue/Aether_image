@@ -851,3 +851,156 @@ fn normalizes_aliases_deduplicates_and_strips_transport_overrides() {
     }
     assert!(normalize_accounts(vec![json!({"access_token":"test", "nested":{"auth_mode":"agentIdentity", "agent_private_key":"test", "agent_runtime_id":"test"}})]).is_err());
 }
+
+#[tokio::test]
+async fn oauth_identity_index_backfills_legacy_keys_and_preserves_admission_rules() {
+    use crate::admin_api::{
+        find_duplicate_provider_oauth_key, find_provider_oauth_key_for_push, AdminAppState,
+    };
+    use aether_data_contracts::repository::provider_catalog::{
+        provider_oauth_identity_hashes, ProviderCatalogWriteRepository, StoredProviderCatalogKey,
+    };
+    let (state, repo) = fixture(true);
+    let auth = json!({"provider_type":"chatgpt_web", "email":"legacy@example.test", "account_id":"legacy-account", "user_id":"legacy-user", "plan_type":"plus"});
+    let mut legacy = StoredProviderCatalogKey::new(
+        "legacy-key".into(),
+        PROVIDER_ID.into(),
+        "Legacy".into(),
+        "oauth".into(),
+        None,
+        true,
+    )
+    .unwrap();
+    legacy.encrypted_api_key = Some(
+        state
+            .seal_provider_catalog_key_api_key(PROVIDER_ID, &legacy.id, "legacy-token")
+            .unwrap(),
+    );
+    legacy.encrypted_auth_config = Some(
+        state
+            .seal_provider_catalog_key_auth_config(PROVIDER_ID, &legacy.id, &auth.to_string())
+            .unwrap(),
+    );
+    repo.create_key(&legacy).await.unwrap();
+    let _guard = state
+        .acquire_provider_oauth_identity_lock(PROVIDER_ID)
+        .await
+        .unwrap();
+    let candidates = state
+        .find_provider_oauth_identity_candidates(
+            PROVIDER_ID,
+            &provider_oauth_identity_hashes(auth.as_object().unwrap()),
+        )
+        .await
+        .unwrap()
+        .unwrap();
+    assert_eq!(candidates.len(), 1);
+    assert!(repo
+        .list_unindexed_oauth_keys(PROVIDER_ID, 100)
+        .await
+        .unwrap()
+        .unwrap()
+        .is_empty());
+    let admin = AdminAppState::new(&state);
+    assert!(
+        find_duplicate_provider_oauth_key(&admin, PROVIDER_ID, auth.as_object().unwrap(), None)
+            .await
+            .is_err(),
+        "interactive imports still reject healthy duplicates"
+    );
+    assert_eq!(
+        find_provider_oauth_key_for_push(&admin, PROVIDER_ID, auth.as_object().unwrap())
+            .await
+            .unwrap()
+            .unwrap()
+            .id,
+        legacy.id
+    );
+    assert!(find_duplicate_provider_oauth_key(
+        &admin,
+        PROVIDER_ID,
+        auth.as_object().unwrap(),
+        Some(&legacy.id)
+    )
+    .await
+    .unwrap()
+    .is_none());
+    let mut different_plan = auth.clone();
+    different_plan["plan_type"] = json!("free");
+    assert_eq!(
+        find_provider_oauth_key_for_push(&admin, PROVIDER_ID, different_plan.as_object().unwrap())
+            .await
+            .unwrap()
+            .unwrap()
+            .id,
+        legacy.id,
+        "an exact Codex account identity remains a duplicate regardless of plan"
+    );
+    different_plan.as_object_mut().unwrap().remove("account_id");
+    assert!(
+        find_provider_oauth_key_for_push(&admin, PROVIDER_ID, different_plan.as_object().unwrap())
+            .await
+            .unwrap()
+            .is_none(),
+        "generic identity fallback still respects Codex plan groups"
+    );
+    let mut other_account = auth.clone();
+    other_account["account_id"] = json!("different-account");
+    assert!(
+        find_provider_oauth_key_for_push(&admin, PROVIDER_ID, other_account.as_object().unwrap())
+            .await
+            .unwrap()
+            .is_none(),
+        "distinct Codex accounts sharing an email remain separate"
+    );
+    assert!(state
+        .find_provider_oauth_identity_candidates(
+            PROVIDER_ID,
+            &provider_oauth_identity_hashes(
+                json!({"email":"unrelated@example.test"})
+                    .as_object()
+                    .unwrap()
+            )
+        )
+        .await
+        .unwrap()
+        .unwrap()
+        .is_empty());
+}
+
+#[tokio::test]
+async fn oauth_identity_admission_serializes_concurrent_creates() {
+    use crate::admin_api::{
+        create_provider_oauth_catalog_key, find_provider_oauth_key_for_push, AdminAppState,
+    };
+    let (state, repo) = fixture(true);
+    let barrier = Arc::new(tokio::sync::Barrier::new(2));
+    let mut tasks = Vec::new();
+    for _ in 0..2 {
+        let state = state.clone();
+        let barrier = barrier.clone();
+        tasks.push(tokio::spawn(async move {
+            barrier.wait().await;
+            let _guard = state.acquire_provider_oauth_identity_lock(PROVIDER_ID).await.unwrap();
+            let auth = json!({"provider_type":"chatgpt_web", "email":"concurrent@example.test", "account_id":"concurrent-account", "user_id":"concurrent-user"});
+            let admin = AdminAppState::new(&state);
+            let existing = find_provider_oauth_key_for_push(&admin, PROVIDER_ID, auth.as_object().unwrap()).await.unwrap();
+            tokio::task::yield_now().await;
+            if existing.is_some() { return false; }
+            create_provider_oauth_catalog_key(&admin, PROVIDER_ID, "chatgpt_web", "Concurrent", "test-token", auth.as_object().unwrap(), &["openai:image".into()], None, None).await.unwrap().unwrap();
+            true
+        }));
+    }
+    let mut created = 0;
+    for task in tasks {
+        created += usize::from(task.await.unwrap());
+    }
+    assert_eq!(created, 1);
+    assert_eq!(
+        repo.list_keys_by_provider_ids(&[PROVIDER_ID.into()])
+            .await
+            .unwrap()
+            .len(),
+        1
+    );
+}

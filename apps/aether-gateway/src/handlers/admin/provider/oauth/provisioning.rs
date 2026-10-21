@@ -171,6 +171,17 @@ pub(crate) async fn provision_provider_oauth_token_payload_for_provider(
     } else {
         Vec::new()
     };
+    let identity_admission = match state
+        .app()
+        .acquire_provider_oauth_identity_lock(&provider_id)
+        .await
+    {
+        Ok(guard) => guard,
+        Err(error) => {
+            release_provider_oauth_account_locks(state, oauth_account_leases).await;
+            return Err(error);
+        }
+    };
     let duplicate = match state
         .find_duplicate_provider_oauth_key(&provider_id, &auth_config, None)
         .await
@@ -265,6 +276,7 @@ pub(crate) async fn provision_provider_oauth_token_payload_for_provider(
     };
     release_provider_oauth_account_locks(state, oauth_account_leases).await;
 
+    drop(identity_admission);
     spawn_provider_oauth_account_state_refresh_after_update(
         state.cloned_app(),
         provider.clone(),

@@ -702,6 +702,10 @@ pub(super) async fn handle_admin_provider_oauth_device_poll(
             auth_config.insert("email".to_string(), json!(email));
         }
 
+        let identity_admission = state
+            .app()
+            .acquire_provider_oauth_identity_lock(&provider_id)
+            .await?;
         let duplicate = match state
             .find_duplicate_provider_oauth_key(&provider_id, &auth_config, None)
             .await
@@ -770,6 +774,7 @@ pub(super) async fn handle_admin_provider_oauth_device_poll(
             }
         };
 
+        drop(identity_admission);
         spawn_provider_oauth_account_state_refresh_after_update(
             state.cloned_app(),
             provider.clone(),
@@ -969,6 +974,10 @@ async fn handle_admin_provider_oauth_windsurf_browser_device_poll(
             .or_insert_with(|| json!(social_provider));
     }
 
+    let identity_admission = state
+        .app()
+        .acquire_provider_oauth_identity_lock(&provider.id)
+        .await?;
     let duplicate = match state
         .find_duplicate_provider_oauth_key(&provider.id, &auth_config, None)
         .await
@@ -1045,6 +1054,7 @@ async fn handle_admin_provider_oauth_windsurf_browser_device_poll(
         }
     };
 
+    drop(identity_admission);
     spawn_provider_oauth_account_state_refresh_after_update(
         state.cloned_app(),
         provider.clone(),
@@ -1266,6 +1276,10 @@ async fn handle_admin_provider_oauth_kiro_social_device_poll(
         auth_config_object.insert("token_type".to_string(), json!(token_type));
     }
 
+    let identity_admission = state
+        .app()
+        .acquire_provider_oauth_identity_lock(&provider.id)
+        .await?;
     let duplicate = match state
         .find_duplicate_provider_oauth_key(&provider.id, &auth_config_object, None)
         .await
@@ -1335,6 +1349,7 @@ async fn handle_admin_provider_oauth_kiro_social_device_poll(
         }
     };
 
+    drop(identity_admission);
     spawn_provider_oauth_account_state_refresh_after_update(
         state.cloned_app(),
         provider.clone(),

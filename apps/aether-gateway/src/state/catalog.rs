@@ -550,6 +550,89 @@ impl AppState {
             .map_err(|err| GatewayError::Internal(err.to_string()))
     }
 
+    pub(crate) async fn acquire_provider_oauth_identity_lock(
+        &self,
+        provider_id: &str,
+    ) -> Result<
+        Option<
+            Box<dyn aether_data_contracts::repository::provider_catalog::ProviderOAuthIdentityLock>,
+        >,
+        GatewayError,
+    > {
+        self.data
+            .acquire_provider_oauth_identity_lock(provider_id)
+            .await
+            .map_err(|error| GatewayError::Internal(error.to_string()))
+    }
+
+    pub(crate) async fn find_provider_oauth_identity_candidates(
+        &self,
+        provider_id: &str,
+        hashes: &[String],
+    ) -> Result<Option<Vec<provider_catalog::StoredProviderCatalogKey>>, GatewayError> {
+        let started = std::time::Instant::now();
+        let mut indexed = 0usize;
+        loop {
+            let Some(keys) = self
+                .data
+                .list_unindexed_provider_oauth_keys(provider_id, 100)
+                .await
+                .map_err(|error| GatewayError::Internal(error.to_string()))?
+            else {
+                return Ok(None);
+            };
+            if keys.is_empty() {
+                break;
+            }
+            let mut progress = 0;
+            for mut key in keys {
+                let plaintext = self.decrypt_provider_catalog_key_auth_config(&key)?;
+                key.oauth_identity_hashes = Some(plaintext.as_deref()
+                    .and_then(|text| serde_json::from_str::<serde_json::Value>(text).ok())
+                    .and_then(|value| value.as_object().map(aether_data_contracts::repository::provider_catalog::provider_oauth_identity_hashes))
+                    .unwrap_or_default());
+                if self
+                    .data
+                    .index_provider_oauth_key(&key)
+                    .await
+                    .map_err(|error| GatewayError::Internal(error.to_string()))?
+                {
+                    indexed += 1;
+                    progress += 1;
+                }
+            }
+            if progress == 0 {
+                return Err(GatewayError::Internal("OAuth identity backfill could not make progress; retry after concurrent credential updates".into()));
+            }
+        }
+        let Some(ids) = self
+            .data
+            .find_provider_oauth_identity_key_ids(provider_id, hashes)
+            .await
+            .map_err(|error| GatewayError::Internal(error.to_string()))?
+        else {
+            return Ok(None);
+        };
+        let mut candidates = self.list_provider_catalog_keys_by_ids_strong(&ids).await?;
+        candidates.sort_by(|left, right| (&left.name, &left.id).cmp(&(&right.name, &right.id)));
+        tracing::debug!(
+            provider_id,
+            indexed,
+            candidates = candidates.len(),
+            elapsed_ms = started.elapsed().as_millis() as u64,
+            "OAuth identity candidate lookup"
+        );
+        if indexed > 0 {
+            tracing::info!(
+                provider_id,
+                indexed,
+                elapsed_ms = started.elapsed().as_millis() as u64,
+                "OAuth identity index backfill completed"
+            );
+        }
+        Ok(Some(candidates))
+    }
+
     pub(crate) async fn list_provider_catalog_keys_by_ids(
         &self,
         key_ids: &[String],
@@ -608,7 +691,7 @@ impl AppState {
             .await
             .map_err(|err| GatewayError::Internal(err.to_string()))?;
         if created.is_some() {
-            self.invalidate_provider_routing_caches();
+            self.invalidate_provider_key_routing_caches();
         }
         match created {
             Some(key) => self.open_provider_catalog_key(key).await.map(Some),
@@ -840,7 +923,7 @@ impl AppState {
             .await
             .map_err(|err| GatewayError::Internal(err.to_string()))?;
         if updated.is_some() {
-            self.invalidate_provider_routing_caches();
+            self.invalidate_provider_key_routing_caches();
         }
         if let Some(key) = updated.as_ref().filter(|key| !key.is_active) {
             self.delete_inactive_provider_catalog_key_pool_scores(
@@ -892,7 +975,7 @@ impl AppState {
             .map_err(|err| GatewayError::Internal(err.to_string()))?;
         // A conflict means another instance changed credentials. Invalidate on
         // both outcomes before the caller reloads or reports the conflict.
-        self.invalidate_provider_routing_caches();
+        self.invalidate_provider_key_routing_caches();
         Ok(updated)
     }
 
@@ -910,7 +993,7 @@ impl AppState {
             .await
             .map_err(|err| GatewayError::Internal(err.to_string()))?;
         if updated.as_ref().is_some_and(|keys| !keys.is_empty()) {
-            self.invalidate_provider_routing_caches();
+            self.invalidate_provider_key_routing_caches();
         }
         if let Some(keys) = updated.as_ref() {
             for key in keys.iter().filter(|key| !key.is_active) {

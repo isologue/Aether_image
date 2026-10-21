@@ -737,6 +737,9 @@ pub struct StoredProviderCatalogKey {
     pub allow_auth_channel_mismatch_formats: Option<serde_json::Value>,
     pub encrypted_api_key: Option<String>,
     pub encrypted_auth_config: Option<String>,
+    /// Derived from authenticated plaintext by credential writers.
+    #[serde(skip)]
+    pub oauth_identity_hashes: Option<Vec<String>>,
     pub note: Option<String>,
     pub internal_priority: i32,
     pub rate_multipliers: Option<serde_json::Value>,
@@ -873,6 +876,7 @@ impl StoredProviderCatalogKey {
             allow_auth_channel_mismatch_formats: None,
             encrypted_api_key: None,
             encrypted_auth_config: None,
+            oauth_identity_hashes: None,
             note: None,
             internal_priority: 50,
             rate_multipliers: None,
@@ -1398,6 +1402,30 @@ impl StoredProviderCatalogKeyStats {
 pub trait ProviderCatalogReadRepository: Send + Sync {
     fn clear_local_cache(&self) {}
 
+    async fn acquire_oauth_identity_lock(
+        &self,
+        _provider_id: &str,
+    ) -> Result<Option<Box<dyn super::ProviderOAuthIdentityLock>>, crate::DataLayerError> {
+        Ok(None)
+    }
+
+    /// None means this backend does not implement the persistent identity index.
+    async fn list_unindexed_oauth_keys(
+        &self,
+        _provider_id: &str,
+        _limit: usize,
+    ) -> Result<Option<Vec<StoredProviderCatalogKey>>, crate::DataLayerError> {
+        Ok(None)
+    }
+
+    async fn find_oauth_identity_key_ids(
+        &self,
+        _provider_id: &str,
+        _hashes: &[String],
+    ) -> Result<Option<Vec<String>>, crate::DataLayerError> {
+        Ok(None)
+    }
+
     async fn list_providers(
         &self,
         active_only: bool,
@@ -1463,6 +1491,14 @@ pub trait ProviderCatalogReadRepository: Send + Sync {
 
 #[async_trait]
 pub trait ProviderCatalogWriteRepository: Send + Sync {
+    /// Backfill only if the observed credentials still match the authoritative row.
+    async fn index_oauth_key(
+        &self,
+        _key: &StoredProviderCatalogKey,
+    ) -> Result<bool, crate::DataLayerError> {
+        Ok(false)
+    }
+
     /// Create a provider and exclude it from every other existing routing group
     /// in one transaction. Implementations must fail closed if unsupported.
     async fn create_provider_in_routing_group(

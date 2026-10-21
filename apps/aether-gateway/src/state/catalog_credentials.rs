@@ -22,13 +22,16 @@ impl AppState {
                 key.encrypted_api_key.as_deref(),
             )?
             .map(|projection| projection.protected);
-        protected.encrypted_auth_config = self
-            .project_provider_catalog_key_credential(
-                key,
-                ProviderCatalogCredentialField::AuthConfig,
-                key.encrypted_auth_config.as_deref(),
-            )?
-            .map(|projection| projection.protected);
+        let auth_config = self.project_provider_catalog_key_credential(
+            key,
+            ProviderCatalogCredentialField::AuthConfig,
+            key.encrypted_auth_config.as_deref(),
+        )?;
+        protected.oauth_identity_hashes = Some(auth_config.as_ref()
+            .and_then(|projection| serde_json::from_str::<serde_json::Value>(&projection.plaintext).ok())
+            .and_then(|value| value.as_object().map(aether_data_contracts::repository::provider_catalog::provider_oauth_identity_hashes))
+            .unwrap_or_default());
+        protected.encrypted_auth_config = auth_config.map(|projection| projection.protected);
         Ok(protected)
     }
 

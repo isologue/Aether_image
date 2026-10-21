@@ -192,6 +192,10 @@ pub(super) async fn execute_admin_provider_oauth_kiro_batch_import(
             auth_config.insert("email".to_string(), json!(email));
         }
 
+        let identity_admission = state
+            .app()
+            .acquire_provider_oauth_identity_lock(provider_id)
+            .await?;
         let duplicate = match find_duplicate_provider_oauth_key(
             state,
             provider_id,
@@ -329,6 +333,7 @@ pub(super) async fn execute_admin_provider_oauth_kiro_batch_import(
             }
         };
 
+        drop(identity_admission);
         let auth_method = auth_config
             .get("auth_method")
             .cloned()

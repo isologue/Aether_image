@@ -401,6 +401,58 @@ impl GatewayDataState {
         }
     }
 
+    pub(crate) async fn acquire_provider_oauth_identity_lock(
+        &self,
+        provider_id: &str,
+    ) -> Result<
+        Option<
+            Box<dyn aether_data_contracts::repository::provider_catalog::ProviderOAuthIdentityLock>,
+        >,
+        DataLayerError,
+    > {
+        match &self.provider_catalog_reader {
+            Some(repository) => repository.acquire_oauth_identity_lock(provider_id).await,
+            None => Ok(None),
+        }
+    }
+    pub(crate) async fn list_unindexed_provider_oauth_keys(
+        &self,
+        provider_id: &str,
+        limit: usize,
+    ) -> Result<Option<Vec<StoredProviderCatalogKey>>, DataLayerError> {
+        match &self.provider_catalog_reader {
+            Some(repository) => {
+                repository
+                    .list_unindexed_oauth_keys(provider_id, limit)
+                    .await
+            }
+            None => Ok(None),
+        }
+    }
+    pub(crate) async fn find_provider_oauth_identity_key_ids(
+        &self,
+        provider_id: &str,
+        hashes: &[String],
+    ) -> Result<Option<Vec<String>>, DataLayerError> {
+        match &self.provider_catalog_reader {
+            Some(repository) => {
+                repository
+                    .find_oauth_identity_key_ids(provider_id, hashes)
+                    .await
+            }
+            None => Ok(None),
+        }
+    }
+    pub(crate) async fn index_provider_oauth_key(
+        &self,
+        key: &StoredProviderCatalogKey,
+    ) -> Result<bool, DataLayerError> {
+        match &self.provider_catalog_writer {
+            Some(repository) => repository.index_oauth_key(key).await,
+            None => Ok(false),
+        }
+    }
+
     pub(crate) async fn list_provider_catalog_keys_by_ids(
         &self,
         key_ids: &[String],

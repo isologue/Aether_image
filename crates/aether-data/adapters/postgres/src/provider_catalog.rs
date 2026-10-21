@@ -1,3 +1,5 @@
+mod oauth_identity;
+
 use std::collections::BTreeMap;
 
 use async_trait::async_trait;
@@ -1710,6 +1712,7 @@ WHERE id = $1
             ));
         }
 
+        let mut transaction = self.pool.begin().await.map_postgres_err()?;
         sqlx::query(
             r#"
 INSERT INTO provider_api_keys (
@@ -1918,10 +1921,12 @@ INSERT INTO provider_api_keys (
         .bind(key.created_at_unix_ms.map(|value| value as f64))
         .bind(key.updated_at_unix_secs.map(|value| value as f64))
         .bind(&key.allow_auth_channel_mismatch_formats)
-        .execute(&self.pool)
+        .execute(&mut *transaction)
         .await
         .map_postgres_err()?;
 
+        oauth_identity::sync_oauth_identity(&mut transaction, key).await?;
+        transaction.commit().await.map_postgres_err()?;
         self.list_keys_by_ids(std::slice::from_ref(&key.id))
             .await?
             .into_iter()
@@ -2277,8 +2282,9 @@ WHERE id = $1
         key: &StoredProviderCatalogKey,
     ) -> Result<StoredProviderCatalogKey, DataLayerError> {
         validate_key_for_update(key)?;
+        let mut transaction = self.pool.begin().await.map_postgres_err()?;
         let rows_affected = key_update_query(key)
-            .execute(&self.pool)
+            .execute(&mut *transaction)
             .await
             .map_postgres_err()?
             .rows_affected();
@@ -2290,6 +2296,8 @@ WHERE id = $1
             )));
         }
 
+        oauth_identity::sync_oauth_identity(&mut transaction, key).await?;
+        transaction.commit().await.map_postgres_err()?;
         self.list_keys_by_ids(std::slice::from_ref(&key.id))
             .await?
             .into_iter()
@@ -2422,12 +2430,17 @@ WHERE id = $1
                 " AND jsonb_typeof(COALESCE(status_snapshot::jsonb, '{}'::jsonb)) = 'object'",
             );
         }
+        let mut transaction = self.pool.begin().await.map_postgres_err()?;
         let rows_affected = builder
             .build()
-            .execute(&self.pool)
+            .execute(&mut *transaction)
             .await
             .map_postgres_err()?
             .rows_affected();
+        if rows_affected > 0 {
+            oauth_identity::sync_oauth_identity(&mut transaction, key).await?;
+        }
+        transaction.commit().await.map_postgres_err()?;
         Ok(rows_affected > 0)
     }
 
@@ -2455,6 +2468,7 @@ WHERE id = $1
                     key.id
                 )));
             }
+            oauth_identity::sync_oauth_identity(&mut transaction, key).await?;
         }
         transaction.commit().await.map_postgres_err()?;
         let key_ids = keys.iter().map(|key| key.id.clone()).collect::<Vec<_>>();
@@ -2986,6 +3000,31 @@ WHERE id = $1
 
 #[async_trait]
 impl ProviderCatalogReadRepository for SqlxProviderCatalogReadRepository {
+    async fn acquire_oauth_identity_lock(
+        &self,
+        provider_id: &str,
+    ) -> Result<
+        Option<
+            Box<dyn aether_data_contracts::repository::provider_catalog::ProviderOAuthIdentityLock>,
+        >,
+        DataLayerError,
+    > {
+        Self::acquire_oauth_identity_lock(self, provider_id).await
+    }
+    async fn list_unindexed_oauth_keys(
+        &self,
+        provider_id: &str,
+        limit: usize,
+    ) -> Result<Option<Vec<StoredProviderCatalogKey>>, DataLayerError> {
+        Self::list_unindexed_oauth_keys(self, provider_id, limit).await
+    }
+    async fn find_oauth_identity_key_ids(
+        &self,
+        provider_id: &str,
+        hashes: &[String],
+    ) -> Result<Option<Vec<String>>, DataLayerError> {
+        Self::find_oauth_identity_key_ids(self, provider_id, hashes).await
+    }
     async fn list_providers(
         &self,
         active_only: bool,
@@ -3059,6 +3098,12 @@ impl ProviderCatalogReadRepository for SqlxProviderCatalogReadRepository {
 
 #[async_trait]
 impl ProviderCatalogWriteRepository for SqlxProviderCatalogReadRepository {
+    async fn index_oauth_key(
+        &self,
+        key: &StoredProviderCatalogKey,
+    ) -> Result<bool, DataLayerError> {
+        Self::index_oauth_key(self, key).await
+    }
     async fn create_provider_in_routing_group(
         &self,
         provider: &StoredProviderCatalogProvider,

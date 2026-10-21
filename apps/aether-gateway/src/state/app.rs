@@ -464,6 +464,8 @@ pub struct AppState {
     pub(crate) local_execution_runtime_miss_diagnostics:
         Arc<DashMap<String, LocalExecutionRuntimeMissDiagnostic>>,
     pub(crate) admin_monitoring_error_stats_reset_at: Arc<StdMutex<Option<u64>>>,
+    pub(crate) oauth_account_refresh_queue:
+        Arc<StdMutex<crate::admin_api::OAuthAccountRefreshQueue>>,
     pub(crate) provider_delete_tasks: Arc<StdMutex<HashMap<String, LocalProviderDeleteTaskState>>>,
     pub(crate) pool_quota_probe_replenish:
         Arc<crate::maintenance::PoolQuotaProbeReplenishCoordinator>,

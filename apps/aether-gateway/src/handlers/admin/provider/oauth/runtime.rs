@@ -231,20 +231,91 @@ pub(crate) async fn refresh_provider_oauth_account_state_after_update(
     Ok((true, error))
 }
 
+// Keep only the latest queued request for each account. Four workers drain the
+// queue; importing thousands of accounts does not spawn thousands of waiting tasks.
+const OAUTH_ACCOUNT_REFRESH_CONCURRENCY: usize = 4;
+
+#[derive(Debug)]
+struct AccountRefreshJob {
+    provider: StoredProviderCatalogProvider,
+    key_id: String,
+    proxy_override: Option<ProxySnapshot>,
+}
+
+#[derive(Debug, Default)]
+pub(crate) struct OAuthAccountRefreshQueue {
+    pending: std::collections::BTreeMap<String, AccountRefreshJob>,
+    workers: usize,
+}
+
+struct AccountRefreshWorker {
+    queue: std::sync::Arc<std::sync::Mutex<OAuthAccountRefreshQueue>>,
+    active: bool,
+}
+impl AccountRefreshWorker {
+    fn next(&mut self) -> Option<AccountRefreshJob> {
+        let mut queue = self
+            .queue
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner);
+        if let Some((_, job)) = queue.pending.pop_first() {
+            return Some(job);
+        }
+        queue.workers -= 1;
+        self.active = false;
+        None
+    }
+}
+impl Drop for AccountRefreshWorker {
+    fn drop(&mut self) {
+        if self.active {
+            self.queue
+                .lock()
+                .unwrap_or_else(std::sync::PoisonError::into_inner)
+                .workers -= 1;
+        }
+    }
+}
+
 pub(crate) fn spawn_provider_oauth_account_state_refresh_after_update(
     app: AppState,
     provider: StoredProviderCatalogProvider,
     key_id: String,
     proxy_override: Option<ProxySnapshot>,
 ) {
+    let queue = std::sync::Arc::clone(&app.oauth_account_refresh_queue);
+    {
+        let mut pending = queue
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner);
+        pending.pending.insert(
+            key_id.clone(),
+            AccountRefreshJob {
+                provider,
+                key_id,
+                proxy_override,
+            },
+        );
+        if pending.workers >= OAUTH_ACCOUNT_REFRESH_CONCURRENCY {
+            return;
+        }
+        pending.workers += 1;
+    }
+    // Construct the guard before spawning, so cancellation also releases the slot.
+    let mut worker = AccountRefreshWorker {
+        queue,
+        active: true,
+    };
     spawn_fire_and_forget(TASK_KEY_PROVIDER_OAUTH_ACCOUNT_REFRESH, async move {
-        let _ = refresh_provider_oauth_account_state_after_update(
-            &AdminAppState::new(&app),
-            &provider,
-            &key_id,
-            proxy_override.as_ref(),
-        )
-        .await;
+        while let Some(job) = worker.next() {
+            let _ = refresh_provider_oauth_account_state_after_update(
+                &AdminAppState::new(&app),
+                &job.provider,
+                &job.key_id,
+                job.proxy_override.as_ref(),
+            )
+            .await;
+        }
     });
 }
 
@@ -255,6 +326,45 @@ mod tests {
         provider_oauth_runtime_endpoint_for_provider,
     };
     use aether_data_contracts::repository::provider_catalog::StoredProviderCatalogEndpoint;
+
+    #[test]
+    fn account_refresh_queue_coalesces_pending_work_and_releases_worker_slots() {
+        use super::{AccountRefreshJob, AccountRefreshWorker, OAuthAccountRefreshQueue};
+        use std::sync::{Arc, Mutex};
+        let queue = Arc::new(Mutex::new(OAuthAccountRefreshQueue::default()));
+        let provider = aether_data_contracts::repository::provider_catalog::StoredProviderCatalogProvider::new("provider".into(), "Provider".into(), None, "chatgpt_web".into()).unwrap();
+        for name in ["old", "new"] {
+            let mut provider = provider.clone();
+            provider.name = name.into();
+            queue.lock().unwrap().pending.insert(
+                "same-key".into(),
+                AccountRefreshJob {
+                    provider,
+                    key_id: "same-key".into(),
+                    proxy_override: None,
+                },
+            );
+        }
+        queue.lock().unwrap().workers = 1;
+        let mut worker = AccountRefreshWorker {
+            queue: queue.clone(),
+            active: true,
+        };
+        assert_eq!(worker.next().unwrap().provider.name, "new");
+        assert!(worker.next().is_none());
+        drop(worker);
+        assert_eq!(queue.lock().unwrap().workers, 0);
+        queue.lock().unwrap().workers = 1;
+        drop(AccountRefreshWorker {
+            queue: queue.clone(),
+            active: true,
+        });
+        assert_eq!(
+            queue.lock().unwrap().workers,
+            0,
+            "cancellation releases the worker slot"
+        );
+    }
 
     fn endpoint(id: &str, api_format: &str, is_active: bool) -> StoredProviderCatalogEndpoint {
         StoredProviderCatalogEndpoint::new(

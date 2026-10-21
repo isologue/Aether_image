@@ -39,7 +39,7 @@ pub(crate) use self::provider::oauth::quota::shared::{
 };
 pub(crate) use self::provider::oauth::runtime::{
     provider_oauth_maintenance_endpoint_for_provider, provider_oauth_runtime_endpoint_for_provider,
-    refresh_provider_oauth_account_state_after_update,
+    refresh_provider_oauth_account_state_after_update, OAuthAccountRefreshQueue,
 };
 pub(crate) use self::provider::ops::providers::actions::admin_provider_ops_local_action_response;
 pub(crate) use self::provider::ops::providers::admin_provider_ops_credential_snapshot;
@@ -67,3 +67,6 @@ pub(crate) use self::system::{
     execute_admin_system_import_exclusively, release_admin_system_import_lease,
     try_acquire_admin_system_import_lease, AdminSystemImportLockError,
 };
+
+#[cfg(test)]
+pub(crate) use self::provider::oauth::duplicates::find_provider_oauth_key_for_push;

@@ -1097,6 +1097,17 @@ pub(super) async fn handle_admin_provider_oauth_import_refresh_token(
     };
 
     let api_formats = provider_oauth_active_api_formats(&endpoints);
+    let identity_admission = match state
+        .app()
+        .acquire_provider_oauth_identity_lock(&provider_id)
+        .await
+    {
+        Ok(guard) => guard,
+        Err(error) => {
+            release_codex_oauth_account_locks(state, codex_oauth_account_leases).await;
+            return Err(error);
+        }
+    };
     let duplicate = if create_agent_identity {
         let initial_duplicate_id = agent_identity_enrollment
             .as_ref()
@@ -1245,6 +1256,7 @@ pub(super) async fn handle_admin_provider_oauth_import_refresh_token(
     };
     release_codex_agent_identity_enrollment(state, agent_identity_enrollment).await;
 
+    drop(identity_admission);
     spawn_provider_oauth_account_state_refresh_after_update(
         state.cloned_app(),
         provider.clone(),

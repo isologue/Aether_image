@@ -220,6 +220,10 @@ async fn persist_xai_device_authorization(
     auth_config.insert("auth_method".to_string(), json!("oauth"));
     auth_config.insert("using_api".to_string(), json!(false));
 
+    let identity_admission = state
+        .app()
+        .acquire_provider_oauth_identity_lock(&provider.id)
+        .await?;
     let duplicate = match state
         .find_duplicate_provider_oauth_key(&provider.id, &auth_config, None)
         .await
@@ -296,6 +300,7 @@ async fn persist_xai_device_authorization(
         }
     };
 
+    drop(identity_admission);
     spawn_provider_oauth_account_state_refresh_after_update(
         state.cloned_app(),
         provider.clone(),

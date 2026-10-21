@@ -232,6 +232,35 @@ impl CachedProviderCatalogReadRepository {
 
 #[async_trait]
 impl ProviderCatalogReadRepository for CachedProviderCatalogReadRepository {
+    async fn acquire_oauth_identity_lock(
+        &self,
+        provider_id: &str,
+    ) -> Result<
+        Option<
+            Box<dyn aether_data_contracts::repository::provider_catalog::ProviderOAuthIdentityLock>,
+        >,
+        DataLayerError,
+    > {
+        self.inner.acquire_oauth_identity_lock(provider_id).await
+    }
+    async fn list_unindexed_oauth_keys(
+        &self,
+        provider_id: &str,
+        limit: usize,
+    ) -> Result<Option<Vec<StoredProviderCatalogKey>>, DataLayerError> {
+        self.inner
+            .list_unindexed_oauth_keys(provider_id, limit)
+            .await
+    }
+    async fn find_oauth_identity_key_ids(
+        &self,
+        provider_id: &str,
+        hashes: &[String],
+    ) -> Result<Option<Vec<String>>, DataLayerError> {
+        self.inner
+            .find_oauth_identity_key_ids(provider_id, hashes)
+            .await
+    }
     fn clear_local_cache(&self) {
         self.clear();
         self.inner.clear_local_cache();

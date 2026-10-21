@@ -1,4 +1,6 @@
+mod oauth_identity;
 mod snapshot;
+pub use oauth_identity::{provider_oauth_identity_hashes, ProviderOAuthIdentityLock};
 mod types;
 
 pub use snapshot::ProviderCatalogSnapshot;

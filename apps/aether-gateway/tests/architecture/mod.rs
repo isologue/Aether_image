@@ -179,7 +179,9 @@ pub(crate) fn read_workspace_file(path: &str) -> String {
         .join("../..")
         .canonicalize()
         .expect("workspace root should resolve");
-    fs::read_to_string(workspace_root.join(path)).expect("source file should be readable")
+    fs::read_to_string(workspace_root.join(path))
+        .expect("source file should be readable")
+        .replace("\r\n", "\n")
 }
 
 pub(crate) fn read_workspace_module_tree(path: &str) -> String {
