@@ -47,12 +47,13 @@ vi.mock('@/components/ui', async () => {
     name: 'DialogStub',
     props: {
       modelValue: Boolean,
+      size: String,
     },
     setup(props, { slots }) {
       return () => {
         if (!props.modelValue) return null
         const headerActions = slots['header-actions'] ?? slots.headerActions
-        return h('section', [headerActions?.(), slots.default?.(), slots.footer?.()])
+        return h('section', { 'data-dialog-size': props.size }, [headerActions?.(), slots.default?.(), slots.footer?.()])
       }
     },
   })
@@ -381,6 +382,7 @@ describe('OAuthAccountDialog authorization and import', () => {
     await settle()
 
     expect(endpointMocks.startProviderLevelOAuth).not.toHaveBeenCalled()
+    expect(root.querySelector('[data-dialog-size]')?.getAttribute('data-dialog-size')).toBe('4xl')
     expect(root.textContent).not.toContain('获取授权')
     expect(root.querySelector('textarea')?.getAttribute('placeholder')).toContain('Grok sso/session token')
     expect(root.textContent).toContain('plan_type / pool_tier')

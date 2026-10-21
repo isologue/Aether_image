@@ -3,7 +3,7 @@
     :model-value="isOpen"
     :title="legacyT('添加账号')"
     :icon="UserPlus"
-    size="md"
+    :size="mode === 'import' ? '4xl' : 'md'"
     @update:model-value="handleDialogUpdate"
   >
     <!-- 右上角代理按钮 -->
@@ -919,18 +919,23 @@
                 tabindex="0"
               >
                 <table
-                  class="w-full text-xs text-left"
+                  class="w-full min-w-[760px] table-fixed text-xs text-left"
                   data-testid="import-failure-list"
                 >
+                  <colgroup>
+                    <col class="w-12">
+                    <col class="w-[240px]">
+                    <col>
+                  </colgroup>
                   <thead class="sticky top-0 bg-muted">
                     <tr>
-                      <th class="p-2">
+                      <th class="w-12 p-2">
                         #
                       </th>
-                      <th class="p-2">
+                      <th class="w-[240px] min-w-[240px] p-2">
                         {{ legacyT('账号') }}
                       </th>
-                      <th class="p-2">
+                      <th class="min-w-[440px] p-2">
                         {{ legacyT('失败原因') }}
                       </th>
                     </tr>
@@ -941,14 +946,21 @@
                       :key="item.index"
                       class="border-t border-border align-top"
                     >
-                      <td class="p-2 tabular-nums">
+                      <td class="w-12 p-2 tabular-nums">
                         {{ item.index + 1 }}
                       </td>
-                      <td class="p-2 break-all">
-                        {{ item.account || legacyT('未提供账号标识（请按序号核对原始导入数据）') }}
+                      <td class="w-[240px] min-w-[240px] p-2 align-top">
+                        <div
+                          class="w-[220px] truncate whitespace-nowrap"
+                          :title="item.account || legacyT('未提供账号标识（请按序号核对原始导入数据）')"
+                        >
+                          {{ item.account || legacyT('未提供账号标识（请按序号核对原始导入数据）') }}
+                        </div>
                       </td>
-                      <td class="p-2 break-words text-destructive">
-                        {{ legacyT(item.error || '导入失败') }}
+                      <td class="min-w-0 p-2 align-top text-destructive">
+                        <div class="whitespace-normal break-words">
+                          {{ legacyT(item.error || '导入失败') }}
+                        </div>
                       </td>
                     </tr>
                   </tbody>
