@@ -32,6 +32,18 @@ pub(super) fn classify_admin_route(
     method: &http::Method,
     normalized_path: &str,
 ) -> Option<ClassifiedRoute> {
+    if method == http::Method::GET
+        && (normalized_path == "/api/admin/image-tasks"
+            || normalized_path.starts_with("/api/admin/image-tasks/"))
+    {
+        return Some(classified(
+            "admin_proxy",
+            "tasks_manage",
+            "image_tasks",
+            "admin:tasks",
+            false,
+        ));
+    }
     let normalized_path_no_trailing = normalized_path.trim_end_matches('/');
     let normalized_path_no_trailing = if normalized_path_no_trailing.is_empty() {
         "/"

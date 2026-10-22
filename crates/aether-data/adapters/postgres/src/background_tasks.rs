@@ -78,6 +78,15 @@ impl SqlxBackgroundTaskRepository {
                 trigger.to_string(),
             );
         }
+        if let Some(task_id) = query.task_id_substring.as_deref() {
+            push_ci_contains(
+                builder,
+                &mut where_clause,
+                SqlDialect::Postgres,
+                "id",
+                task_id,
+            );
+        }
         if let Some(task_key_substring) = query.task_key_substring.as_deref() {
             push_ci_contains(
                 builder,

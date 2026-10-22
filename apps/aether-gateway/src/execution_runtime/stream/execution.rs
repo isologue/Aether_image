@@ -489,9 +489,12 @@ async fn record_sync_terminal_usage_with_handoff_after_spawn<F>(
     // task-local values do not propagate across spawn boundaries.
     let (context_seed, payload_seed) =
         build_sync_terminal_usage_seeds(plan, report_context, payload);
+    if crate::image_tasks::flow::defer(context_seed.clone(), payload_seed.clone()) {
+        return;
+    }
     let state = state.clone();
     let usage_producer = state.usage_runtime.track_producer();
-    let task = tokio::spawn(async move {
+    let task = crate::image_tasks::flow::spawn(async move {
         let _usage_producer = usage_producer;
         before_dispatch.await;
         state
@@ -597,6 +600,17 @@ async fn record_stream_terminal_usage(
     );
     let context_seed = build_terminal_usage_context_seed(plan, analytics_context.as_ref());
     let payload_seed = build_stream_terminal_usage_payload_seed(payload);
+    if crate::image_tasks::flow::defer_stream_for(
+        crate::image_tasks::flow::current(),
+        state,
+        context_seed.clone(),
+        payload_seed.clone(),
+        cancelled,
+    )
+    .await
+    {
+        return;
+    }
     state
         .usage_runtime
         .record_stream_terminal(
@@ -1906,6 +1920,7 @@ async fn forward_direct_passthrough_client_chunk(
 }
 
 struct DirectPassthroughFinalizer {
+    image_flow: Option<crate::image_tasks::flow::ImageFlow>,
     core: Option<DirectPassthroughFinalizerCore>,
 }
 
@@ -1953,7 +1968,10 @@ struct DirectPassthroughFinalizerCore {
 
 impl DirectPassthroughFinalizer {
     fn new(core: DirectPassthroughFinalizerCore) -> Self {
-        Self { core: Some(core) }
+        Self {
+            core: Some(core),
+            image_flow: crate::image_tasks::flow::current(),
+        }
     }
 
     fn core(&self) -> &DirectPassthroughFinalizerCore {
@@ -2186,10 +2204,11 @@ impl DirectPassthroughFinalizer {
         // future while terminal admission is backpressured; the handoff must
         // continue independently so the usage row cannot remain streaming.
         let usage_producer = core.state.usage_runtime.track_producer();
-        let task = tokio::spawn(async move {
+        let image_flow = self.image_flow.clone();
+        let task = tokio::spawn(crate::image_tasks::flow::scope(image_flow, async move {
             let _usage_producer = usage_producer;
             core.finalize(downstream_dropped).await;
-        });
+        }));
         if let Err(_err) = task.await {
             warn!(
                 event_name = "direct_passthrough_terminal_handoff_failed",
@@ -2209,10 +2228,11 @@ impl Drop for DirectPassthroughFinalizer {
         observe_gateway_stage_ms("stream_finalizer_enqueue", 0);
         if let Ok(handle) = tokio::runtime::Handle::try_current() {
             let usage_producer = core.state.usage_runtime.track_producer();
-            handle.spawn(async move {
+            let image_flow = self.image_flow.clone();
+            handle.spawn(crate::image_tasks::flow::scope(image_flow, async move {
                 let _usage_producer = usage_producer;
                 core.finalize(true).await;
-            });
+            }));
         }
     }
 }
@@ -2235,7 +2255,7 @@ fn enqueue_stream_candidate_status_update(
     // fire-and-handoff behavior. Queue saturation uses the bounded deferred
     // record above and does not create one task per waiter.
     let state = state.clone();
-    tokio::spawn(async move {
+    crate::image_tasks::flow::spawn(async move {
         persist_local_request_candidate_status_record(&state, record).await;
     });
     None
@@ -2921,11 +2941,12 @@ impl Drop for DirectPassthroughInlineBodyState {
                     .core
                     .as_ref()
                     .map(|core| core.state.usage_runtime.track_producer());
-                handle.spawn(async move {
+                let image_flow = crate::image_tasks::flow::current();
+                handle.spawn(crate::image_tasks::flow::scope(image_flow, async move {
                     let _usage_producer = usage_producer;
                     let mut finalizer = finalizer;
                     finalizer.finalize(true).await;
-                });
+                }));
             }
         }
     }
@@ -3228,7 +3249,7 @@ async fn execute_stream_from_direct_passthrough(
     let provider_pool_in_flight_guard_for_report = in_flight_guard;
     record_stream_pre_first_byte_spawn();
     let usage_producer = state_for_report.usage_runtime.track_producer();
-    tokio::spawn(async move {
+    crate::image_tasks::flow::spawn(async move {
         let _usage_producer = usage_producer;
         let mut stage_trace_for_report = stage_trace_for_report;
         let _stream_total_guard =
@@ -7370,7 +7391,7 @@ async fn execute_stream_from_frame_stream_with_retry_scope(
     let request_diagnostics_for_report = current_request_diagnostics();
     let provider_pool_in_flight_guard_for_report = in_flight_guard;
     let usage_producer = state_for_report.usage_runtime.track_producer();
-    tokio::spawn(async move {
+    crate::image_tasks::flow::spawn(async move {
         let _usage_producer = usage_producer;
         let mut stage_trace_for_report = stage_trace_for_report;
         let _stream_total_guard =
@@ -7450,7 +7471,7 @@ async fn execute_stream_from_frame_stream_with_retry_scope(
                 .clone()
                 .unwrap_or_else(|| "-".to_string());
             let has_local_stream_rewriter_for_idle = local_stream_rewriter.is_some();
-            tokio::spawn(async move {
+            crate::image_tasks::flow::spawn(async move {
                 let mut interval = tokio::time::interval(STREAM_IDLE_LOG_INTERVAL);
                 interval.set_missed_tick_behavior(MissedTickBehavior::Delay);
                 interval.tick().await;

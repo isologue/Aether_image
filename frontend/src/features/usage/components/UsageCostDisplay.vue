@@ -3,6 +3,8 @@
     class="flex flex-col items-end gap-0.5"
     :class="compact ? 'text-[10px]' : 'text-xs'"
   >
+    <span v-if="record.billing_status === 'refunded'" class="text-emerald-600" :title="`原扣费 ${formatCurrency(record.refund?.amount ?? 0)}，已原路退回`">已退款 · 实收 $0</span>
+    <span v-else-if="record.billing_status === 'void'" class="text-muted-foreground">预占已释放 · 未扣费</span>
     <template v-if="record.usage_available !== false && record.usage_pricing_available !== false">
       <span
         data-usage-cost="base"

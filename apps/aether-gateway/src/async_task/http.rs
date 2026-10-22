@@ -28,6 +28,7 @@ pub(crate) use self::cancel::{
 
 #[derive(Debug, Deserialize)]
 pub(crate) struct ListVideoTasksQuery {
+    pub(crate) task_id: Option<String>,
     pub(crate) status: Option<String>,
     pub(crate) user_id: Option<String>,
     pub(crate) model: Option<String>,
@@ -186,6 +187,7 @@ fn parse_filter(
     };
 
     Ok(VideoTaskQueryFilter {
+        task_id_substring: query.task_id.clone(),
         user_id: query.user_id.clone(),
         status,
         model_substring: query.model.clone(),

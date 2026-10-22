@@ -1104,25 +1104,29 @@ fn build_openai_image_sync_heartbeat_shell_response(
     let request_diagnostics = current_request_diagnostics();
     let cancel_on_disconnect = crate::request_lifecycle::cancel_on_client_disconnect();
 
+    let image_flow = crate::image_tasks::flow::current();
     tokio::spawn(async move {
-        scope_request_diagnostics_with(request_diagnostics, async move {
-            let execution = execute_openai_image_sync_heartbeat_attempts(
-                state,
-                request_path,
-                trace_id,
-                decision,
-                plan_kind,
-                attempts,
-                transfer_tracker,
-                started_at,
-            );
-            let outcome = tokio::select! {
-                biased;
-                _ = tx.closed(), if cancel_on_disconnect => return,
-                result = execution => result,
-            };
-            let bytes = openai_image_sync_heartbeat_final_bytes(outcome).await;
-            let _ = tx.send(Ok(Bytes::from(bytes))).await;
+        crate::image_tasks::flow::scope(image_flow, async move {
+            scope_request_diagnostics_with(request_diagnostics, async move {
+                let execution = Box::pin(execute_openai_image_sync_heartbeat_attempts(
+                    state,
+                    request_path,
+                    trace_id,
+                    decision,
+                    plan_kind,
+                    attempts,
+                    transfer_tracker,
+                    started_at,
+                ));
+                let outcome = tokio::select! {
+                    biased;
+                    _ = tx.closed(), if cancel_on_disconnect => return,
+                    result = execution => result,
+                };
+                let bytes = openai_image_sync_heartbeat_final_bytes(outcome).await;
+                let _ = tx.send(Ok(Bytes::from(bytes))).await;
+            })
+            .await;
         })
         .await;
     });
@@ -1313,9 +1317,10 @@ pub(crate) async fn maybe_execute_sync_via_local_image_decision(
         return Ok(LocalExecutionRequestOutcome::NoPath);
     };
 
-    if attempt_source
-        .routing_execution_policy()
-        .is_some_and(|policy| policy.enable_cf_heartbeat)
+    if !crate::image_tasks::flow::is_async()
+        && attempt_source
+            .routing_execution_policy()
+            .is_some_and(|policy| policy.enable_cf_heartbeat)
     {
         let mut attempts = Vec::new();
         while let Some(attempt) = attempt_source.next_execution_attempt().await? {

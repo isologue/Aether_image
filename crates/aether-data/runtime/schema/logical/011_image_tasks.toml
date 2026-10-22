@@ -1,0 +1,67 @@
+[table.image_tasks]
+domain = "image_tasks"
+order = 10
+primary_key = ["id"]
+
+[[table.image_tasks.columns]]
+name = "id"
+type = "text_id"
+
+[[table.image_tasks.columns]]
+name = "api_key_id"
+type = "text"
+
+[[table.image_tasks.columns]]
+name = "user_id"
+type = "text"
+
+[[table.image_tasks.columns]]
+name = "node_id"
+type = "text"
+
+[[table.image_tasks.columns]]
+name = "idempotency_key"
+type = "text"
+nullable = true
+
+[[table.image_tasks.columns]]
+name = "fingerprint"
+type = "text"
+
+[[table.image_tasks.columns]]
+name = "status"
+type = "text"
+default = "queued"
+
+[[table.image_tasks.columns]]
+name = "created_at"
+type = "unix_seconds"
+
+[[table.image_tasks.columns]]
+name = "started_at"
+type = "unix_seconds"
+nullable = true
+
+[[table.image_tasks.columns]]
+name = "completed_at"
+type = "unix_seconds"
+nullable = true
+
+[[table.image_tasks.columns]]
+name = "lease_owner"
+type = "text"
+nullable = true
+
+[[table.image_tasks.columns]]
+name = "lease_until"
+type = "unix_seconds"
+nullable = true
+
+[[table.image_tasks.columns]]
+name = "settled"
+type = "bool"
+default = false
+
+[[table.image_tasks.columns]]
+name = "payload"
+type = "json"

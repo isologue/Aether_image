@@ -22,8 +22,64 @@ pub struct InMemoryBackgroundTaskRepository {
     index: RwLock<InMemoryBackgroundTaskIndex>,
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use aether_data_contracts::repository::background_tasks::BackgroundTaskKind;
+
+    #[tokio::test]
+    async fn task_id_search_filters_before_total_and_pagination() {
+        let runs = ["worker-Alpha", "worker-beta"].map(|id| StoredBackgroundTaskRun {
+            id: id.into(),
+            task_key: "test.worker".into(),
+            kind: BackgroundTaskKind::Scheduled,
+            trigger: "manual".into(),
+            status: BackgroundTaskStatus::Succeeded,
+            attempt: 1,
+            max_attempts: 1,
+            owner_instance: None,
+            progress_percent: 100,
+            progress_message: None,
+            payload_json: None,
+            result_json: None,
+            error_message: None,
+            cancel_requested: false,
+            created_by: None,
+            created_at_unix_secs: 100,
+            started_at_unix_secs: Some(100),
+            finished_at_unix_secs: Some(101),
+            updated_at_unix_secs: 101,
+        });
+        let repo = InMemoryBackgroundTaskRepository::seed_runs(runs);
+        let mut query = BackgroundTaskListQuery {
+            task_id_substring: Some("ALPHA".into()),
+            limit: 1,
+            ..Default::default()
+        };
+        let page = repo.list_runs(&query).await.unwrap();
+        assert_eq!(page.total, 1);
+        assert_eq!(page.items[0].id, "worker-Alpha");
+        query.offset = 1;
+        let page = repo.list_runs(&query).await.unwrap();
+        assert_eq!(page.total, 1);
+        assert!(page.items.is_empty());
+        query.offset = 0;
+        query.status = Some(BackgroundTaskStatus::Failed);
+        assert_eq!(repo.list_runs(&query).await.unwrap().total, 0);
+    }
+}
+
 impl InMemoryBackgroundTaskRepository {
     fn matches_filter(run: &StoredBackgroundTaskRun, query: &BackgroundTaskListQuery) -> bool {
+        if let Some(task_id) = query.task_id_substring.as_deref() {
+            if !run
+                .id
+                .to_ascii_lowercase()
+                .contains(&task_id.to_ascii_lowercase())
+            {
+                return false;
+            }
+        }
         if let Some(kind) = query.kind {
             if run.kind != kind {
                 return false;

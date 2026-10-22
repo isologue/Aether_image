@@ -8831,12 +8831,21 @@ ORDER BY "usage".user_id ASC
         usage.validate()?;
         // Move the event before cloning or compressing captures, and do not hold a connection
         // while preparing them. Stale lifecycle updates still ignore preparation errors below.
-        let (usage, prepared) =
+        let (mut usage, prepared) =
             prepare_usage_in_background(move || Ok(prepare_usage_for_persistence(usage))).await?;
         self.tx_runner
             .run_read_write(|tx| {
                 Box::pin(async move {
                     lock_usage_request_id_in_tx(tx, &usage.request_id).await?;
+
+                    // Fence delayed lifecycle events after an image executor has failed.
+                    // The task remains authoritative even when its pending usage arrives late.
+                    let image_failed: bool = if usage.request_id.starts_with("imgtask_") { sqlx::query_scalar("SELECT EXISTS (SELECT 1 FROM image_tasks WHERE status='failed' AND (id=$1 OR payload->>'request_id'=$1))")
+                        .bind(&usage.request_id).fetch_one(&mut **tx).await.map_postgres_err()? } else { false };
+                    if image_failed {
+                        usage.status = "failed".into();
+                        usage.billing_status = "void".into();
+                    }
 
                     let previous_usage =
                         find_usage_by_request_id_in_tx(tx, &usage.request_id).await?;
@@ -9343,7 +9352,8 @@ ORDER BY "usage".user_id ASC
                     .copied()
                     .unwrap_or_default()
                     > 1;
-                let original_usage = duplicate.then(|| usage.clone());
+                let original_usage =
+                    (duplicate || usage.request_id.starts_with("imgtask_")).then(|| usage.clone());
                 let prepared = PreparedPendingUsage::try_from_usage(usage)?;
                 if let Some(original_usage) = original_usage {
                     // Preserve capture markers for the canonical fallback, including validation

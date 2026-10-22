@@ -89,6 +89,36 @@ impl InMemorySettlementRepository {
 
 #[async_trait]
 impl SettlementWriteRepository for InMemorySettlementRepository {
+    async fn check_usage_policy_request(
+        &self,
+        input: ReserveUsagePolicyRequestInput,
+    ) -> Result<ReserveUsagePolicyRequestOutcome, DataLayerError> {
+        input.validate()?;
+        let admissions = self
+            .request_admissions
+            .read()
+            .expect("usage policy request admission lock");
+        for (window_index, window) in input.windows.iter().enumerate() {
+            let used_requests = admissions
+                .values()
+                .filter(|admission| {
+                    admission.state == UsagePolicyRequestAdmissionState::Active
+                        && admission.subject_id == input.subject_id
+                        && admission.admitted_at_unix_secs >= window.starts_at_unix_secs
+                        && admission.admitted_at_unix_secs < window.ends_at_unix_secs
+                })
+                .count() as u64;
+            if used_requests >= window.limit_requests {
+                return Ok(ReserveUsagePolicyRequestOutcome::Rejected {
+                    window_index,
+                    limit_requests: window.limit_requests,
+                    used_requests,
+                });
+            }
+        }
+        Ok(ReserveUsagePolicyRequestOutcome::Allowed)
+    }
+
     async fn reserve_usage_policy_request(
         &self,
         input: ReserveUsagePolicyRequestInput,
@@ -570,6 +600,35 @@ mod usage_policy_request_admission_tests {
                 .unwrap_or(admitted_at + 1),
             windows,
         }
+    }
+
+    #[tokio::test]
+    async fn queue_probe_does_not_write_admissions_or_tombstones() {
+        let repository = InMemorySettlementRepository::default();
+        let input = reserve("queue-1", "queue-1", 100, &[(0, 1_000, 1)]);
+        for _ in 0..3 {
+            assert_eq!(
+                repository
+                    .check_usage_policy_request(input.clone())
+                    .await
+                    .unwrap(),
+                ReserveUsagePolicyRequestOutcome::Allowed
+            );
+        }
+        assert!(repository.request_admissions.read().unwrap().is_empty());
+        repository
+            .reserve_usage_policy_request(reserve("running", "running", 99, &[(0, 1_000, 1)]))
+            .await
+            .unwrap();
+        assert_eq!(
+            repository.check_usage_policy_request(input).await.unwrap(),
+            ReserveUsagePolicyRequestOutcome::Rejected {
+                window_index: 0,
+                limit_requests: 1,
+                used_requests: 1
+            }
+        );
+        assert_eq!(repository.request_admissions.read().unwrap().len(), 1);
     }
 
     #[tokio::test]

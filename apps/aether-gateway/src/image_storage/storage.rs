@@ -398,6 +398,9 @@ impl ImageStorage {
             "sync": index.sync, "updated_at": now(), "failure_details": failure_details,
         });
         drop(index);
+        let mut result = result;
+        result["task_input_bytes"] =
+            serde_json::json!(crate::image_tasks::input_bytes(&self.root).await);
         let root = self.root.clone();
         let disk = tokio::task::spawn_blocking(move || {
             let canonical = std::fs::canonicalize(root).ok()?;

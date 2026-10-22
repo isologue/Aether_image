@@ -649,6 +649,53 @@ impl MemoryRuntimeBackend {
         })
     }
 
+    pub(crate) async fn check_usage_limits(
+        &self,
+        input: crate::UsageLimitInput<'_>,
+    ) -> Result<UsageLimitCheck, DataLayerError> {
+        let state = self.usage_limits.lock().await;
+        for (index, rule) in input.rules.iter().enumerate() {
+            let Some(window) = state.windows.get(rule.key) else {
+                continue;
+            };
+            if window.expires_at_unix_ms <= input.now_unix_ms {
+                continue;
+            }
+            let window_ms = rule.window_seconds.saturating_mul(1_000);
+            let live = |timestamp: &u64| {
+                *timestamp > input.now_unix_ms.saturating_sub(window_ms)
+                    || input.now_unix_ms < window_ms
+            };
+            if window.events.get(input.event_id).is_some_and(live) {
+                continue;
+            }
+            let used = window
+                .events
+                .values()
+                .filter(|timestamp| live(timestamp))
+                .count() as u64;
+            if used >= rule.limit {
+                let earliest = window
+                    .events
+                    .values()
+                    .filter(|timestamp| live(timestamp))
+                    .copied()
+                    .min()
+                    .unwrap_or(input.now_unix_ms);
+                return Ok(UsageLimitCheck::Rejected {
+                    rule_index: index,
+                    limit: rule.limit,
+                    retry_after: earliest
+                        .saturating_add(window_ms)
+                        .saturating_sub(input.now_unix_ms)
+                        .saturating_add(999)
+                        / 1_000,
+                });
+            }
+        }
+        Ok(UsageLimitCheck::Allowed)
+    }
+
     pub(crate) async fn check_and_consume_usage_limits(
         &self,
         input: crate::UsageLimitInput<'_>,

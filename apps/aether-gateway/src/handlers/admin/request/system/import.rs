@@ -3509,6 +3509,7 @@ impl<'a> AdminAppState<'a> {
             oauth_provider_types.insert(provider_type);
         }
 
+        let mut image_policy_entries = Vec::new();
         for imported_config_item in imported_system_configs {
             let config = imported_config_item.value;
             let normalized_key = normalize_imported_system_config_key(&config.key);
@@ -3550,7 +3551,26 @@ impl<'a> AdminAppState<'a> {
                     )));
                 };
             }
+            if matches!(
+                normalized_key.as_str(),
+                "image_storage" | "async_task_retention_days"
+            ) {
+                image_policy_entries.push((
+                    normalized_key.clone(),
+                    update.value.clone(),
+                    config.description.clone(),
+                ));
+            }
             existing_system_config_keys.insert(normalized_key);
+        }
+        if let Err(e) =
+            crate::handlers::admin::system::shared::configs::validate_image_policy_entries(
+                self,
+                &image_policy_entries,
+            )
+            .await?
+        {
+            return Ok(Err(e));
         }
 
         Ok(Ok(()))
@@ -6707,6 +6727,7 @@ impl<'a> AdminAppState<'a> {
             }
         }
 
+        let mut image_policy_entries = Vec::new();
         for imported_config_item in imported_system_configs {
             let (_, system_config) = imported_config_item.into_parts();
             let ImportedSystemConfig {
@@ -6743,8 +6764,19 @@ impl<'a> AdminAppState<'a> {
                 }))
                 .map_err(|err| GatewayError::Internal(err.to_string()))?,
             );
-            let update_result =
-                apply_admin_system_config_update(self, &key, &request_bytes).await?;
+            let update_result = if matches!(
+                normalized_key.as_str(),
+                "image_storage" | "async_task_retention_days"
+            ) {
+                image_policy_entries.push((
+                    normalized_key.clone(),
+                    value.clone(),
+                    description.clone(),
+                ));
+                Ok(json!({}))
+            } else {
+                apply_admin_system_config_update(self, &key, &request_bytes).await?
+            };
             match update_result {
                 Ok(_) => {
                     if exists {
@@ -6761,6 +6793,17 @@ impl<'a> AdminAppState<'a> {
             }
         }
 
+        if !image_policy_entries.is_empty() {
+            if let Err(e) =
+                crate::handlers::admin::system::shared::configs::apply_image_policy_entries(
+                    self,
+                    &image_policy_entries,
+                )
+                .await?
+            {
+                return Ok(Err(e));
+            }
+        }
         Ok(Ok(json!({
             "message": "配置导入成功",
             "stats": stats,

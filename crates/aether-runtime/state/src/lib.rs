@@ -498,6 +498,21 @@ impl RuntimeState {
         }
     }
 
+    /// Checks a sliding-window snapshot without adding events or changing retention.
+    pub async fn check_usage_limits(
+        &self,
+        input: UsageLimitInput<'_>,
+    ) -> Result<UsageLimitCheck, DataLayerError> {
+        if input.rules.is_empty() {
+            return Ok(UsageLimitCheck::Allowed);
+        }
+        validate_usage_limit_input(input)?;
+        match self.backend.as_ref() {
+            RuntimeStateBackend::Memory(memory) => memory.check_usage_limits(input).await,
+            RuntimeStateBackend::Redis(redis) => redis.runtime.check_usage_limits(input).await,
+        }
+    }
+
     pub async fn check_and_consume_usage_limits(
         &self,
         input: UsageLimitInput<'_>,
@@ -3376,12 +3391,14 @@ mod tests {
     #[tokio::test]
     async fn runtime_backends_share_atomic_sliding_usage_limit_contract() {
         let memory = RuntimeState::memory(MemoryRuntimeStateConfig::default());
+        assert_read_only_usage_limit_contract(&memory).await;
         assert_sliding_usage_limit_contract(&memory).await;
         assert_concurrent_usage_limit_cap(&memory).await;
 
         let Some((_redis, redis_runtime)) = redis_runtime_for_test("usage-limits").await else {
             return;
         };
+        assert_read_only_usage_limit_contract(&redis_runtime).await;
         assert_sliding_usage_limit_contract(&redis_runtime).await;
         assert_concurrent_usage_limit_cap(&redis_runtime).await;
     }
@@ -3773,6 +3790,92 @@ mod tests {
             .await
             .expect("winning value should be readable")
             .is_some());
+    }
+
+    #[tokio::test]
+    #[ignore = "requires AETHER_TEST_REDIS_URL pointing to an isolated test Redis"]
+    async fn live_usage_limit_snapshot_is_read_only() {
+        let runtime = RuntimeState::redis(
+            RedisClientConfig {
+                url: std::env::var("AETHER_TEST_REDIS_URL").expect("isolated Redis URL"),
+                key_prefix: Some(format!("usage-probe-{}", uuid::Uuid::new_v4())),
+            },
+            Some(5_000),
+        )
+        .await
+        .unwrap();
+        assert_read_only_usage_limit_contract(&runtime).await;
+    }
+
+    async fn assert_read_only_usage_limit_contract(runtime: &RuntimeState) {
+        let rules = [UsageLimitRule {
+            key: "usage:{read-only}:minute",
+            limit: 1,
+            window_seconds: 60,
+            retention_seconds: 60,
+        }];
+        for event_id in ["queue-1", "queue-2", "queue-1"] {
+            assert_eq!(
+                runtime
+                    .check_usage_limits(UsageLimitInput {
+                        rules: &rules,
+                        event_id,
+                        now_unix_ms: 100_000,
+                    })
+                    .await
+                    .unwrap(),
+                UsageLimitCheck::Allowed
+            );
+        }
+        assert_eq!(
+            runtime
+                .check_and_consume_usage_limits(UsageLimitInput {
+                    rules: &rules,
+                    event_id: "running",
+                    now_unix_ms: 100_000,
+                })
+                .await
+                .unwrap(),
+            UsageLimitCheck::Allowed
+        );
+        // A future snapshot must not prune the existing event or alter its TTL.
+        assert_eq!(
+            runtime
+                .check_usage_limits(UsageLimitInput {
+                    rules: &rules,
+                    event_id: "later",
+                    now_unix_ms: 160_000,
+                })
+                .await
+                .unwrap(),
+            UsageLimitCheck::Allowed
+        );
+        assert_eq!(
+            runtime
+                .check_usage_limits(UsageLimitInput {
+                    rules: &rules,
+                    event_id: "queue-3",
+                    now_unix_ms: 105_000,
+                })
+                .await
+                .unwrap(),
+            UsageLimitCheck::Rejected {
+                rule_index: 0,
+                limit: 1,
+                retry_after: 55
+            }
+        );
+        assert_eq!(
+            runtime
+                .check_usage_limits(UsageLimitInput {
+                    rules: &rules,
+                    event_id: "running",
+                    now_unix_ms: 105_000,
+                })
+                .await
+                .unwrap(),
+            UsageLimitCheck::Allowed
+        );
     }
 
     async fn assert_sliding_usage_limit_contract(runtime: &RuntimeState) {

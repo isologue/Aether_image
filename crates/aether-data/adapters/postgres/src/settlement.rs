@@ -656,6 +656,34 @@ ON CONFLICT (user_entitlement_id, request_id) DO NOTHING
 
 #[async_trait]
 impl SettlementWriteRepository for SqlxSettlementRepository {
+    async fn check_usage_policy_request(
+        &self,
+        input: ReserveUsagePolicyRequestInput,
+    ) -> Result<ReserveUsagePolicyRequestOutcome, DataLayerError> {
+        input.validate()?;
+        self.tx_runner
+            .run_read_only(|tx| {
+                Box::pin(async move {
+                    let counts = usage_policy_request_window_counts(tx, &input).await?;
+                    for (window_index, window) in input.windows.iter().enumerate() {
+                        let used_requests = usage_policy_cost_u64(
+                            counts.try_get(window_index).map_postgres_err()?,
+                            "usage policy request used_requests",
+                        )?;
+                        if used_requests >= window.limit_requests {
+                            return Ok(ReserveUsagePolicyRequestOutcome::Rejected {
+                                window_index,
+                                limit_requests: window.limit_requests,
+                                used_requests,
+                            });
+                        }
+                    }
+                    Ok(ReserveUsagePolicyRequestOutcome::Allowed)
+                })
+            })
+            .await
+    }
+
     async fn reserve_usage_policy_request(
         &self,
         input: ReserveUsagePolicyRequestInput,
@@ -1116,7 +1144,7 @@ WHERE retain_until <= TO_TIMESTAMP($1::double precision)
                         usage_row.try_get("billing_status").map_postgres_err()?;
                     if matches!(
                         current_billing_status.as_str(),
-                        "settled" | "void" | "insufficient_quota"
+                        "settled" | "void" | "refunded" | "insufficient_quota"
                     ) {
                         return settlement_from_row(&usage_row).map(Some);
                     }
@@ -1620,7 +1648,13 @@ mod tests {
             assert_eq!(repo.reserve_usage_policy_request(request.clone()).await.unwrap(),
                 ReserveUsagePolicyRequestOutcome::Rejected { window_index: 1, limit_requests: 4, used_requests: 4 });
             request.windows[1].limit_requests = 5;
+            for _ in 0..3 {
+                assert_eq!(repo.check_usage_policy_request(request.clone()).await.unwrap(), ReserveUsagePolicyRequestOutcome::Allowed);
+            }
+            assert_eq!(sqlx::query_scalar::<_, i64>("SELECT COUNT(*) FROM usage_request_admissions WHERE event_token = 'new'")
+                .fetch_one(&pool).await.unwrap(), 0);
             assert_eq!(repo.reserve_usage_policy_request(request.clone()).await.unwrap(), ReserveUsagePolicyRequestOutcome::Allowed);
+            assert!(matches!(repo.check_usage_policy_request(request.clone()).await.unwrap(), ReserveUsagePolicyRequestOutcome::Rejected { .. }));
             assert_eq!(repo.reserve_usage_policy_request(request.clone()).await.unwrap(), ReserveUsagePolicyRequestOutcome::Allowed);
             assert_eq!(sqlx::query_scalar::<_, i64>("SELECT COUNT(*) FROM usage_request_admissions WHERE event_token = 'new'")
                 .fetch_one(&pool).await.unwrap(), 1);

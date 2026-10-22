@@ -2229,6 +2229,10 @@ pub fn admin_system_config_default_value(key: &str) -> Option<serde_json::Value>
         "account_push_api_key" => Some(json!("")),
         "account_push" => Some(json!({"enabled":false,"provider_id":""})),
         "account_push_last_result" => Some(serde_json::Value::Null),
+        "image_async_tasks" => {
+            Some(json!({"concurrency":200,"max_queued":10000,"max_queue_seconds":3600}))
+        }
+        "async_task_retention_days" => Some(json!(30)),
         "image_webdav_password" => Some(json!("")),
         "image_storage" => Some(
             json!({"resize_enabled":false, "return_format":"base64", "honor_response_format":false,

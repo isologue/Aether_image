@@ -1,4 +1,4 @@
-import client from '../client'
+﻿import client from '../client'
 
 export interface ImageStorageConfig {
   resize_enabled: boolean
@@ -29,7 +29,7 @@ export interface ImageCleanupRun {
 }
 export interface ImageStorageStats {
   directory: string; count: number; bytes: number; synced: number; pending: number; failed: number
-  expired_pending: number; webdav_enabled: boolean; updated_at: number
+  task_input_bytes: number; expired_pending: number; webdav_enabled: boolean; updated_at: number
   failure_details: { id: string; error: string; attempts: number }[]
   disk: { total: number; available: number; used_percent: number } | null
   last_cleanup: ImageCleanupRun | null; next_cleanup_at: number | null

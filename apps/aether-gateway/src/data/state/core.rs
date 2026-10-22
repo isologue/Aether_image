@@ -561,6 +561,14 @@ impl GatewayDataState {
         })
     }
 
+    pub(crate) fn image_tasks(
+        &self,
+    ) -> Option<aether_data::driver::postgres::SqlxImageTaskRepository> {
+        self.backends.as_ref()?.postgres().map(|backend| {
+            aether_data::driver::postgres::SqlxImageTaskRepository::new(backend.pool_clone())
+        })
+    }
+
     pub(crate) fn has_backends(&self) -> bool {
         self.backends.is_some()
     }
@@ -962,6 +970,38 @@ impl GatewayDataState {
         backends.list_system_config_entries().await
     }
 
+    pub(crate) async fn upsert_image_policy_entries(
+        &self,
+        entries: &[(String, serde_json::Value, Option<String>)],
+    ) -> Result<(), DataLayerError> {
+        if let Some(values) = &self.system_config_values {
+            let mut values = values.write().expect("system config values lock");
+            for (key, value, description) in entries {
+                let description = description
+                    .clone()
+                    .or_else(|| values.get(key).and_then(|v| v.description.clone()));
+                values.insert(
+                    key.clone(),
+                    StoredSystemConfigEntry {
+                        key: key.clone(),
+                        value: value.clone(),
+                        description,
+                        updated_at_unix_secs: Some(current_system_config_updated_at_unix_secs()),
+                    },
+                );
+            }
+        } else if let Some(repo) = self.image_tasks() {
+            repo.upsert_config_entries(entries).await?;
+        } else {
+            return Err(DataLayerError::InvalidInput(
+                "Image policies require persistent storage".into(),
+            ));
+        }
+        for (key, _, _) in entries {
+            self.clear_cached_system_config_value(key);
+        }
+        Ok(())
+    }
     pub(crate) async fn upsert_system_config_entry(
         &self,
         key: &str,

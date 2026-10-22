@@ -491,6 +491,7 @@ pub enum VideoTaskLookupKey<'a> {
 
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct VideoTaskQueryFilter {
+    pub task_id_substring: Option<String>,
     pub user_id: Option<String>,
     pub status: Option<VideoTaskStatus>,
     pub model_substring: Option<String>,

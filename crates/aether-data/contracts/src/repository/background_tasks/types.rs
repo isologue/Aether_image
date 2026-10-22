@@ -486,6 +486,7 @@ fn sanitize_background_task_metadata_error_code(value: &str) -> Option<String> {
 
 #[derive(Debug, Clone, PartialEq, Eq, Default, serde::Serialize, serde::Deserialize)]
 pub struct BackgroundTaskListQuery {
+    pub task_id_substring: Option<String>,
     pub task_key_substring: Option<String>,
     pub kind: Option<BackgroundTaskKind>,
     pub status: Option<BackgroundTaskStatus>,

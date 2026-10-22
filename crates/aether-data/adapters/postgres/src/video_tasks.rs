@@ -1040,7 +1040,8 @@ fn has_video_task_filter(
     filter: &VideoTaskQueryFilter,
     created_since_unix_secs: Option<u64>,
 ) -> bool {
-    filter.user_id.is_some()
+    filter.task_id_substring.is_some()
+        || filter.user_id.is_some()
         || filter.status.is_some()
         || filter.model_substring.is_some()
         || filter.client_api_format.is_some()
@@ -1068,6 +1069,15 @@ fn push_video_task_filter<'args>(
 ) {
     let mut has_where = false;
 
+    if let Some(task_id) = filter.task_id_substring.as_deref() {
+        push_sql_clause(builder, &mut has_where, "(id ILIKE ");
+        builder.push_bind(format!("%{}%", escape_like_pattern(task_id)));
+        builder.push(" ESCAPE '\\' OR short_id ILIKE ");
+        builder.push_bind(format!("%{}%", escape_like_pattern(task_id)));
+        builder.push(" ESCAPE '\\' OR external_task_id ILIKE ");
+        builder.push_bind(format!("%{}%", escape_like_pattern(task_id)));
+        builder.push(" ESCAPE '\\')");
+    }
     if let Some(user_id) = filter.user_id.as_deref() {
         push_sql_clause(builder, &mut has_where, "user_id = ");
         builder.push_bind(user_id);

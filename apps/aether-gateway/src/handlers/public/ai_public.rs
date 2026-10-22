@@ -1754,6 +1754,7 @@ async fn build_local_gemini_video_operations_list_response(
     };
 
     let filter = VideoTaskQueryFilter {
+        task_id_substring: None,
         user_id: Some(user_id.to_string()),
         status: None,
         model_substring: None,

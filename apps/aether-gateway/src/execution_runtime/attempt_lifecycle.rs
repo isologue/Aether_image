@@ -501,6 +501,7 @@ pub(crate) struct ExecutionAttemptLifecycle {
     candidate_started_at_unix_ms: u64,
     stage_guard: AttemptStageGuard,
     started_recorded: bool,
+    image_flow: Option<crate::image_tasks::flow::ImageFlow>,
 }
 
 impl ExecutionAttemptLifecycle {
@@ -552,6 +553,7 @@ impl ExecutionAttemptLifecycle {
             candidate_started_at_unix_ms,
             stage_guard,
             started_recorded: false,
+            image_flow: crate::image_tasks::flow::current(),
         }
     }
 
@@ -686,20 +688,30 @@ impl ExecutionAttemptLifecycle {
             build_terminal_usage_context_seed(&self.plan, analytics_context.as_ref());
         let payload_seed = build_stream_terminal_usage_payload_seed(&payload);
         let billing_void = settlement.billing.is_void();
+        let deferred = crate::image_tasks::flow::defer_stream_for(
+            self.image_flow.clone(),
+            state,
+            context_seed.clone(),
+            payload_seed.clone(),
+            billing_void,
+        )
+        .await;
         let usage_runtime = Arc::clone(&state.usage_runtime);
         let usage_data = Arc::clone(state.usage_lifecycle_data_state());
         let usage_producer = usage_runtime.track_producer();
         self.stage_guard
             .await_detachable_stage(self.trace_id.as_str(), "usage_terminal", async move {
                 let _usage_producer = usage_producer;
-                usage_runtime
-                    .record_stream_terminal(
-                        usage_data.as_ref(),
-                        context_seed,
-                        payload_seed,
-                        billing_void,
-                    )
-                    .await;
+                if !deferred {
+                    usage_runtime
+                        .record_stream_terminal(
+                            usage_data.as_ref(),
+                            context_seed,
+                            payload_seed,
+                            billing_void,
+                        )
+                        .await;
+                }
             })
             .await;
 

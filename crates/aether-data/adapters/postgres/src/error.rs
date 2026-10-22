@@ -5,6 +5,15 @@ pub(crate) fn postgres_error(error: sqlx::Error) -> DataLayerError {
         .as_database_error()
         .and_then(|database_error| database_error.code())
         .map(|code| code.into_owned());
+    if sqlstate.as_deref() == Some("A0001") {
+        return DataLayerError::InvalidInput(
+            error
+                .as_database_error()
+                .map(|e| e.message())
+                .unwrap_or("Invalid image task configuration")
+                .to_owned(),
+        );
+    }
     match sqlstate {
         Some(code) => DataLayerError::Postgres(format!("{error} (SQLSTATE {code})")),
         None => DataLayerError::postgres(error),

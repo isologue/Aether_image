@@ -602,6 +602,7 @@ async fn has_active_s3_backup_task(app: &AppState) -> Result<bool, S3BackupTaskE
     for status in [BackgroundTaskStatus::Queued, BackgroundTaskStatus::Running] {
         let page = app
             .list_background_task_runs(&BackgroundTaskListQuery {
+                task_id_substring: None,
                 task_key_substring: Some(TASK_KEY_SYSTEM_S3_BACKUP.to_string()),
                 kind: Some(BackgroundTaskKind::Scheduled),
                 status: Some(status),

@@ -466,6 +466,57 @@ impl RedisRuntimeRunner {
         Ok(RateLimitCheck::Rejected { scope, limit })
     }
 
+    pub(crate) async fn check_usage_limits(
+        &self,
+        input: UsageLimitInput<'_>,
+    ) -> Result<UsageLimitCheck, DataLayerError> {
+        // ZCOUNT and the bounded first-member lookup inspect only the live range.
+        // Do not prune, insert events, or extend TTLs while checking a queued job.
+        let script = script(
+            r#"
+local now, event_id = tonumber(ARGV[1]), ARGV[2]
+for i, key in ipairs(KEYS) do
+    local limit = tonumber(ARGV[(i - 1) * 2 + 3])
+    local window_ms = tonumber(ARGV[(i - 1) * 2 + 4]) * 1000
+    local cutoff = now - window_ms
+    local score = redis.call('ZSCORE', key, event_id)
+    if not score or tonumber(score) <= cutoff then
+        local live = '(' .. string.format('%.0f', cutoff)
+        if redis.call('ZCOUNT', key, live, '+inf') >= limit then
+            local first = redis.call('ZRANGEBYSCORE', key, live, '+inf', 'WITHSCORES', 'LIMIT', 0, 1)
+            local retry = math.max(1, math.ceil((tonumber(first[2]) + window_ms - now) / 1000))
+            return {0, i, limit, retry}
+        end
+    end
+end
+return {1, 0, 0, 0}
+"#,
+        );
+        let mut invocation = script.prepare_invoke();
+        for rule in input.rules {
+            invocation.key(self.keyspace.key(rule.key));
+        }
+        invocation.arg(input.now_unix_ms).arg(input.event_id);
+        for rule in input.rules {
+            invocation.arg(rule.limit).arg(rule.window_seconds);
+        }
+        let raw: Vec<i64> = run_lane_with_timeout(
+            &self.connections,
+            RedisConnectionLane::Fast,
+            Some(self.command_timeout_ms.unwrap_or(30_000)),
+            "runtime usage limit snapshot",
+            async {
+                let mut connection = self.connections.connection(RedisConnectionLane::Fast);
+                invocation
+                    .invoke_async(&mut connection)
+                    .await
+                    .map_redis_err()
+            },
+        )
+        .await?;
+        Self::decode_usage_limit_check(&raw, input)
+    }
+
     pub(crate) async fn check_and_consume_usage_limits(
         &self,
         input: UsageLimitInput<'_>,
@@ -483,6 +534,13 @@ impl RedisRuntimeRunner {
             super::usage_cleanup::check_and_consume(&self.connections, &keys, &input),
         )
         .await?;
+        Self::decode_usage_limit_check(&raw, input)
+    }
+
+    fn decode_usage_limit_check(
+        raw: &[i64],
+        input: UsageLimitInput<'_>,
+    ) -> Result<UsageLimitCheck, DataLayerError> {
         match raw.first().copied() {
             Some(1) if raw.len() >= 4 => return Ok(UsageLimitCheck::Allowed),
             Some(0) if raw.len() >= 4 => {}

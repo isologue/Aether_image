@@ -953,6 +953,7 @@ mod worker_boot_run_id_tests {
 
         let page = repository
             .list_runs(&BackgroundTaskListQuery {
+                task_id_substring: None,
                 task_key_substring: Some("usage.queue.worker".to_string()),
                 kind: None,
                 status: None,

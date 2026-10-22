@@ -15,6 +15,42 @@ use tower::ServiceExt;
 
 const PNG: &str =
     "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aD1sAAAAASUVORK5CYII=";
+
+#[tokio::test]
+async fn successful_http_status_requires_complete_images_or_explicit_refusal() {
+    let dir = TempDir::new();
+    let config = ImageConfig::default();
+    let state = app(&dir.0, &config);
+    for (value, expected) in [
+        (json!({"data":[]}), StatusCode::BAD_GATEWAY),
+        (
+            json!({"error":{"message":"upstream failed"}}),
+            StatusCode::BAD_GATEWAY,
+        ),
+        (
+            json!({"data":[{"b64_json":PNG},{}]}),
+            StatusCode::BAD_GATEWAY,
+        ),
+        (
+            json!({"data":[],"outcome":"content_refused","refusal":"Content policy refusal"}),
+            StatusCode::OK,
+        ),
+        (json!({"data":[{"b64_json":PNG}]}), StatusCode::OK),
+    ] {
+        let slot = ImageRequestSlot(Arc::new(Mutex::new(Some(request_config(
+            config.clone(),
+            false,
+        )))));
+        let response = Response::builder()
+            .header("content-type", "application/json")
+            .body(Body::from(value.to_string()))
+            .unwrap();
+        let response = transform_response(state.clone(), slot, response)
+            .await
+            .unwrap();
+        assert_eq!(response.status(), expected, "{value}");
+    }
+}
 fn png() -> Vec<u8> {
     base64::engine::general_purpose::STANDARD
         .decode(PNG)
@@ -103,6 +139,7 @@ async fn resize_capture_is_opt_in_hot_configured_and_reads_json_and_multipart_si
         .is_none());
     config.resize_enabled = true;
     let state = app(&temp.0, &config);
+    let slot = ImageRequestSlot::default();
     assert!(slot.capture(&state, &headers, &body, false).await.is_err());
     let body =
         Bytes::from_static(br#"{"size":"2048x1024","response_format":"url","prompt":"test"}"#);
@@ -127,6 +164,7 @@ async fn resize_capture_is_opt_in_hot_configured_and_reads_json_and_multipart_si
         "multipart/form-data; boundary=fixture".parse().unwrap(),
     );
     let body = Bytes::from_static(b"--fixture\r\nContent-Disposition: form-data; name=\"image\"; filename=\"x.png\"\r\n\r\n\x00\xff\x80\r\n--fixture\r\nContent-Disposition: form-data; name=\"size\"\r\n\r\n1024x2048\r\n--fixture--\r\n");
+    let slot = ImageRequestSlot::default();
     let normalized = slot.capture(&state, &headers, &body, false).await.unwrap();
     assert_eq!(normalized, body);
     assert_eq!(
@@ -308,6 +346,7 @@ async fn request_capture_ignores_field_unless_enabled_and_preserves_multipart_by
     let mut enabled = c.clone();
     enabled.honor_response_format = true;
     let state = app(&temp.0, &enabled);
+    let slot = ImageRequestSlot::default();
     assert!(slot
         .capture(
             &state,
@@ -330,6 +369,7 @@ async fn request_capture_ignores_field_unless_enabled_and_preserves_multipart_by
         "content-type",
         "multipart/form-data; boundary=fixture".parse().unwrap(),
     );
+    let slot = ImageRequestSlot::default();
     let mut body = b"--fixture\r\nContent-Disposition: form-data; name=\"image\"; filename=\"x.png\"\r\nContent-Type: image/png\r\n\r\n".to_vec();
     body.extend_from_slice(&[0, 255, 128, 2]);
     body.extend_from_slice(b"\r\n--fixture\r\nContent-Disposition: form-data; name=\"response_format\"\r\n\r\nurl\r\n--fixture--\r\n");
@@ -430,15 +470,88 @@ async fn json_to_local_url_is_downloadable_with_head_range_and_restart() {
 }
 
 #[tokio::test]
-async fn base64_response_survives_unwritable_storage() {
+async fn captured_request_keeps_its_resize_and_format_snapshot() {
+    let temp = TempDir::new();
+    let original = ImageConfig {
+        resize_enabled: true,
+        honor_response_format: true,
+        ..Default::default()
+    };
+    let slot = ImageRequestSlot::default();
+    let mut headers = HeaderMap::new();
+    headers.insert("content-type", "application/json".parse().unwrap());
+    slot.capture(
+        &app(&temp.0, &original),
+        &headers,
+        &Bytes::from_static(br#"{"size":"32x48","response_format":"url"}"#),
+        false,
+    )
+    .await
+    .unwrap();
+    slot.capture(
+        &app(&temp.0, &ImageConfig::default()),
+        &headers,
+        &Bytes::from_static(br#"{"size":"64x64"}"#),
+        false,
+    )
+    .await
+    .unwrap();
+    let snapshot = slot.0.lock().unwrap().clone().unwrap();
+    assert!(snapshot.use_url);
+    assert_eq!(snapshot.target_size.unwrap().height, 48);
+}
+
+#[tokio::test]
+async fn incomplete_and_error_streams_are_never_successful_deliveries() {
+    let temp = TempDir::new();
+    let state = app(&temp.0, &ImageConfig::default());
+    for wire in [
+        "data: [DONE]\n\n",
+        "event: image_generation.partial_image\ndata: {\"b64_json\":\"partial\"}\n\ndata: [DONE]\n\n",
+        "event: error\ndata: {\"error\":{\"message\":\"provider failed\"}}\n\n",
+    ] {
+        let slot = ImageRequestSlot::default();
+        *slot.0.lock().unwrap() = Some(request_config(ImageConfig::default(), false));
+        let flow = crate::image_tasks::flow::ImageFlow::default();
+        let response = Response::builder().header("content-type", "text/event-stream").body(Body::from(wire)).unwrap();
+        let bytes = crate::image_tasks::flow::scope(Some(flow.clone()), async {
+            let response = transform_response(state.clone(), slot, response).await.unwrap();
+            to_bytes(response.into_body(), 8192).await.unwrap()
+        }).await;
+        assert!(String::from_utf8_lossy(&bytes).contains("error"));
+        assert_eq!(flow.0.lock().unwrap().completion, Some(false));
+    }
+    let flow = crate::image_tasks::flow::ImageFlow::default();
+    let slot = ImageRequestSlot::default();
+    *slot.0.lock().unwrap() = Some(request_config(ImageConfig::default(), false));
+    let response = Response::builder()
+        .header("content-type", "text/event-stream")
+        .body(Body::from(format!(
+            "event: image_generation.completed\ndata: {{\"b64_json\":\"{PNG}\"}}\n\n"
+        )))
+        .unwrap();
+    crate::image_tasks::flow::scope(Some(flow.clone()), async {
+        let response = transform_response(state.clone(), slot, response)
+            .await
+            .unwrap();
+        to_bytes(response.into_body(), 8192).await.unwrap()
+    })
+    .await;
+    assert_eq!(flow.0.lock().unwrap().completion, Some(true));
+}
+
+#[tokio::test]
+async fn durable_results_fail_on_unwritable_storage_in_both_formats() {
     let temp = TempDir::new();
     std::fs::write(&temp.0, b"not a directory").unwrap();
     let c = ImageConfig::default();
     let state = app(&temp.0, &c);
     let mut value = json!({"data":[{"b64_json":PNG}]});
-    transform_json(&state, &request_config(c.clone(), false), &mut value)
-        .await
-        .unwrap();
+    assert!(
+        transform_json(&state, &request_config(c.clone(), false), &mut value)
+            .await
+            .is_err()
+    );
     assert_eq!(value["data"][0]["b64_json"], PNG);
     assert!(transform_json(&state, &request_config(c, true), &mut value)
         .await
@@ -524,6 +637,7 @@ struct DavFixture {
     bad_public: bool,
     expected_auth: Arc<Mutex<String>>,
     public_gate: Arc<Mutex<Option<Arc<tokio::sync::Semaphore>>>>,
+    public_status: Arc<Mutex<Option<u16>>>,
 }
 async fn dav_handler(
     axum::extract::State(state): axum::extract::State<DavFixture>,
@@ -532,6 +646,12 @@ async fn dav_handler(
     let path = request.uri().path().to_string();
     let method = request.method().as_str().to_string();
     if path.starts_with("/public/") {
+        if let Some(status) = *state.public_status.lock().unwrap() {
+            return Response::builder()
+                .status(status)
+                .body(Body::empty())
+                .unwrap();
+        }
         let gate = state.public_gate.lock().unwrap().clone();
         let _permit = if let Some(gate) = &gate {
             Some(gate.acquire().await.unwrap())
@@ -902,7 +1022,7 @@ async fn webdav_only_failure_returns_storage_error_without_local_fallback() {
 }
 
 #[tokio::test]
-async fn webdav_only_base64_returns_before_upload_finishes_without_local_copy() {
+async fn webdav_only_base64_waits_until_durable_without_local_copy() {
     let temp = TempDir::new();
     let (mut config, fixture, server) = dav_server(false).await;
     config.storage_mode = "webdav".into();
@@ -910,33 +1030,118 @@ async fn webdav_only_base64_returns_before_upload_finishes_without_local_copy() 
     let gate = Arc::new(tokio::sync::Semaphore::new(0));
     *fixture.public_gate.lock().unwrap() = Some(gate.clone());
     let state = app(&temp.0, &config);
-    let mut value = json!({"data":[{"b64_json":PNG}]});
-    tokio::time::timeout(
-        std::time::Duration::from_secs(2),
-        transform_json(&state, &request_config(config.clone(), false), &mut value),
-    )
+    let request = tokio::spawn(async move {
+        let mut value = json!({"data":[{"b64_json":PNG}]});
+        transform_json(&state, &request_config(config, false), &mut value)
+            .await
+            .unwrap();
+        value
+    });
+    tokio::time::timeout(std::time::Duration::from_secs(2), async {
+        while fixture.files.lock().unwrap().is_empty() {
+            tokio::task::yield_now().await;
+        }
+    })
     .await
-    .unwrap()
     .unwrap();
-    assert_eq!(value["data"][0]["b64_json"], PNG);
-    assert!(value["data"][0].get("url").is_none());
+    assert!(
+        !request.is_finished(),
+        "Result preparation includes durable WebDAV storage"
+    );
     assert!(!temp.0.exists());
     gate.add_permits(1);
-    // All upload slots become available only after the background upload and verification finish.
-    let _idle = tokio::time::timeout(
-        std::time::Duration::from_secs(2),
-        state
-            .image_storage
-            .upload_gate
-            .clone()
-            .acquire_many_owned(4),
-    )
-    .await
-    .unwrap()
-    .unwrap();
+    let value = request.await.unwrap();
+    assert_eq!(value["data"][0]["b64_json"], PNG);
+    assert!(value["data"][0].get("url").is_none());
     assert_eq!(fixture.files.lock().unwrap().len(), 1);
     assert!(!temp.0.exists());
     server.abort();
+}
+
+#[tokio::test]
+async fn task_results_storage_matrix_fallback_and_read_errors() {
+    use super::task_results::{persist, read_task_result, ResultReadError};
+    for mode in ["local", "webdav", "local_webdav"] {
+        for use_url in [false, true] {
+            let temp = TempDir::new();
+            let (mut config, fixture, server) = dav_server(false).await;
+            config.storage_mode = mode.into();
+            *fixture.expected_auth.lock().unwrap() = "Basic YWRtaW46".into();
+            let state = app(&temp.0, &config);
+            let reference = persist(&state, &request_config(config, use_url), &png())
+                .await
+                .unwrap();
+            let stored = json!({"created":123,"data":[{"$image_ref":reference.clone()}]});
+            let read = read_task_result(&state, &stored, true).await.unwrap();
+            if use_url {
+                assert!(read["data"][0]["url"].is_string());
+            } else {
+                assert_eq!(read["data"][0]["b64_json"], PNG);
+            }
+            assert!(read["data"][0].get("$image_ref").is_none());
+            if mode == "webdav" {
+                assert!(
+                    !temp.0.exists(),
+                    "Pure WebDAV must not retain local results"
+                );
+            }
+            if mode == "local_webdav" {
+                *fixture.public_status.lock().unwrap() = Some(503);
+                let fallback = read_task_result(&state, &stored, true).await.unwrap();
+                if use_url {
+                    assert!(fallback["data"][0]["url"]
+                        .as_str()
+                        .unwrap()
+                        .contains("images.example.test"));
+                }
+            }
+            if let Some(path) = reference["local"]["path"].as_str() {
+                tokio::fs::remove_file(temp.0.join("objects").join(path))
+                    .await
+                    .unwrap();
+            }
+            if mode != "local" {
+                *fixture.public_status.lock().unwrap() = None;
+                // A missing local copy must fall back to a preserved remote copy.
+                assert!(read_task_result(&state, &stored, true).await.is_ok());
+                for status in [401, 503] {
+                    *fixture.public_status.lock().unwrap() = Some(status);
+                    assert!(matches!(
+                        read_task_result(&state, &stored, true).await,
+                        Err(ResultReadError::Unavailable(_))
+                    ));
+                }
+                *fixture.public_status.lock().unwrap() = Some(404);
+            }
+            assert!(matches!(
+                read_task_result(&state, &stored, true).await,
+                Err(ResultReadError::Cleaned)
+            ));
+            if mode == "local_webdav" {
+                assert!(
+                    matches!(
+                        read_task_result(&state, &stored, false).await,
+                        Err(ResultReadError::Unavailable(_))
+                    ),
+                    "another node's missing local path cannot prove cleanup"
+                );
+            }
+            // Never return a partial success for a missing member of a multi-image result.
+            let another = persist(
+                &state,
+                &request_config(ImageConfig::default(), false),
+                &png(),
+            )
+            .await
+            .unwrap();
+            let multiple = json!({"data":[{"$image_ref":another},{"$image_ref":reference}]});
+            assert!(matches!(
+                read_task_result(&state, &multiple, true).await,
+                Err(ResultReadError::Cleaned)
+            ));
+            server.abort();
+        }
+    }
 }
 
 #[tokio::test]

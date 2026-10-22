@@ -776,6 +776,24 @@ impl StoredRequestUsageAudit {
         usage_request_metadata_client_family(self.request_metadata.as_ref())
     }
 
+    /// Async generation is distinct from streaming a synchronous response.
+    pub fn is_async(&self) -> bool {
+        let metadata = self.request_metadata.as_ref();
+        metadata
+            .and_then(|value| value.get("is_async"))
+            .and_then(Value::as_bool)
+            == Some(true)
+            || ["image_task_id", "video_task_id"].iter().any(|key| {
+                metadata
+                    .and_then(|value| value.get(key))
+                    .and_then(Value::as_str)
+                    .is_some_and(|value| !value.trim().is_empty())
+            })
+            // Older task records predate the explicit metadata marker.
+            || self.request_id.starts_with("imgtask_")
+            || self.request_type.as_deref() == Some("video")
+    }
+
     pub fn is_websocket(&self) -> bool {
         self.request_metadata_bool(WEBSOCKET_MODE_METADATA_KEY)
             .unwrap_or(false)
@@ -3260,6 +3278,32 @@ mod tests {
             Some(102),
         )
         .expect("usage should build")
+    }
+
+    #[test]
+    fn async_usage_recognizes_tasks_without_confusing_streaming() {
+        let mut item = sample_usage();
+        assert!(!item.is_async());
+        item.is_stream = true;
+        assert!(!item.is_async());
+        for metadata in [
+            json!({"is_async": true}),
+            json!({"image_task_id": "img_1"}),
+            json!({"video_task_id": "vid_1"}),
+        ] {
+            item.request_metadata = Some(metadata);
+            assert!(item.is_async());
+        }
+        for metadata in [json!({"is_async": false}), json!({"image_task_id": " "})] {
+            item.request_metadata = Some(metadata);
+            assert!(!item.is_async());
+        }
+        item.request_metadata = None;
+        item.request_id = "imgtask_legacy".to_string();
+        assert!(item.is_async());
+        item.request_id = "request-video".to_string();
+        item.request_type = Some("video".to_string());
+        assert!(item.is_async());
     }
 
     #[test]

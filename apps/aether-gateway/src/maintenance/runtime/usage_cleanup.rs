@@ -72,6 +72,18 @@ pub(super) async fn perform_automatic_usage_cleanup_once(
 ) -> Result<UsageCleanupSummary, DataLayerError> {
     let mut summary = perform_usage_cleanup_once(data).await?;
     cleanup_usage_policy_ledgers(data, &mut summary).await?;
+    if system_config_bool(data, "enable_auto_cleanup", true).await? {
+        if let Some(repo) = data.image_tasks() {
+            let days = data
+                .find_system_config_value(crate::image_tasks::RETENTION_KEY)
+                .await?
+                .and_then(|v| v.as_i64())
+                .unwrap_or(30);
+            if (1..=36500).contains(&days) {
+                repo.cleanup(days).await?;
+            }
+        }
+    }
     Ok(summary)
 }
 

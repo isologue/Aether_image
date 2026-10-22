@@ -50,6 +50,7 @@ pub(super) async fn maybe_build_local_admin_video_tasks_response(
             None => None,
         };
         let filter = VideoTaskQueryFilter {
+            task_id_substring: query_param_value(request_context.query_string(), "task_id"),
             user_id: query_param_value(request_context.query_string(), "user_id"),
             status,
             model_substring: query_param_value(request_context.query_string(), "model"),
@@ -88,9 +89,10 @@ pub(super) async fn maybe_build_local_admin_video_tasks_response(
         )
     {
         let filter = VideoTaskQueryFilter {
-            user_id: None,
+            task_id_substring: query_param_value(request_context.query_string(), "task_id"),
+            user_id: query_param_value(request_context.query_string(), "user_id"),
             status: None,
-            model_substring: None,
+            model_substring: query_param_value(request_context.query_string(), "model"),
             client_api_format: None,
         };
         let stats = state

@@ -1,5 +1,5 @@
 use super::{
-    config::{load_config, load_password, validate_http_url, ImageConfig},
+    config::{load_config, validate_http_url, ImageConfig},
     storage::{MAX_BODY_BYTES, MAX_IMAGE_BYTES},
 };
 use crate::{AppState, GatewayError};
@@ -14,7 +14,7 @@ use std::sync::{Arc, Mutex};
 
 #[derive(Clone, Default)]
 pub(crate) struct ImageRequestSlot(pub Arc<Mutex<Option<ImageRequest>>>);
-#[derive(Clone)]
+#[derive(Clone, serde::Serialize, serde::Deserialize)]
 pub(crate) struct ImageRequest {
     pub config: ImageConfig,
     pub use_url: bool,
@@ -44,6 +44,9 @@ impl ImageRequestSlot {
         body: &Bytes,
         trusted_forwarded: bool,
     ) -> Result<Bytes, String> {
+        if self.0.lock().unwrap_or_else(|e| e.into_inner()).is_some() {
+            return Ok(body.clone());
+        }
         let config = load_config(state)
             .await
             .map_err(|_| "读取图片存储配置失败".to_string())?;
@@ -207,7 +210,14 @@ fn multipart_text_field(
 fn error_json(message: &str) -> Value {
     json!({"error":{"type":"image_storage_error", "code":"image_storage_error", "message":message}})
 }
-pub(crate) async fn transform_response(
+pub(crate) fn transform_response(
+    state: AppState,
+    slot: ImageRequestSlot,
+    response: Response<Body>,
+) -> impl std::future::Future<Output = Result<Response<Body>, GatewayError>> + Send {
+    Box::pin(transform_response_inner(state, slot, response))
+}
+async fn transform_response_inner(
     state: AppState,
     slot: ImageRequestSlot,
     response: Response<Body>,
@@ -251,6 +261,22 @@ pub(crate) async fn transform_response(
     if let Err(error) = transform_json(&state, &request, &mut value).await {
         parts.status = StatusCode::BAD_GATEWAY;
         value = error_json(&error);
+    }
+    if parts.status.is_success()
+        && (value.get("error").is_some_and(|e| !e.is_null())
+            || (!complete_images(&value)
+                && !(value["outcome"] == "content_refused"
+                    && value["refusal"].as_str().is_some_and(|s| !s.is_empty()))))
+    {
+        parts.status = StatusCode::BAD_GATEWAY;
+        if value.get("error").is_none_or(Value::is_null) {
+            value = error_json("Upstream returned no completed image");
+        }
+    }
+    if parts.status.is_success() && value["outcome"] == "content_refused" {
+        if let Some(reason) = value["refusal"].as_str().filter(|s| !s.is_empty()) {
+            crate::image_tasks::flow::content_refusal(reason);
+        }
     }
     let bytes = serde_json::to_vec(&value)
         .map_err(|_| GatewayError::Internal("图片响应序列化失败".into()))?;
@@ -307,6 +333,7 @@ async fn transform_item(
     if b64.is_none() && provider_url.is_none() {
         return Ok(());
     }
+    crate::image_tasks::flow::stage("downloading", 70).await;
     let bytes = if let Some(b64) = &b64 {
         let raw = if b64.starts_with("data:") {
             b64.split_once(',')
@@ -327,6 +354,7 @@ async fn transform_item(
             .download(provider_url.as_deref().ok_or("缺少图片 URL")?)
             .await?
     };
+    crate::image_tasks::flow::stage("processing", 90).await;
     let bytes = if let Some(size) = request.target_size {
         let bytes = state.image_storage.resize(bytes, size).await?;
         for (field, dimension) in [("width", size.width), ("height", size.height)] {
@@ -344,91 +372,25 @@ async fn transform_item(
     } else {
         bytes
     };
-    let saved = if request.config.stores_local() {
-        Some(state.image_storage.save(&bytes).await)
-    } else {
-        None
-    };
-    let mut remote_url = None;
-    if request.config.stores_webdav() && request.use_url {
-        let uploaded = match load_password(state).await {
-            Ok(password) => {
-                if let Some(Ok(record)) = &saved {
-                    state
-                        .image_storage
-                        .upload(&request.config, &password, record)
-                        .await
-                } else {
-                    state
-                        .image_storage
-                        .upload_bytes(&request.config, &password, bytes.clone())
-                        .await
-                }
-            }
-            Err(error) => Err(error),
-        };
-        match uploaded {
-            Ok(url) => remote_url = Some(url),
-            Err(error) if !request.config.stores_local() => return Err(error),
-            Err(error) => {
-                tracing::warn!(error = %error, "image WebDAV upload failed; falling back to local image")
-            }
-        }
-    } else if request.config.stores_webdav() && !request.config.stores_local() {
-        // Reserve capacity before spawning so slow WebDAV cannot retain unbounded image buffers.
-        match load_password(state).await {
-            Ok(password) => {
-                let permit = state
-                    .image_storage
-                    .upload_gate
-                    .clone()
-                    .acquire_owned()
-                    .await
-                    .map_err(|_| "图片上传服务已停止".to_string())?;
-                let storage = state.image_storage.clone();
-                let config = request.config.clone();
-                let upload_bytes = bytes.clone();
-                tokio::spawn(async move {
-                    if let Err(error) = storage
-                        .upload_bytes_with_permit(&config, &password, upload_bytes, permit)
-                        .await
-                    {
-                        tracing::warn!(error = %error, "memory-only image WebDAV upload failed");
-                    }
-                });
-            }
-            Err(error) => {
-                tracing::warn!(error = %error, "WebDAV password unavailable; returning provider Base64")
-            }
-        }
-    }
-    if request.use_url {
-        let url = if let Some(remote) = remote_url {
-            remote
-        } else {
-            let record = saved
-                .as_ref()
-                .ok_or("WebDAV 未返回图片地址")?
-                .as_ref()
-                .map_err(|e| e.clone())?;
-            let base = request
-                .public_base
-                .as_deref()
-                .ok_or("返回本地 URL 前请配置图片公开站点地址或 AETHER_PUBLIC_BASE_URL")?;
-            super::webdav::joined_url(base, &format!("media/images/{}", record.path))?.to_string()
-        };
+    if crate::image_tasks::flow::is_async() {
+        let reference = super::task_results::persist(state, request, &bytes).await?;
         object.remove("b64_json");
-        object.insert("url".into(), Value::String(url));
-    } else {
-        if let Some(Err(error)) = saved {
-            tracing::warn!(error = %error, "image persistence failed; returning provider Base64");
-        }
         object.remove("url");
+        object.insert("$image_ref".into(), reference);
+        return Ok(());
+    }
+    let reference = super::task_results::persist(state, request, &bytes).await?;
+    object.remove("url");
+    object.remove("b64_json");
+    if request.use_url {
+        object.insert("url".into(), reference["url"].clone());
+    } else {
         object.insert(
             "b64_json".into(),
-            Value::String(base64::engine::general_purpose::STANDARD.encode(bytes)),
+            json!(base64::engine::general_purpose::STANDARD.encode(&bytes)),
         );
     }
+
     Ok(())
 }
 fn transform_sse(
@@ -438,17 +400,20 @@ fn transform_sse(
 ) -> Response<Body> {
     let (mut parts, body) = response.into_parts();
     strip_changed_headers(&mut parts.headers);
+    let flow = crate::image_tasks::flow::current();
+    let mut delivery = crate::image_tasks::flow::DeliveryGuard::new(&state);
     let stream: std::pin::Pin<
         Box<dyn futures_util::Stream<Item = Result<Bytes, std::io::Error>> + Send>,
     > = Box::pin(async_stream::try_stream! {
         let mut source = body.into_data_stream(); let mut buffer = Vec::new();
+        let mut outcome = StreamOutcome::default();
         while let Some(chunk) = source.next().await {
             let chunk = chunk.map_err(std::io::Error::other)?;
             if buffer.len() + chunk.len() > MAX_BODY_BYTES { Err(std::io::Error::other("Image SSE frame too large"))?; }
             buffer.extend_from_slice(&chunk);
             while let Some((position, delimiter)) = sse_delimiter(&buffer) {
                 let frame: Vec<_> = buffer.drain(..position + delimiter).collect();
-                let processing = transform_frame(&state, &request, frame);
+                let processing = crate::image_tasks::flow::scope(flow.clone(),transform_frame(&state, &request, frame, &mut outcome));
                 tokio::pin!(processing);
                 let processed = loop {
                     tokio::select! {
@@ -459,6 +424,7 @@ fn transform_sse(
                 match processed {
                     Ok(bytes) => yield Bytes::from(bytes),
                     Err(error) => {
+                        delivery.complete(false).await;
                         let payload = json!({"type":"error", "error":error_json(&error)["error"]});
                         yield Bytes::from(format!("event: error\ndata: {payload}\n\n"));
                         return;
@@ -466,7 +432,13 @@ fn transform_sse(
                 }
             }
         }
-        if !buffer.is_empty() { yield Bytes::from(transform_frame(&state, &request, buffer).await.map_err(std::io::Error::other)?); }
+        if !buffer.is_empty() { yield Bytes::from(crate::image_tasks::flow::scope(flow.clone(),transform_frame(&state, &request, buffer, &mut outcome)).await.map_err(std::io::Error::other)?); }
+        let succeeded = !outcome.failed && (outcome.image_ready || outcome.refused);
+        delivery.complete(succeeded).await;
+        if !succeeded && !outcome.failed {
+            let payload = error_json("Upstream image stream ended without a completed image");
+            yield Bytes::from(format!("event: error\ndata: {payload}\n\n"));
+        }
     });
     Response::from_parts(parts, Body::from_stream(stream))
 }
@@ -484,10 +456,31 @@ pub(crate) fn sse_delimiter(buffer: &[u8]) -> Option<(usize, usize)> {
         )
         .min_by_key(|(n, _)| *n)
 }
+#[derive(Default)]
+struct StreamOutcome {
+    image_ready: bool,
+    refused: bool,
+    failed: bool,
+}
+
+fn complete_images(value: &Value) -> bool {
+    let has_image = |v: &Value| {
+        ["url", "b64_json"]
+            .iter()
+            .any(|k| v[*k].as_str().is_some_and(|s| !s.is_empty()))
+            || v.get("$image_ref").is_some_and(Value::is_object)
+    };
+    has_image(value)
+        || value["data"]
+            .as_array()
+            .is_some_and(|items| !items.is_empty() && items.iter().all(has_image))
+}
+
 async fn transform_frame(
     state: &AppState,
     request: &ImageRequest,
     frame: Vec<u8>,
+    outcome: &mut StreamOutcome,
 ) -> Result<Vec<u8>, String> {
     let text = std::str::from_utf8(&frame).map_err(|_| "图片 SSE 编码错误".to_string())?;
     let data = text
@@ -501,6 +494,23 @@ async fn transform_frame(
     let event = text
         .lines()
         .find_map(|l| l.strip_prefix("event:").map(str::trim));
+    let kind = value
+        .get("type")
+        .and_then(Value::as_str)
+        .or(event)
+        .unwrap_or("");
+    if value.get("error").is_some_and(|v| !v.is_null())
+        || kind == "error"
+        || kind.ends_with(".failed")
+    {
+        outcome.failed = true;
+    }
+    if value["outcome"] == "content_refused"
+        && value["refusal"].as_str().is_some_and(|s| !s.is_empty())
+    {
+        outcome.refused = true;
+        crate::image_tasks::flow::content_refusal(value["refusal"].as_str().unwrap());
+    }
     if !matches!(
         value.get("type").and_then(Value::as_str).or(event),
         Some("image_generation.completed" | "image_edit.completed")
@@ -520,6 +530,7 @@ async fn transform_frame(
         }
     }
     transform_json(state, request, &mut value).await?;
+    outcome.image_ready |= complete_images(&value);
     let mut output = String::new();
     for line in text
         .lines()

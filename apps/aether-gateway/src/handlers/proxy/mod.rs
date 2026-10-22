@@ -1,3 +1,4 @@
+use axum::response::IntoResponse;
 mod body_buffer;
 mod local;
 mod websocket;
@@ -1030,30 +1031,80 @@ async fn build_sync_aware_affinity_forward_response(
     )
 }
 
-pub(crate) async fn proxy_request(
+pub(crate) fn proxy_request(
     State(state): State<AppState>,
     ConnectInfo(remote_addr): ConnectInfo<std::net::SocketAddr>,
     request: Request,
-) -> Result<Response<Body>, GatewayError> {
+) -> impl std::future::Future<Output = Result<Response<Body>, GatewayError>> + Send {
     let image_request = crate::image_storage::is_image_path(request.uri().path());
-    let slot = crate::image_storage::ImageRequestSlot::default();
     let mut request = request;
+    let slot = request
+        .extensions()
+        .get::<crate::image_storage::ImageRequestSlot>()
+        .cloned()
+        .unwrap_or_default();
     if image_request {
         request.extensions_mut().insert(slot.clone());
     }
-    let response = crate::request_lifecycle::run_request_with_usage(
-        state.usage_runtime.clone(),
-        Box::pin(proxy_request_inner(state.clone(), remote_addr, request)),
-    )
-    .await?;
-    if image_request {
-        crate::image_storage::transform_response(state, slot, response).await
+    let flow = if image_request {
+        Some(crate::image_tasks::flow::current().unwrap_or_default())
     } else {
-        Ok(response)
-    }
+        None
+    };
+    let usage_runtime = state.usage_runtime.clone();
+    let future = async move {
+        let execution = proxy_request_inner(state.clone(), remote_addr, request);
+        let response = match Box::pin(execution).await {
+            Ok(response) => response,
+            Err(error) => {
+                if let Some(flow) = crate::image_tasks::flow::current() {
+                    if !crate::image_tasks::flow::is_async() {
+                        Box::pin(flow.flush(&state, false)).await;
+                    }
+                }
+                return Err(error);
+            }
+        };
+        // A durable queue acknowledgement has no image yet and must stay HTTP 202.
+        if image_request && response.status() != http::StatusCode::ACCEPTED {
+            let transformed = Box::pin(crate::image_storage::transform_response(
+                state.clone(),
+                slot,
+                response,
+            ))
+            .await;
+            if let Some(flow) = crate::image_tasks::flow::current() {
+                let succeeded = transformed.as_ref().is_ok_and(|r| r.status().is_success());
+                if !crate::image_tasks::flow::is_async()
+                    && !transformed.as_ref().is_ok_and(|r| {
+                        r.headers()
+                            .get(http::header::CONTENT_TYPE)
+                            .and_then(|v| v.to_str().ok())
+                            .is_some_and(|v| v.contains("text/event-stream"))
+                    })
+                {
+                    Box::pin(flow.flush(&state, succeeded)).await;
+                }
+            }
+            transformed
+        } else {
+            Ok(response)
+        }
+    };
+    Box::pin(crate::request_lifecycle::run_request_with_usage(
+        usage_runtime,
+        Box::pin(crate::image_tasks::flow::scope(flow, future)),
+    ))
 }
 
-async fn proxy_request_inner(
+fn proxy_request_inner(
+    state: AppState,
+    remote_addr: std::net::SocketAddr,
+    request: Request,
+) -> impl std::future::Future<Output = Result<Response<Body>, GatewayError>> + Send {
+    Box::pin(proxy_request_body(state, remote_addr, request))
+}
+async fn proxy_request_body(
     state: AppState,
     remote_addr: std::net::SocketAddr,
     request: Request,
@@ -1786,6 +1837,36 @@ async fn proxy_request_inner(
         ));
     }
 
+    if crate::image_storage::is_image_path(parts.uri.path()) {
+        if let Some(body) = buffered_body.as_ref() {
+            let ct = parts
+                .headers
+                .get(http::header::CONTENT_TYPE)
+                .and_then(|v| v.to_str().ok())
+                .unwrap_or("application/json");
+            match crate::image_tasks::scheduling(body, ct) {
+                Ok((enabled, normalized)) => {
+                    if enabled {
+                        parts.extensions.insert(crate::image_tasks::Submission {
+                            original: normalized.clone(),
+                        });
+                    }
+                    buffered_body = Some(normalized);
+                    parts.headers.remove(http::header::CONTENT_LENGTH);
+                }
+                Err(message) => {
+                    return Ok((
+                        http::StatusCode::BAD_REQUEST,
+                        axum::Json(
+                            serde_json::json!({"error":{"code":"invalid_async","message":message}}),
+                        ),
+                    )
+                        .into_response())
+                }
+            }
+        }
+    }
+
     if let (Some(slot), Some(body)) = (
         parts
             .extensions
@@ -1834,6 +1915,12 @@ async fn proxy_request_inner(
         ));
     }
 
+    if parts.method == http::Method::GET {
+        if let Some(id) = parts.uri.path().strip_prefix("/v1/images/tasks/") {
+            return Box::pin(crate::image_tasks::query(&state, id, control_decision)).await;
+        }
+    }
+
     if let Some(buffered_body) = buffered_body.as_ref() {
         let auth_model_started_at = Instant::now();
         let model_rejection = request_model_local_rejection(
@@ -1860,6 +1947,20 @@ async fn proxy_request_inner(
                 &started_at,
                 request_permit.take(),
             ));
+        }
+    }
+
+    if let Some(submission) = parts.extensions.get::<crate::image_tasks::Submission>() {
+        if let Some(response) = crate::image_tasks::repeated_submission(
+            &state,
+            &parts.headers,
+            parts.uri.path(),
+            &submission.original,
+            control_decision,
+        )
+        .await?
+        {
+            return Ok(response);
         }
     }
 
@@ -1952,85 +2053,99 @@ async fn proxy_request_inner(
     }
 
     let plan_usage_started_at = Instant::now();
-    let plan_usage_event_id = uuid::Uuid::new_v4().to_string();
+    let plan_usage_event_id = if crate::image_tasks::flow::is_async() {
+        trace_id.clone()
+    } else {
+        uuid::Uuid::new_v4().to_string()
+    };
     let now_unix_ms = chrono::Utc::now().timestamp_millis().max(0) as u64;
-    let plan_usage_admission =
-        match crate::plan_usage_policy::check_and_acquire_http_plan_usage_policy(
-            &state,
-            control_decision,
-            &plan_usage_event_id,
-            now_unix_ms,
-        )
-        .await
+    let plan_usage_admission = match async {
+        if parts
+            .extensions
+            .get::<crate::image_tasks::Submission>()
+            .is_some()
         {
-            Ok(admission) => admission,
-            Err(crate::plan_usage_policy::PlanUsageAdmissionError::Rejected(rejection)) => {
-                let response = build_local_plan_usage_limited_response(
-                    &trace_id,
-                    control_decision,
-                    &rejection,
-                )?;
-                return Ok(finalize_gateway_response_with_context(
-                    &state,
-                    response,
-                    &remote_addr,
-                    &request_context,
-                    EXECUTION_PATH_LOCAL_RATE_LIMITED,
-                    &started_at,
-                    request_permit.take(),
-                ));
-            }
-            Err(crate::plan_usage_policy::PlanUsageAdmissionError::Runtime(
-                aether_runtime_state::RuntimeSemaphoreError::Saturated { limit, .. },
-            )) => {
-                let rejection = crate::plan_usage_policy::PlanUsagePolicyRejection {
-                    metric: "concurrency",
-                    limit: limit as f64,
-                    retry_after: 1,
-                    window: "concurrent",
-                };
-                let response = build_local_plan_usage_limited_response(
-                    &trace_id,
-                    control_decision,
-                    &rejection,
-                )?;
-                return Ok(finalize_gateway_response_with_context(
-                    &state,
-                    response,
-                    &remote_addr,
-                    &request_context,
-                    EXECUTION_PATH_LOCAL_RATE_LIMITED,
-                    &started_at,
-                    request_permit.take(),
-                ));
-            }
-            Err(crate::plan_usage_policy::PlanUsageAdmissionError::Runtime(
-                aether_runtime_state::RuntimeSemaphoreError::Unavailable { gate, limit, .. },
-            )) => {
-                let response = build_local_overloaded_response(
-                    &trace_id,
-                    control_decision,
-                    Some(request_context.request_path.as_str()),
-                    gate,
-                    limit,
-                )?;
-                return Ok(finalize_gateway_response_with_context(
-                    &state,
-                    response,
-                    &remote_addr,
-                    &request_context,
-                    EXECUTION_PATH_DISTRIBUTED_OVERLOADED,
-                    &started_at,
-                    request_permit.take(),
-                ));
-            }
-            Err(crate::plan_usage_policy::PlanUsageAdmissionError::Runtime(
-                aether_runtime_state::RuntimeSemaphoreError::InvalidConfiguration(message),
-            )) => return Err(GatewayError::Internal(message)),
-            Err(crate::plan_usage_policy::PlanUsageAdmissionError::Gateway(error)) => {
-                return Err(error)
-            }
-        };
+            crate::plan_usage_policy::check_http_plan_usage_policy_for_queue(
+                &state,
+                control_decision,
+                &plan_usage_event_id,
+                now_unix_ms,
+            )
+            .await
+        } else {
+            crate::plan_usage_policy::check_and_acquire_http_plan_usage_policy(
+                &state,
+                control_decision,
+                &plan_usage_event_id,
+                now_unix_ms,
+            )
+            .await
+        }
+    }
+    .await
+    {
+        Ok(admission) => admission,
+        Err(crate::plan_usage_policy::PlanUsageAdmissionError::Rejected(rejection)) => {
+            let response =
+                build_local_plan_usage_limited_response(&trace_id, control_decision, &rejection)?;
+            return Ok(finalize_gateway_response_with_context(
+                &state,
+                response,
+                &remote_addr,
+                &request_context,
+                EXECUTION_PATH_LOCAL_RATE_LIMITED,
+                &started_at,
+                request_permit.take(),
+            ));
+        }
+        Err(crate::plan_usage_policy::PlanUsageAdmissionError::Runtime(
+            aether_runtime_state::RuntimeSemaphoreError::Saturated { limit, .. },
+        )) => {
+            let rejection = crate::plan_usage_policy::PlanUsagePolicyRejection {
+                metric: "concurrency",
+                limit: limit as f64,
+                retry_after: 1,
+                window: "concurrent",
+            };
+            let response =
+                build_local_plan_usage_limited_response(&trace_id, control_decision, &rejection)?;
+            return Ok(finalize_gateway_response_with_context(
+                &state,
+                response,
+                &remote_addr,
+                &request_context,
+                EXECUTION_PATH_LOCAL_RATE_LIMITED,
+                &started_at,
+                request_permit.take(),
+            ));
+        }
+        Err(crate::plan_usage_policy::PlanUsageAdmissionError::Runtime(
+            aether_runtime_state::RuntimeSemaphoreError::Unavailable { gate, limit, .. },
+        )) => {
+            let response = build_local_overloaded_response(
+                &trace_id,
+                control_decision,
+                Some(request_context.request_path.as_str()),
+                gate,
+                limit,
+            )?;
+            return Ok(finalize_gateway_response_with_context(
+                &state,
+                response,
+                &remote_addr,
+                &request_context,
+                EXECUTION_PATH_DISTRIBUTED_OVERLOADED,
+                &started_at,
+                request_permit.take(),
+            ));
+        }
+        Err(crate::plan_usage_policy::PlanUsageAdmissionError::Runtime(
+            aether_runtime_state::RuntimeSemaphoreError::InvalidConfiguration(message),
+        )) => return Err(GatewayError::Internal(message)),
+        Err(crate::plan_usage_policy::PlanUsageAdmissionError::Gateway(error)) => {
+            return Err(error)
+        }
+    };
     let crate::plan_usage_policy::HttpPlanUsageAdmission {
         permit: plan_usage_permit,
         reservation_context,
@@ -2085,6 +2200,26 @@ async fn proxy_request_inner(
             &started_at,
             request_permit.take(),
         ));
+    }
+
+    if let Some(submission) = parts.extensions.get::<crate::image_tasks::Submission>() {
+        if let (Some(body), Some(slot)) = (
+            buffered_body.as_ref(),
+            parts
+                .extensions
+                .get::<crate::image_storage::ImageRequestSlot>(),
+        ) {
+            return Box::pin(crate::image_tasks::submit(
+                &state,
+                &parts.headers,
+                parts.uri.path(),
+                body,
+                &submission.original,
+                control_decision,
+                slot,
+            ))
+            .await;
+        }
     }
 
     if control_decision.is_none() {

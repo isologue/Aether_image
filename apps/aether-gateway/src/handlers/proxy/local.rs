@@ -30,7 +30,24 @@ pub(super) async fn maybe_build_local_internal_proxy_response(
     .await
 }
 
-pub(super) async fn maybe_build_local_admin_proxy_response(
+pub(super) fn maybe_build_local_admin_proxy_response<'a>(
+    state: &'a AppState,
+    request_context: &'a GatewayPublicRequestContext,
+    remote_addr: &'a std::net::SocketAddr,
+    request_headers: &'a http::HeaderMap,
+    request_body: Option<&'a Bytes>,
+) -> impl std::future::Future<Output = Result<Option<Response<Body>>, GatewayError>> + Send + 'a {
+    // Allocate the large admin dispatcher outside the proxy future's poll frame.
+    Box::pin(maybe_build_local_admin_proxy_response_inner(
+        state,
+        request_context,
+        remote_addr,
+        request_headers,
+        request_body,
+    ))
+}
+
+async fn maybe_build_local_admin_proxy_response_inner(
     state: &AppState,
     request_context: &GatewayPublicRequestContext,
     remote_addr: &std::net::SocketAddr,

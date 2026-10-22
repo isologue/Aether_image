@@ -51,6 +51,11 @@ pub(crate) async fn reconcile_usage_policy_cost_for_event_with_result(
         return Ok(None);
     }
     let terminal_state = match event.event_type {
+        UsageEventType::Completed
+            if crate::record::content_refused(event.data.request_metadata.as_ref()) =>
+        {
+            UsagePolicyCostReservationState::Released
+        }
         UsageEventType::Completed => UsagePolicyCostReservationState::Finalized,
         UsageEventType::Cancelled
             if cancelled_request_fee_is_billable(event.data.request_metadata.as_ref()) =>
@@ -184,7 +189,8 @@ pub(crate) async fn settle_usage_with_reconciled_cost(
             usage.user_id.as_deref().and_then(non_empty_trimmed),
             usage_policy_reservation_token(usage),
         ) {
-            let (terminal_state, actual_cost_units) = if usage.status == "completed"
+            let (terminal_state, actual_cost_units) = if (usage.status == "completed"
+                && !crate::record::content_refused(usage.request_metadata.as_ref()))
                 || (usage.status == "cancelled"
                     && cancelled_request_fee_is_billable(usage.request_metadata.as_ref()))
             {

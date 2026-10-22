@@ -330,6 +330,13 @@
           </template>
         </div>
 
+        <p
+          v-if="isColumnVisible('is_async')"
+          class="mt-1 text-[10px] leading-3.5 text-muted-foreground"
+        >
+          是否异步：<span data-usage-async>{{ record.is_async ? '是' : '否' }}</span>
+        </p>
+
         <!-- 用户与上游提供商信息 -->
         <div
           v-if="isAdmin"
@@ -559,6 +566,12 @@
               />
             </template>
           </SortableTableHead>
+          <TableHead
+            v-if="isColumnVisible('is_async')"
+            class="h-12 font-semibold text-center"
+          >
+            是否异步
+          </TableHead>
           <TableHead
             v-if="isColumnVisible('tokens')"
             class="h-12 font-semibold w-[10%] text-center"
@@ -844,6 +857,18 @@
             </Badge>
           </TableCell>
           <TableCell
+            v-if="isColumnVisible('is_async')"
+            class="py-4 text-center align-top"
+          >
+            <Badge
+              :variant="record.is_async ? 'secondary' : 'outline'"
+              class="text-xs"
+              data-usage-async
+            >
+              {{ record.is_async ? '是' : '否' }}
+            </Badge>
+          </TableCell>
+          <TableCell
             v-if="isColumnVisible('tokens')"
             class="py-4 w-[10%]"
           >
@@ -1071,6 +1096,7 @@ type UsageRecordColumnId =
   | 'provider'
   | 'api_format'
   | 'status'
+  | 'is_async'
   | 'tokens'
   | 'cost'
   | 'performance'
@@ -1140,6 +1166,7 @@ const USAGE_RECORD_COLUMN_OPTIONS: UsageRecordColumnOption[] = [
   { id: 'provider', label: '提供商', adminOnly: true },
   { id: 'api_format', label: 'API格式' },
   { id: 'status', label: '类型/状态' },
+  { id: 'is_async', label: '是否异步' },
   { id: 'tokens', label: 'Tokens' },
   { id: 'cost', label: '费用' },
   { id: 'performance', label: '耗时/速度' },
@@ -1155,6 +1182,7 @@ const DEFAULT_ADMIN_COLUMNS: UsageRecordColumnId[] = [
   'provider',
   'api_format',
   'status',
+  'is_async',
   'tokens',
   'cost',
   'performance',
@@ -1166,6 +1194,7 @@ const DEFAULT_USER_COLUMNS: UsageRecordColumnId[] = [
   'model',
   'api_format',
   'status',
+  'is_async',
   'tokens',
   'cost',
   'performance',
@@ -1185,6 +1214,20 @@ const userVisibleColumnIds = useLocalStorage<UsageRecordColumnId[]>(
   'usage-records-visible-columns-user',
   DEFAULT_USER_COLUMNS,
 )
+
+// Migrate saved layouts once; subsequent manual hiding remains respected.
+const asyncColumnMigrated = useLocalStorage('usage-records-async-column-v1', false)
+if (!asyncColumnMigrated.value) {
+  for (const columns of [adminVisibleColumnIds, userVisibleColumnIds]) {
+    if (!columns.value.includes('is_async')) {
+      const updated = [...columns.value]
+      const tokensIndex = updated.indexOf('tokens')
+      updated.splice(tokensIndex < 0 ? updated.length : tokensIndex, 0, 'is_async')
+      columns.value = updated
+    }
+  }
+  asyncColumnMigrated.value = true
+}
 
 const roleColumnOptions = computed(() => USAGE_RECORD_COLUMN_OPTIONS.filter((column) => {
   if (column.adminOnly && !props.isAdmin) return false
@@ -1206,8 +1249,6 @@ function sanitizeColumnIds(
     return true
   })
   if (sanitized.length === 0) return [...fallback]
-  // Add newly introduced feature column to existing saved layouts, keeping it
-  // immediately before Tokens as the default presentation order.
   return sanitized
 }
 
@@ -1237,6 +1278,7 @@ const desktopColumnWidths: Record<UsageRecordColumnId, number> = {
   provider: 176,
   api_format: 160,
   status: 100,
+  is_async: 88,
   tokens: 132,
   cost: 96,
   performance: 176,

@@ -149,6 +149,7 @@ export interface AsyncTaskStatsResponse {
 }
 
 export interface AsyncTaskQueryParams {
+  task_id?: string
   status?: AsyncTaskStatus
   kind?: AsyncTaskKind
   task_type?: AsyncTaskType
@@ -174,6 +175,7 @@ export const asyncTasksApi = {
     if (params.kind) searchParams.append('kind', params.kind)
     if (params.task_type && params.task_type !== 'video') searchParams.append('kind', params.task_type)
     if (params.task_key) searchParams.append('task_key', params.task_key)
+    if (params.task_id) searchParams.append('task_id', params.task_id)
     if (params.trigger) searchParams.append('trigger', params.trigger)
     if (params.page) searchParams.append('page', params.page.toString())
     if (params.page_size) searchParams.append('page_size', params.page_size.toString())

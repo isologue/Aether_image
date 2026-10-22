@@ -399,6 +399,13 @@ pub struct StoredUsageSettlement {
 
 #[async_trait]
 pub trait SettlementWriteRepository: Send + Sync {
+    /// Checks current request allowances without inserting or extending an admission.
+    /// Execution must reserve again; this snapshot does not guarantee a future slot.
+    async fn check_usage_policy_request(
+        &self,
+        input: ReserveUsagePolicyRequestInput,
+    ) -> Result<ReserveUsagePolicyRequestOutcome, crate::DataLayerError>;
+
     async fn reserve_usage_policy_request(
         &self,
         input: ReserveUsagePolicyRequestInput,

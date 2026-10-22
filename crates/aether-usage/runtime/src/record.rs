@@ -44,6 +44,10 @@ pub fn build_upsert_usage_record_from_event(
         }
     };
     let mut data = event.data.clone();
+    if content_refused(data.request_metadata.as_ref()) {
+        data.total_cost_usd = Some(0.0);
+        data.actual_total_cost_usd = Some(0.0);
+    }
     if usage_is_explicitly_unavailable(data.request_metadata.as_ref()) {
         clear_unavailable_usage_fields(&mut data);
     } else if usage_pricing_is_explicitly_unavailable(data.request_metadata.as_ref()) {
@@ -217,6 +221,13 @@ fn clear_unavailable_pricing_fields(data: &mut crate::UsageEventData) {
     data.actual_total_cost_usd = None;
 }
 
+pub(crate) fn content_refused(metadata: Option<&serde_json::Value>) -> bool {
+    metadata
+        .and_then(|v| v.get("response_outcome"))
+        .and_then(serde_json::Value::as_str)
+        == Some("content_refused")
+}
+
 fn lifecycle_status_and_billing(
     event_type: UsageEventType,
     request_metadata: Option<&serde_json::Value>,
@@ -225,7 +236,8 @@ fn lifecycle_status_and_billing(
         UsageEventType::Pending => ("pending", "pending"),
         UsageEventType::Streaming => ("streaming", "pending"),
         UsageEventType::Completed
-            if usage_is_explicitly_unavailable(request_metadata)
+            if content_refused(request_metadata)
+                || usage_is_explicitly_unavailable(request_metadata)
                 || usage_pricing_is_explicitly_unavailable(request_metadata) =>
         {
             ("completed", "void")

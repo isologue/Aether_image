@@ -287,7 +287,7 @@ async fn gateway_executes_codex_image_stream_via_local_decision_gate_after_oauth
                 });
                 let frames = concat!(
                     "{\"type\":\"headers\",\"payload\":{\"kind\":\"headers\",\"status_code\":200,\"headers\":{\"content-type\":\"application/json\"}}}\n",
-                    "{\"type\":\"data\",\"payload\":{\"kind\":\"data\",\"text\":\"{\\\"created\\\":1776991097,\\\"data\\\":[{\\\"b64_json\\\":\\\"aGVsbG8=\\\",\\\"revised_prompt\\\":\\\"水墨视觉海报\\\"}],\\\"usage\\\":{\\\"input_tokens\\\":11,\\\"output_tokens\\\":22,\\\"total_tokens\\\":33}}\"}}\n",
+                    "{\"type\":\"data\",\"payload\":{\"kind\":\"data\",\"text\":\"{\\\"created\\\":1776991097,\\\"data\\\":[{\\\"b64_json\\\":\\\"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGP4z8AAAAMBAQDJ/pLvAAAAAElFTkSuQmCC\\\",\\\"revised_prompt\\\":\\\"水墨视觉海报\\\"}],\\\"usage\\\":{\\\"input_tokens\\\":11,\\\"output_tokens\\\":22,\\\"total_tokens\\\":33}}\"}}\n",
                     "{\"type\":\"telemetry\",\"payload\":{\"kind\":\"telemetry\",\"telemetry\":{\"elapsed_ms\":41}}}\n",
                     "{\"type\":\"eof\",\"payload\":{\"kind\":\"eof\"}}\n"
                 );
@@ -375,7 +375,7 @@ async fn gateway_executes_codex_image_stream_via_local_decision_gate_after_oauth
     );
     assert!(response_text.contains("event: image_generation.completed"));
     assert!(response_text.contains("\"type\":\"image_generation.completed\""));
-    assert!(response_text.contains("\"b64_json\":\"aGVsbG8=\""));
+    assert!(response_text.contains("\"b64_json\":\"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGP4z8AAAAMBAQDJ/pLvAAAAAElFTkSuQmCC\""));
     assert!(response_text.contains("\"total_tokens\":33"));
     assert!(!response_text.contains("response.completed"));
 
@@ -645,7 +645,7 @@ async fn gateway_bridges_codex_image_sync_json_to_streaming_image_sse_impl() {
                 });
                 let frames = concat!(
                     "{\"type\":\"headers\",\"payload\":{\"kind\":\"headers\",\"status_code\":200,\"headers\":{\"content-type\":\"application/json\"}}}\n",
-                    "{\"type\":\"data\",\"payload\":{\"kind\":\"data\",\"text\":\"{\\\"created\\\":1776991097,\\\"data\\\":[{\\\"b64_json\\\":\\\"aGVsbG8=\\\"}],\\\"usage\\\":{\\\"total_tokens\\\":100,\\\"input_tokens\\\":50,\\\"output_tokens\\\":50,\\\"input_tokens_details\\\":{\\\"text_tokens\\\":10,\\\"image_tokens\\\":40}}}\"}}\n",
+                    "{\"type\":\"data\",\"payload\":{\"kind\":\"data\",\"text\":\"{\\\"created\\\":1776991097,\\\"data\\\":[{\\\"b64_json\\\":\\\"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGP4z8AAAAMBAQDJ/pLvAAAAAElFTkSuQmCC\\\"}],\\\"usage\\\":{\\\"total_tokens\\\":100,\\\"input_tokens\\\":50,\\\"output_tokens\\\":50,\\\"input_tokens_details\\\":{\\\"text_tokens\\\":10,\\\"image_tokens\\\":40}}}\"}}\n",
                     "{\"type\":\"telemetry\",\"payload\":{\"kind\":\"telemetry\",\"telemetry\":{\"elapsed_ms\":41}}}\n",
                     "{\"type\":\"eof\",\"payload\":{\"kind\":\"eof\"}}\n"
                 );
@@ -727,7 +727,7 @@ async fn gateway_bridges_codex_image_sync_json_to_streaming_image_sse_impl() {
     let response_text = response.text().await.expect("body should read");
     assert!(response_text.contains("event: image_generation.completed"));
     assert!(response_text.contains("\"type\":\"image_generation.completed\""));
-    assert!(response_text.contains("\"b64_json\":\"aGVsbG8=\""));
+    assert!(response_text.contains("\"b64_json\":\"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGP4z8AAAAMBAQDJ/pLvAAAAAElFTkSuQmCC\""));
     assert!(response_text.contains("\"total_tokens\":100"));
     assert!(!response_text.trim_start().starts_with('{'));
     assert!(!response_text.contains("\"created\": 1776991097"));
@@ -1047,7 +1047,7 @@ fn image_bridge_execution_runtime(
                     Some(capture_image_bridge_execution_plan(parts, payload));
                 let frames = concat!(
                     "{\"type\":\"headers\",\"payload\":{\"kind\":\"headers\",\"status_code\":200,\"headers\":{\"content-type\":\"text/event-stream\"}}}\n",
-                    "{\"type\":\"data\",\"payload\":{\"kind\":\"data\",\"text\":\"event: response.output_item.done\\ndata: {\\\"type\\\":\\\"response.output_item.done\\\",\\\"output_index\\\":0,\\\"item\\\":{\\\"id\\\":\\\"ig_bridge_123\\\",\\\"type\\\":\\\"image_generation_call\\\",\\\"result\\\":\\\"aGVsbG8=\\\",\\\"output_format\\\":\\\"png\\\"}}\\n\\n\"}}\n",
+                    "{\"type\":\"data\",\"payload\":{\"kind\":\"data\",\"text\":\"event: response.output_item.done\\ndata: {\\\"type\\\":\\\"response.output_item.done\\\",\\\"output_index\\\":0,\\\"item\\\":{\\\"id\\\":\\\"ig_bridge_123\\\",\\\"type\\\":\\\"image_generation_call\\\",\\\"result\\\":\\\"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGP4z8AAAAMBAQDJ/pLvAAAAAElFTkSuQmCC\\\",\\\"output_format\\\":\\\"png\\\"}}\\n\\n\"}}\n",
                     "{\"type\":\"data\",\"payload\":{\"kind\":\"data\",\"text\":\"event: response.completed\\ndata: {\\\"type\\\":\\\"response.completed\\\",\\\"response\\\":{\\\"id\\\":\\\"resp_bridge_123\\\",\\\"object\\\":\\\"response\\\",\\\"model\\\":\\\"gpt-image-2\\\",\\\"status\\\":\\\"completed\\\",\\\"output\\\":[]}}\\n\\n\"}}\n",
                     "{\"type\":\"eof\",\"payload\":{\"kind\":\"eof\"}}\n"
                 );

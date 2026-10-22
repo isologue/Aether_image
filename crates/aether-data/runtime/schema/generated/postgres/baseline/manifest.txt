@@ -12,3 +12,4 @@
 009_overview.sql
 010_dashboard.sql
 010_provider_expenses.sql
+011_image_tasks.sql

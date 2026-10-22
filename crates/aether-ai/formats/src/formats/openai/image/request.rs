@@ -143,12 +143,6 @@ pub fn build_chatgpt_web_image_request_body_with_resize_target(
             "ChatGPT-Web image proxy only supports OpenAI image requests with prompt, n=1, supported image inputs, and supported output options",
         )
     })?;
-    if request.tool.contains_key("input_image_mask") {
-        return Err(ChatGptWebImageRequestError::invalid_request(
-            "ChatGPT-Web image proxy does not support mask inputs",
-        ));
-    }
-
     let mut raw_fields = resolve_chatgpt_web_raw_image_fields(parts, body_json, body_base64)?;
     if let Some((width, height)) = resize_target {
         if width == 0 || height == 0 {
@@ -3280,7 +3274,7 @@ mod tests {
     }
 
     #[test]
-    fn chatgpt_web_rejects_file_id_and_mask_inputs() {
+    fn chatgpt_web_rejects_file_id_inputs() {
         let edit_parts = request_parts("/v1/images/edits", Some("application/json"));
 
         let file_id_err = build_chatgpt_web_image_request_body(
@@ -3293,8 +3287,12 @@ mod tests {
         )
         .expect_err("file_id should not be supported");
         assert!(file_id_err.message.contains("file_id"));
+    }
 
-        let mask_err = build_chatgpt_web_image_request_body(
+    #[test]
+    fn chatgpt_web_does_not_reject_mask_inputs_locally() {
+        let edit_parts = request_parts("/v1/images/edits", Some("application/json"));
+        let body = build_chatgpt_web_image_request_body(
             &edit_parts,
             &json!({
                 "prompt": "edit",
@@ -3303,7 +3301,8 @@ mod tests {
             }),
             None,
         )
-        .expect_err("mask should not be supported");
-        assert!(mask_err.message.contains("mask"));
+        .expect("mask inputs should not be rejected locally");
+        assert_eq!(body["operation"], "edit");
+        assert_eq!(body["images"], json!(["data:image/png;base64,aW1hZ2U="]));
     }
 }

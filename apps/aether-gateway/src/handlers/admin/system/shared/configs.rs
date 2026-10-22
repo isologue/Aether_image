@@ -133,6 +133,79 @@ pub(crate) async fn build_admin_system_config_detail_payload(
     ))
 }
 
+/// Validate both submitted values against the final effective policy.
+pub(crate) async fn validate_image_policy_entries(
+    state: &AdminAppState<'_>,
+    entries: &[(String, serde_json::Value, Option<String>)],
+) -> Result<Result<(), (http::StatusCode, serde_json::Value)>, GatewayError> {
+    let value_for = |key: &str| {
+        entries
+            .iter()
+            .rev()
+            .find(|(k, _, _)| k == key)
+            .map(|(_, v, _)| v.clone())
+    };
+    let storage = match value_for("image_storage") {
+        Some(v) => v,
+        None => state
+            .read_system_config_json_value("image_storage")
+            .await?
+            .unwrap_or_else(|| json!({})),
+    };
+    let config = match crate::image_storage::parse_config(storage) {
+        Ok(c) => c,
+        Err(_) => {
+            return Ok(Err((
+                http::StatusCode::BAD_REQUEST,
+                json!({"detail":"图片存储配置字段或类型错误"}),
+            )))
+        }
+    };
+    if let Err(message) = config.validate() {
+        return Ok(Err((
+            http::StatusCode::BAD_REQUEST,
+            json!({"detail":message}),
+        )));
+    }
+    let days = match value_for("async_task_retention_days") {
+        Some(v) => v,
+        None => state
+            .read_system_config_json_value("async_task_retention_days")
+            .await?
+            .unwrap_or(json!(30)),
+    };
+    let minimum = if config.cleanup_enabled {
+        config.retention_hours.div_ceil(24).max(1)
+    } else {
+        1
+    };
+    if !days.as_u64().is_some_and(|n| n >= minimum && n <= 36500) {
+        return Ok(Err((
+            http::StatusCode::BAD_REQUEST,
+            json!({"detail":format!("异步任务记录保留天数必须为 {minimum}–36500 的整数；不能低于图片保留时长折算天数")}),
+        )));
+    }
+    Ok(Ok(()))
+}
+pub(crate) async fn apply_image_policy_entries(
+    state: &AdminAppState<'_>,
+    entries: &[(String, serde_json::Value, Option<String>)],
+) -> Result<Result<(), (http::StatusCode, serde_json::Value)>, GatewayError> {
+    if let Err(e) = validate_image_policy_entries(state, entries).await? {
+        return Ok(Err(e));
+    }
+    match state.app().data.upsert_image_policy_entries(entries).await {
+        Ok(()) => {}
+        Err(aether_data::DataLayerError::InvalidInput(message)) => {
+            return Ok(Err((
+                http::StatusCode::BAD_REQUEST,
+                json!({"detail":message}),
+            )))
+        }
+        Err(error) => return Err(GatewayError::Internal(error.to_string())),
+    }
+    Ok(Ok(()))
+}
 pub(crate) async fn apply_admin_system_config_update(
     state: &AdminAppState<'_>,
     requested_key: &str,
@@ -148,6 +221,37 @@ pub(crate) async fn apply_admin_system_config_update(
     let mut value = update.value;
     let normalized_key = update.normalized_key;
     let description = update.description;
+    if normalized_key == "image_task_policy" {
+        let Some(object) = value.as_object().filter(|o| {
+            !o.is_empty()
+                && o.keys()
+                    .all(|k| matches!(k.as_str(), "image_storage" | "async_task_retention_days"))
+        }) else {
+            return Ok(Err((
+                http::StatusCode::BAD_REQUEST,
+                json!({"detail":"请提供图片存储和/或异步任务记录保留配置"}),
+            )));
+        };
+        let entries = object
+            .iter()
+            .map(|(k, v)| (k.clone(), v.clone(), None))
+            .collect::<Vec<_>>();
+        if let Err(e) = apply_image_policy_entries(state, &entries).await? {
+            return Ok(Err(e));
+        }
+        return Ok(Ok(
+            json!({"message":"图片与任务保留策略已保存","value":value}),
+        ));
+    }
+    if matches!(
+        normalized_key.as_str(),
+        "image_storage" | "async_task_retention_days"
+    ) {
+        let entries = [(normalized_key.clone(), value.clone(), description.clone())];
+        if let Err(e) = validate_image_policy_entries(state, &entries).await? {
+            return Ok(Err(e));
+        }
+    }
 
     if normalized_key == crate::image_generation::NO_ASSET_GRACE_KEY
         && crate::image_generation::parse_no_asset_grace_seconds(&value).is_none()
@@ -195,6 +299,27 @@ pub(crate) async fn apply_admin_system_config_update(
         return Ok(Err((
             http::StatusCode::BAD_REQUEST,
             json!({"detail":"推送结果由接收接口记录，不能手动修改"}),
+        )));
+    }
+    if normalized_key == crate::image_tasks::SETTINGS_KEY {
+        let config = serde_json::from_value::<crate::image_tasks::Settings>(value.clone());
+        let error = match config {
+            Ok(config) => config.validate().err(),
+            Err(e) => Some(e.to_string()),
+        };
+        if let Some(message) = error {
+            return Ok(Err((
+                http::StatusCode::BAD_REQUEST,
+                json!({"detail":message}),
+            )));
+        }
+    }
+    if normalized_key == crate::image_tasks::RETENTION_KEY
+        && !value.as_u64().is_some_and(|n| (1..=36500).contains(&n))
+    {
+        return Ok(Err((
+            http::StatusCode::BAD_REQUEST,
+            json!({"detail":"Async task retention must be 1-36500 whole days"}),
         )));
     }
     if normalized_key == crate::image_storage::CONFIG_KEY {

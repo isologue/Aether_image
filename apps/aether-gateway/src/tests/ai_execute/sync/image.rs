@@ -291,7 +291,7 @@ async fn gateway_converts_openai_image_sync_to_gemini_image_provider_impl() {
                                     "role": "model",
                                     "parts": [
                                         {"text": "revised kite prompt"},
-                                        {"inlineData": {"mimeType": "image/png", "data": "aGVsbG8="}}
+                                        {"inlineData": {"mimeType": "image/png", "data": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGP4z8AAAAMBAQDJ/pLvAAAAAElFTkSuQmCC"}}
                                     ]
                                 },
                                 "finishReason": "STOP"
@@ -358,7 +358,7 @@ async fn gateway_converts_openai_image_sync_to_gemini_image_provider_impl() {
     assert_eq!(response_status, StatusCode::OK, "{response_body}");
     let response_json: serde_json::Value =
         serde_json::from_str(&response_body).expect("body should parse");
-    assert_eq!(response_json["data"][0]["b64_json"], "aGVsbG8=");
+    assert_eq!(response_json["data"][0]["b64_json"], "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGP4z8AAAAMBAQDJ/pLvAAAAAElFTkSuQmCC");
     assert_eq!(
         response_json["data"][0]["revised_prompt"],
         "revised kite prompt"
@@ -631,7 +631,7 @@ async fn gateway_converts_gemini_image_sync_to_openai_image_provider_impl() {
                             },
                             "data": [{
                                 "revised_prompt": "converted gemini prompt",
-                                "b64_json": "aGVsbG8="
+                                "b64_json": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGP4z8AAAAMBAQDJ/pLvAAAAAElFTkSuQmCC"
                             }]
                         }
                     },
@@ -682,7 +682,7 @@ async fn gateway_converts_gemini_image_sync_to_openai_image_provider_impl() {
         .header(http::header::CONTENT_TYPE, "application/json")
         .header(TRACE_ID_HEADER, "trace-gemini-image-to-openai-123")
         .body(
-            "{\"generationConfig\":{\"responseModalities\":[\"TEXT\",\"IMAGE\"]},\"contents\":[{\"role\":\"user\",\"parts\":[{\"text\":\"Change the background\"},{\"inlineData\":{\"mimeType\":\"image/png\",\"data\":\"aGVsbG8=\"}}]}]}",
+            "{\"generationConfig\":{\"responseModalities\":[\"TEXT\",\"IMAGE\"]},\"contents\":[{\"role\":\"user\",\"parts\":[{\"text\":\"Change the background\"},{\"inlineData\":{\"mimeType\":\"image/png\",\"data\":\"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGP4z8AAAAMBAQDJ/pLvAAAAAElFTkSuQmCC\"}}]}]}",
         )
         .send()
         .await
@@ -704,7 +704,7 @@ async fn gateway_converts_gemini_image_sync_to_openai_image_provider_impl() {
     );
     assert_eq!(
         response_json["candidates"][0]["content"]["parts"][1]["inlineData"]["data"],
-        "aGVsbG8="
+        "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGP4z8AAAAMBAQDJ/pLvAAAAAElFTkSuQmCC"
     );
     assert_eq!(response_json["usageMetadata"]["promptTokenCount"], 3);
     assert_eq!(response_json["usageMetadata"]["candidatesTokenCount"], 4);
@@ -733,7 +733,7 @@ async fn gateway_converts_gemini_image_sync_to_openai_image_provider_impl() {
     );
     assert_eq!(
         seen_execution_runtime_request.images,
-        json!([{"image_url": "data:image/png;base64,aGVsbG8="}])
+        json!([{"image_url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGP4z8AAAAMBAQDJ/pLvAAAAAElFTkSuQmCC"}])
     );
     assert!(!seen_execution_runtime_request.has_legacy_image_field);
     assert!(!seen_execution_runtime_request.request_stream);
@@ -999,7 +999,7 @@ async fn gateway_executes_codex_image_sync_via_local_decision_gate_after_oauth_r
                     },
                     "body": {
                         "body_bytes_b64": base64::engine::general_purpose::STANDARD.encode(
-                            r#"{"created":1776839946,"data":[{"b64_json":"aGVsbG8=","revised_prompt":"水墨视觉海报"}],"usage":{"input_tokens":171,"output_tokens":1372,"total_tokens":1543}}"#
+                            r#"{"created":1776839946,"data":[{"b64_json":"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGP4z8AAAAMBAQDJ/pLvAAAAAElFTkSuQmCC","revised_prompt":"水墨视觉海报"}],"usage":{"input_tokens":171,"output_tokens":1372,"total_tokens":1543}}"#
                         )
                     },
                     "telemetry": {
@@ -1064,7 +1064,7 @@ async fn gateway_executes_codex_image_sync_via_local_decision_gate_after_oauth_r
     assert_eq!(response.status(), StatusCode::OK);
     let response_json: serde_json::Value = response.json().await.expect("body should parse");
     assert_eq!(response_json["created"], 1776839946);
-    assert_eq!(response_json["data"][0]["b64_json"], "aGVsbG8=");
+    assert_eq!(response_json["data"][0]["b64_json"], "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGP4z8AAAAMBAQDJ/pLvAAAAAElFTkSuQmCC");
     assert_eq!(response_json["data"][0]["revised_prompt"], "水墨视觉海报");
     assert_eq!(response_json["usage"]["input_tokens"], 171);
     assert_eq!(response_json["usage"]["output_tokens"], 1372);
@@ -1447,7 +1447,7 @@ async fn run_chatgpt_web_image_plan_scenario(resize_enabled: bool, refused: bool
                             format!("data: {}\n\ndata: {}\n\ndata: [DONE]\n\n",
                                 json!({"type":"response.output_item.done", "output_index":0,
                                     "item":{"id":"ig_chatgpt_web_123", "type":"image_generation_call",
-                                    "output_format":"png", "result": if resize_enabled { PNG } else { "aGVsbG8=" }}}),
+                                    "output_format":"png", "result": if resize_enabled { PNG } else { "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGP4z8AAAAMBAQDJ/pLvAAAAAElFTkSuQmCC" }}}),
                                 json!({"type":"response.completed", "response":{"id":"resp_chatgpt_web_123",
                                     "object":"response", "model":"gpt-image-2", "status":"completed", "output":[]}}))
                             }
@@ -1545,7 +1545,7 @@ async fn run_chatgpt_web_image_plan_scenario(resize_enabled: bool, refused: bool
         assert_eq!(u32::from_be_bytes(bytes[16..20].try_into().unwrap()), 2048);
         assert_eq!(u32::from_be_bytes(bytes[20..24].try_into().unwrap()), 1024);
     } else {
-        assert_eq!(response_json["data"][0]["b64_json"], "aGVsbG8=");
+        assert_eq!(response_json["data"][0]["b64_json"], "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGP4z8AAAAMBAQDJ/pLvAAAAAElFTkSuQmCC");
     }
 
     let seen_execution_runtime_request = seen_execution_runtime

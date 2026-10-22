@@ -186,9 +186,33 @@ afterEach(() => {
     root.remove()
   }
   vi.useRealTimers()
+  localStorage.clear()
 })
 
 describe('UsageRecordsTable', () => {
+  it.each([true, false])('shows async and sync labels in desktop and mobile (admin=%s)', (isAdmin) => {
+    const root = mountUsageRecordsTable([
+      buildRecord({ id: 'async', is_async: true }),
+      buildRecord({ id: 'sync', is_async: false, is_stream: true }),
+    ], { isAdmin })
+    expect([...root.querySelectorAll('[data-usage-async]')].map(el => el.textContent?.trim()))
+      .toEqual(['是', '否', '是', '否'])
+    expect([...root.querySelectorAll('th')].some(el => el.textContent?.trim() === '是否异步')).toBe(true)
+  })
+
+  it('adds the async column once to saved layouts and respects hiding it afterwards', async () => {
+    localStorage.setItem('usage-records-visible-columns-admin', JSON.stringify(['model', 'tokens']))
+    const root = mountUsageRecordsTable([buildRecord({ is_async: true })])
+    await nextTick()
+    expect(root.querySelectorAll('[data-usage-async]')).toHaveLength(2)
+    expect(JSON.parse(localStorage.getItem('usage-records-visible-columns-admin')!))
+      .toEqual(['model', 'is_async', 'tokens'])
+    // Simulate the saved selection after the user hides the new column.
+    localStorage.setItem('usage-records-visible-columns-admin', JSON.stringify(['model', 'tokens']))
+    const remounted = mountUsageRecordsTable([buildRecord({ is_async: true })])
+    expect(remounted.querySelector('[data-usage-async]')).toBeNull()
+  })
+
   it.each([
     [{ routing_group_name: '生产策略', routing_group_id: 'group-1' }, '生产策略'],
     [{ routing_group_name: ' ', routing_group_id: 'group-history' }, 'group-history'],

@@ -16,6 +16,7 @@ export interface UsageRecord {
   provider_name?: string
   model: string
   request_type?: string | null
+  is_async?: boolean
   requested_reasoning_effort?: string | null
   reasoning_effort?: string | null
   service_tier?: string | null
@@ -615,6 +616,7 @@ export const usageApi = {
   ): Promise<{
     requests: Array<{
       id: string
+      is_async?: boolean
       status: 'pending' | 'streaming' | 'completed' | 'failed' | 'cancelled'
       input_tokens: number
       effective_input_tokens?: number | null
@@ -696,6 +698,7 @@ export const usageApi = {
     const response = await apiClient.get<{
     requests: Array<{
       id: string
+      is_async?: boolean
       status: 'pending' | 'streaming' | 'completed' | 'failed' | 'cancelled'
       input_tokens: number
       effective_input_tokens?: number | null

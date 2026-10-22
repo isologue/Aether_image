@@ -16,6 +16,7 @@ aether-vscodex/vscode-extension/node_modules/
 aether-vscodex/vscode-extension/dist/
 
 # Development
+.codex-*
 .git/
 .gitignore
 .github/

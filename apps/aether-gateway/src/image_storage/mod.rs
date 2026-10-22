@@ -10,8 +10,11 @@ mod webdav;
 
 pub(crate) use admin::admin_response;
 pub(crate) use config::{parse_config, ImageConfig, CONFIG_KEY, PASSWORD_KEY};
+pub(crate) use response::ImageRequest;
 pub(crate) use response::{is_image_path, transform_response, ImageRequestSlot};
-pub(crate) use storage::ImageStorage;
+pub(crate) use storage::{atomic_write, ImageStorage};
+mod task_results;
+pub(crate) use task_results::{read_task_result, ResultReadError};
 
 pub(crate) fn spawn_worker(state: crate::AppState) -> tokio::task::JoinHandle<()> {
     // Per-node storage: a distributed singleton would leave other nodes' files unmaintained.
@@ -28,6 +31,7 @@ async fn maintenance_tick(state: &crate::AppState) -> Result<(), String> {
     let config = config::load_config(state)
         .await
         .map_err(|_| "读取图片维护配置失败".to_string())?;
+    crate::image_tasks::maintain_inputs(state).await?;
     let storage = &state.image_storage;
     let index = storage.index().await?;
     if config.cleanup_enabled {

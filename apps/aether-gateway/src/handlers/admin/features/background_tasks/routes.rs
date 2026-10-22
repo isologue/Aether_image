@@ -79,6 +79,7 @@ pub(super) async fn maybe_build_local_admin_background_tasks_response(
             let offset = (page - 1).saturating_mul(page_size);
             let response = state
                 .list_background_task_runs(&BackgroundTaskListQuery {
+                    task_id_substring: query_param_value(query, "task_id"),
                     task_key_substring,
                     kind,
                     status,

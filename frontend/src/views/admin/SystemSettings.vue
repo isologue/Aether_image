@@ -122,9 +122,12 @@
           />
 
           <!-- 请求记录清理策略 -->
+          <ImageAsyncSection />
           <CleanupPolicySection
             id="section-cleanup"
             :enable-auto-cleanup="systemConfig.enable_auto_cleanup"
+            :async-task-retention-days="systemConfig.async_task_retention_days"
+            @update:async-task-retention-days="systemConfig.async_task_retention_days = $event"
             :detail-log-retention-days="systemConfig.detail_log_retention_days"
             :compressed-log-retention-days="systemConfig.compressed_log_retention_days"
             :header-retention-days="systemConfig.header_retention_days"
@@ -266,6 +269,7 @@ import SiteInfoSection from './system-settings/SiteInfoSection.vue'
 import DataManagementSection from './system-settings/DataManagementSection.vue'
 import ProxyConfigSection from './system-settings/ProxyConfigSection.vue'
 import ImageStorageSection from './system-settings/ImageStorageSection.vue'
+import ImageAsyncSection from './system-settings/ImageAsyncSection.vue'
 import ImageGenerationSection from './system-settings/ImageGenerationSection.vue'
 import BasicConfigSection from './system-settings/BasicConfigSection.vue'
 import RequestLogSection from './system-settings/RequestLogSection.vue'

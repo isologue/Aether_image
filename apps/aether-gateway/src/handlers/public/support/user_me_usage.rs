@@ -595,6 +595,7 @@ fn build_users_me_usage_record_payload(
         "response_time_ms": item.response_time_ms,
         "first_byte_time_ms": item.first_byte_time_ms,
         "is_stream": item.is_stream,
+        "is_async": item.is_async(),
         "is_websocket": item.is_websocket(),
         "websocket_transport": item.websocket_transport(),
         "usage_available": item.usage_available(),
@@ -633,6 +634,13 @@ fn build_users_me_usage_record_payload(
         ),
     });
     payload["end_to_end_time_ms"] = json!(users_me_usage_metadata_u64(item, "end_to_end_time_ms"));
+    payload["billing_status"] = json!(item.billing_status);
+    payload["refund"] = item
+        .request_metadata
+        .as_ref()
+        .and_then(|m| m.get("refund"))
+        .cloned()
+        .unwrap_or(Value::Null);
     payload["response_outcome"] = json!(users_me_usage_metadata_string(item, "response_outcome"));
     payload["content_refusal_reason"] = json!(users_me_usage_metadata_string(
         item,
@@ -698,6 +706,7 @@ fn build_users_me_usage_active_payload(item: &StoredRequestUsageAudit) -> serde_
         "api_format": item.api_format,
         "endpoint_api_format": item.endpoint_api_format,
         "is_stream": item.is_stream,
+        "is_async": item.is_async(),
         "is_websocket": item.is_websocket(),
         "websocket_transport": item.websocket_transport(),
         "usage_available": item.usage_available(),
@@ -716,6 +725,13 @@ fn build_users_me_usage_active_payload(item: &StoredRequestUsageAudit) -> serde_
         "has_fallback": item.has_fallback(),
         "chat_pii_redaction": users_me_usage_chat_pii_redacted(item),
     });
+    payload["billing_status"] = json!(item.billing_status);
+    payload["refund"] = item
+        .request_metadata
+        .as_ref()
+        .and_then(|m| m.get("refund"))
+        .cloned()
+        .unwrap_or(Value::Null);
     payload["response_outcome"] = json!(users_me_usage_metadata_string(item, "response_outcome"));
     payload["content_refusal_reason"] = json!(users_me_usage_metadata_string(
         item,

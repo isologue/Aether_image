@@ -201,6 +201,8 @@ export class RequestBodyProtocolError extends Error {
 }
 
 export interface RequestDetail {
+  billing_status?: string
+  refund?: import('./usageRecords').UsageRecord['refund']
   id: string // UUID
   request_id: string
   user: {

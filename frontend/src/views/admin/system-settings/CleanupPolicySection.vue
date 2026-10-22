@@ -43,6 +43,11 @@
     </template>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div>
+        <Label for="async-retention">异步任务记录保留天数</Label>
+        <Input id="async-retention" :model-value="asyncTaskRetentionDays" type="number" min="1" max="36500" step="1" class="mt-1" @update:model-value="$emit('update:asyncTaskRetentionDays', Number($event))" />
+        <p class="mt-1 text-xs text-muted-foreground">统一清理已完成结算的图片、视频任务记录。至少覆盖图片自动清理的保留时长；不删除图片和使用记录。</p>
+      </div>
+      <div>
         <Label
           for="detail-log-retention-days"
           class="block text-sm font-medium"
@@ -415,6 +420,7 @@ import { useToast } from '@/composables/useToast'
 
 defineProps<{
   enableAutoCleanup: boolean
+  asyncTaskRetentionDays: number
   detailLogRetentionDays: number
   compressedLogRetentionDays: number
   headerRetentionDays: number
@@ -433,6 +439,7 @@ defineProps<{
 defineEmits<{
   save: []
   toggleAutoCleanup: [enabled: boolean]
+  'update:asyncTaskRetentionDays': [value: number]
   'update:detailLogRetentionDays': [value: number]
   'update:compressedLogRetentionDays': [value: number]
   'update:headerRetentionDays': [value: number]

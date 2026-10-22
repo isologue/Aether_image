@@ -1375,6 +1375,16 @@ impl GatewayDataState {
         }
     }
 
+    pub(crate) async fn check_usage_policy_request(
+        &self,
+        input: ReserveUsagePolicyRequestInput,
+    ) -> Result<Option<ReserveUsagePolicyRequestOutcome>, DataLayerError> {
+        match &self.settlement_writer {
+            Some(repository) => repository.check_usage_policy_request(input).await.map(Some),
+            None => Ok(None),
+        }
+    }
+
     pub(crate) async fn reserve_usage_policy_request(
         &self,
         input: ReserveUsagePolicyRequestInput,

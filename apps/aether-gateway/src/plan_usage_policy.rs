@@ -882,6 +882,142 @@ pub(crate) async fn check_and_acquire_http_plan_usage_policy(
     })
 }
 
+/// Queue admission reads current allowances without acquiring slots or writing
+/// admissions. Execution must reserve again against its own admission timestamp.
+pub(crate) async fn check_http_plan_usage_policy_for_queue(
+    state: &AppState,
+    decision: Option<&GatewayControlDecision>,
+    event_id: &str,
+    now_unix_ms: u64,
+) -> Result<HttpPlanUsageAdmission, PlanUsageAdmissionError> {
+    if let Some(auth) = decision
+        .filter(|d| d.route_class.as_deref() == Some("ai_public"))
+        .and_then(|d| d.auth_context.as_ref())
+        .filter(|a| !a.admin_bypass_limits && !a.api_key_is_standalone)
+    {
+        let now = now_unix_ms / 1_000;
+        let policy = load_effective_policy(state, &auth.user_id, now).await?;
+        let rules = policy
+            .request_rules
+            .iter()
+            .filter(request_rule_uses_runtime_state)
+            .map(|r| runtime_request_rule(&auth.user_id, r, now))
+            .collect::<Result<Vec<_>, _>>()?;
+        let inputs = rules
+            .iter()
+            .map(|r| UsageLimitRule {
+                key: &r.key,
+                limit: r.limit,
+                window_seconds: r.window_seconds,
+                retention_seconds: r.retention_seconds,
+            })
+            .collect::<Vec<_>>();
+        if let UsageLimitCheck::Rejected {
+            rule_index,
+            limit,
+            retry_after,
+        } = state
+            .runtime_state
+            .check_usage_limits(UsageLimitInput {
+                rules: &inputs,
+                event_id,
+                now_unix_ms,
+            })
+            .await
+            .map_err(|e| GatewayError::Internal(e.to_string()))?
+        {
+            let rule = rules.get(rule_index).ok_or_else(|| {
+                GatewayError::Internal("usage policy runtime returned an invalid rule index".into())
+            })?;
+            return Err(PlanUsageAdmissionError::Rejected(
+                PlanUsagePolicyRejection {
+                    metric: "request_count",
+                    limit: limit as f64,
+                    retry_after: retry_after.min(rule.retry_after).max(1),
+                    window: rule.window,
+                },
+            ));
+        }
+        let durable_rules = policy
+            .request_rules
+            .iter()
+            .filter(|r| !request_rule_uses_runtime_state(r))
+            .map(|r| durable_request_rule(r, now))
+            .collect::<Result<Vec<_>, _>>()?;
+        if !durable_rules.is_empty() {
+            let daily_exhausted = state
+                .find_user_daily_quota_availability_for_auth(&auth.user_id)
+                .await?
+                .is_some_and(|q| q.has_active_daily_quota && q.remaining_usd <= 0.000_000_01);
+            if daily_exhausted && wallet_fallback_available(state, auth, None).await? {
+                return Ok(HttpPlanUsageAdmission {
+                    permit: None,
+                    reservation_context: None,
+                });
+            }
+            let retain_until_unix_secs = durable_rules
+                .iter()
+                .map(|r| r.influence_ends_at_unix_secs)
+                .chain(std::iter::once(
+                    now.saturating_add(COST_RESERVATION_SAFE_HISTORY_SECS),
+                ))
+                .max()
+                .unwrap();
+            let outcome = state
+                .data
+                .check_usage_policy_request(ReserveUsagePolicyRequestInput {
+                    request_id: event_id.into(),
+                    subject_id: auth.user_id.clone(),
+                    event_token: event_id.into(),
+                    admitted_at_unix_secs: now,
+                    retain_until_unix_secs,
+                    windows: durable_rules.iter().map(|r| r.window.clone()).collect(),
+                })
+                .await
+                .map_err(|e| GatewayError::Internal(e.to_string()))?
+                .ok_or_else(|| {
+                    GatewayError::Internal(
+                        "long-window plan request limits require a settlement repository".into(),
+                    )
+                })?;
+            match outcome {
+                ReserveUsagePolicyRequestOutcome::Allowed => {}
+                ReserveUsagePolicyRequestOutcome::Rejected {
+                    window_index,
+                    limit_requests,
+                    ..
+                } => {
+                    if !wallet_fallback_available(state, auth, None).await? {
+                        let rule = durable_rules.get(window_index).ok_or_else(|| {
+                            GatewayError::Internal(
+                                "usage policy request ledger returned an invalid rule index".into(),
+                            )
+                        })?;
+                        return Err(PlanUsageAdmissionError::Rejected(
+                            PlanUsagePolicyRejection {
+                                metric: "request_count",
+                                limit: limit_requests as f64,
+                                retry_after: rule.retry_after,
+                                window: rule.label,
+                            },
+                        ));
+                    }
+                }
+                _ => {
+                    return Err(GatewayError::Internal(
+                        "invalid usage policy snapshot outcome".into(),
+                    )
+                    .into())
+                }
+            }
+        }
+    }
+    Ok(HttpPlanUsageAdmission {
+        permit: None,
+        reservation_context: None,
+    })
+}
+
 fn request_rule_uses_runtime_state(rule: &&EffectiveRequestRule) -> bool {
     matches!(rule.window, UsagePolicyWindow::Rolling { seconds } if seconds <= 60)
 }
@@ -1475,6 +1611,88 @@ mod tests {
                 {"metric":"concurrency","window":{"kind":"concurrent"},"limit":1}
             ]
         }]))], 2_000).unwrap()
+    }
+
+    #[tokio::test]
+    async fn queue_validation_is_read_only_and_ignores_execution_concurrency() {
+        let state = fallback_test_state(false, 20.0);
+        let auth = fallback_test_auth();
+        let mut policy = fallback_test_policy(2);
+        for rule in &mut policy.request_rules {
+            rule.limit = 2;
+        }
+        state.auth_plan_usage_policy_cache.insert(
+            auth.user_id.clone(),
+            Some(policy.clone()),
+            POLICY_CACHE_TTL,
+        );
+        let mut decision = GatewayControlDecision::synthetic(
+            "/v1/images/generations",
+            Some("ai_public".into()),
+            Some("image".into()),
+            None,
+            Some("openai:image".into()),
+        );
+        decision.auth_context = Some(auth.clone());
+        let (first, _) = check_and_acquire_compiled_plan_usage_policy(
+            &state, &auth, &policy, "running", 2_000_000,
+        )
+        .await
+        .unwrap();
+        for id in ["queue-1", "queue-2"] {
+            let admission =
+                check_http_plan_usage_policy_for_queue(&state, Some(&decision), id, 2_000_001)
+                    .await
+                    .unwrap();
+            assert!(admission.permit.is_none());
+            assert!(admission.reservation_context.is_none());
+            assert!(
+                state
+                    .data
+                    .release_usage_policy_request_admission(
+                        ReleaseUsagePolicyRequestAdmissionInput {
+                            request_id: id.into(),
+                            subject_id: auth.user_id.clone(),
+                            event_token: id.into(),
+                            released_at_unix_secs: 2_000,
+                        }
+                    )
+                    .await
+                    .unwrap()
+                    .is_none(),
+                "queue probes must not leave admission tombstones"
+            );
+        }
+        assert!(matches!(
+            check_and_acquire_compiled_plan_usage_policy(
+                &state,
+                &auth,
+                &policy,
+                "concurrent",
+                2_000_002,
+            )
+            .await,
+            Err(PlanUsageAdmissionError::Runtime(
+                RuntimeSemaphoreError::Saturated { .. }
+            ))
+        ));
+        drop(first);
+        // Distributed permits release through a task scheduled by Drop.
+        tokio::task::yield_now().await;
+        let (second, _) = check_and_acquire_compiled_plan_usage_policy(
+            &state, &auth, &policy, "second", 2_000_003,
+        )
+        .await
+        .unwrap();
+        drop(second);
+        assert!(check_http_plan_usage_policy_for_queue(
+            &state,
+            Some(&decision),
+            "queue-over-quota",
+            2_000_004,
+        )
+        .await
+        .is_err());
     }
 
     #[tokio::test]

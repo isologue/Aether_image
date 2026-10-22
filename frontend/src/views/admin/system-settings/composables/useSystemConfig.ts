@@ -38,6 +38,7 @@ export interface SystemConfig {
   sensitive_headers: string[]
   // 请求记录清理
   enable_auto_cleanup: boolean
+  async_task_retention_days: number
   detail_log_retention_days: number
   compressed_log_retention_days: number
   header_retention_days: number
@@ -88,6 +89,7 @@ const CONFIG_KEYS = [
   'sensitive_headers',
   // 请求记录清理
   'enable_auto_cleanup',
+  'async_task_retention_days',
   'detail_log_retention_days',
   'compressed_log_retention_days',
   'header_retention_days',
@@ -140,6 +142,7 @@ function createDefaultConfig(): SystemConfig {
     sensitive_headers: ['authorization', 'x-api-key', 'api-key', 'cookie', 'set-cookie'],
     // 请求记录清理
     enable_auto_cleanup: true,
+    async_task_retention_days: 30,
     detail_log_retention_days: 7,
     compressed_log_retention_days: 30,
     header_retention_days: 90,
@@ -235,6 +238,7 @@ export function useSystemConfig() {
     if (systemConfigLoading.value) return false
     if (!originalConfig.value) return false
     return (
+      systemConfig.value.async_task_retention_days !== originalConfig.value.async_task_retention_days ||
       systemConfig.value.detail_log_retention_days !==
       originalConfig.value.detail_log_retention_days ||
       systemConfig.value.compressed_log_retention_days !==
@@ -586,7 +590,14 @@ export function useSystemConfig() {
   async function saveCleanupConfig() {
     cleanupConfigLoading.value = true
     try {
+      const days=systemConfig.value.async_task_retention_days
+      const storage=(await adminApi.getSystemConfig('image_storage')).value as { cleanup_enabled?: boolean; retention_hours?: number }
+      const min=storage?.cleanup_enabled ? Math.max(1,Math.ceil((storage.retention_hours ?? 168)/24)) : 1
+      if (!Number.isInteger(days) || days<min || days>36500) { error(`异步任务记录至少保留 ${min} 天，且必须为整数`); return }
       const configItems = [
+        {
+          key: 'async_task_retention_days', value: systemConfig.value.async_task_retention_days, description: 'Business async task retention days',
+        },
         {
           key: 'detail_log_retention_days',
           value: systemConfig.value.detail_log_retention_days,
@@ -650,6 +661,7 @@ export function useSystemConfig() {
         )
       )
       if (originalConfig.value) {
+        originalConfig.value.async_task_retention_days = systemConfig.value.async_task_retention_days
         originalConfig.value.detail_log_retention_days =
           systemConfig.value.detail_log_retention_days
         originalConfig.value.compressed_log_retention_days =

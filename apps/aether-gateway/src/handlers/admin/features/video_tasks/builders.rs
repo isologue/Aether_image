@@ -108,7 +108,8 @@ pub(super) fn build_admin_video_task_list_item(
         "error_message": admin_video_task_error_projection(task),
         "poll_count": task.poll_count,
         "max_poll_count": task.max_poll_count,
-        "created_at": admin_video_task_timestamp(Some(task.created_at_unix_ms)),
+        "created_at": chrono::DateTime::<Utc>::from_timestamp_millis(task.created_at_unix_ms as i64).map(|t|t.to_rfc3339_opts(SecondsFormat::Millis,true)),
+        "request_id": task.request_id,
         "completed_at": admin_video_task_timestamp(task.completed_at_unix_secs),
         "submitted_at": admin_video_task_timestamp(task.submitted_at_unix_secs),
     })

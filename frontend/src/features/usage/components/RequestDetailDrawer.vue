@@ -15,6 +15,11 @@
 
         <!-- 抽屉内容 -->
         <Card class="relative h-full w-full sm:w-[800px] sm:max-w-[90vw] rounded-none shadow-2xl flex flex-col">
+          <div v-if="detail?.refund" class="border-b bg-emerald-500/10 px-6 py-3 text-sm" data-refund-detail>
+            <strong>已退款</strong> · 原扣费 ${{ detail.refund.amount }} · 退款 ${{ detail.refund.amount }}
+            <div>时间：{{ new Date(detail.refund.refunded_at * 1000).toLocaleString() }} · 原因：{{ detail.refund.reason === 'image_task_failed' ? '图片任务最终失败' : detail.refund.reason }}</div>
+            <div v-if="detail.refund.transaction_id">关联钱包流水：{{ detail.refund.transaction_id }}</div>
+          </div>
           <!-- 固定头部 - 整合基本信息 -->
           <div class="sticky top-0 z-10 bg-background border-b px-3 sm:px-6 py-3 sm:py-4 flex-shrink-0">
             <!-- 第一行：标题、模型、状态、操作按钮 -->

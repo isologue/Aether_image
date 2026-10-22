@@ -11,6 +11,7 @@ mod candidates;
 mod error;
 mod gemini_file_mappings;
 mod global_models;
+mod image_tasks;
 mod lease;
 mod management_tokens;
 mod migrations;
@@ -67,3 +68,5 @@ pub use usage::{cleanup, SqlxUsageReadRepository};
 pub use users::SqlxUserReadRepository;
 pub use video_tasks::{SqlxVideoTaskReadRepository, SqlxVideoTaskRepository};
 pub use wallet::SqlxWalletRepository;
+
+pub use image_tasks::{ImageTaskAdmission, SqlxImageTaskRepository};

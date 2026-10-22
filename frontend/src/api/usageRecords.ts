@@ -45,11 +45,14 @@ export interface UsageRecord {
   routing_group_name?: string | null
   /** Captured customer charge. Null means unavailable and must not be recalculated. */
   billing_cost?: number | null
+  billing_status?: string
+  refund?: { amount: number; refunded_at: number; reason: string; task_id?: string; transaction_id?: string } | null
   response_time_ms?: number | null
   first_byte_time_ms?: number | null  // 首字时间 (TTFB)
   end_to_end_time_ms?: number | null  // 客户端从请求进入网关到完成的总耗时
   end_to_end_first_byte_time_ms?: number | null  // 客户端从请求进入网关到首字节的耗时
   is_stream: boolean
+  is_async?: boolean
   is_websocket?: boolean
   websocket_transport?: string | null
   usage_available?: boolean

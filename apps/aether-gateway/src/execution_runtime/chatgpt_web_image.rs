@@ -114,7 +114,7 @@ struct WebRequirement {
     so_token: Option<String>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 struct WebUploadMeta {
     file_id: String,
     library_file_id: Option<String>,
@@ -540,70 +540,98 @@ async fn execute_chatgpt_web_image_with_progress(
     let request = ChatGptWebImageRequest::from_body(body)?;
     let base_url = chatgpt_web_base_url_from_plan(plan);
     let token = bearer_token_from_headers(&plan.headers).unwrap_or_default();
-    let fp = WebFingerprint::new();
-
-    debug!(
-        event_name = "chatgpt_web_image_start",
-        log_type = "debug",
-        request_id = %plan.request_id,
-        candidate_id = ?plan.candidate_id,
-        upstream_origin = %crate::handlers::shared::security_log_url_origin(&base_url),
-        operation = %request.operation,
-        image_count = request.images.len(),
-        size = %request.size,
-        ratio = %request.ratio,
-        "gateway executing ChatGPT-Web image request"
-    );
-
-    progress.enter("bootstrap");
-    web_bootstrap(plan, &base_url, &fp).await?;
-    progress.enter("requirements");
-    let requirements = web_requirements(plan, &base_url, &fp, token.as_str()).await?;
-    let mut uploads = Vec::new();
-    for (index, image) in request.images.iter().enumerate() {
-        progress.enter("upload");
-        uploads.push(
-            web_upload_image(
-                state,
-                plan,
-                &base_url,
-                &fp,
-                token.as_str(),
-                image,
-                format!("image_{}.png", index + 1),
+    let recovery = crate::image_tasks::flow::recovery();
+    let (fp, uploads, mut summary) = if let Some(saved) =
+        recovery.as_ref().and_then(|v| v.get("upstream"))
+    {
+        let fp = WebFingerprint {
+            user_agent: CHATGPT_WEB_USER_AGENT,
+            device_id: saved["device_id"]
+                .as_str()
+                .ok_or_else(|| {
+                    ExecutionRuntimeTransportError::UpstreamRequest(
+                        "Missing recovered device ID".into(),
+                    )
+                })?
+                .into(),
+            session_id: saved["session_id"]
+                .as_str()
+                .ok_or_else(|| {
+                    ExecutionRuntimeTransportError::UpstreamRequest(
+                        "Missing recovered session ID".into(),
+                    )
+                })?
+                .into(),
+        };
+        let uploads: Vec<WebUploadMeta> = serde_json::from_value(saved["uploads"].clone())
+            .map_err(|e| ExecutionRuntimeTransportError::UpstreamRequest(e.to_string()))?;
+        let conversation = saved["conversation_id"].as_str().ok_or_else(|| {
+            ExecutionRuntimeTransportError::UpstreamRequest(
+                "Missing recovered conversation ID".into(),
             )
-            .await?,
-        );
+        })?;
+        progress.enter("recovery_poll");
+        let mut summary =
+            web_poll_conversation(plan, &base_url, &fp, token.as_str(), conversation, &uploads)
+                .await?;
+        summary.conversation_id = Some(conversation.to_owned());
+        (fp, uploads, summary)
+    } else {
+        let fp = WebFingerprint::new();
+        progress.enter("bootstrap");
+        web_bootstrap(plan, &base_url, &fp).await?;
+        progress.enter("requirements");
+        let requirements = web_requirements(plan, &base_url, &fp, token.as_str()).await?;
+        let mut uploads = Vec::new();
+        for (index, image) in request.images.iter().enumerate() {
+            progress.enter("upload");
+            uploads.push(
+                web_upload_image(
+                    state,
+                    plan,
+                    &base_url,
+                    &fp,
+                    token.as_str(),
+                    image,
+                    format!("image_{}.png", index + 1),
+                )
+                .await?,
+            );
+        }
+
+        progress.enter("prepare");
+        let conduit = web_prepare_conversation(
+            plan,
+            &base_url,
+            &fp,
+            token.as_str(),
+            &requirements,
+            request.web_model.as_str(),
+        )
+        .await?;
+        progress.enter("initial_response");
+        let mut summary = web_start_conversation(
+            plan,
+            &base_url,
+            &fp,
+            token.as_str(),
+            &requirements,
+            conduit.as_str(),
+            &request,
+            &uploads,
+        )
+        .await?;
+        filter_uploaded_asset_ids(&mut summary, &uploads);
+        progress.observe_summary("initial_response", &summary);
+        progress.enter("quota_update");
+        apply_chatgpt_web_image_quota_request_delta_after_conversation_start(state, plan).await;
+        spawn_chatgpt_web_image_quota_refresh_after_request(state, plan, &base_url, token.as_str());
+
+        (fp, uploads, summary)
+    };
+    if let Some(conversation) = summary.conversation_id.as_deref() {
+        crate::image_tasks::flow::checkpoint(state,json!({"conversation_id":conversation,"device_id":fp.device_id,"session_id":fp.session_id,"uploads":uploads})).await.map_err(ExecutionRuntimeTransportError::UpstreamRequest)?;
     }
-
-    progress.enter("prepare");
-    let conduit = web_prepare_conversation(
-        plan,
-        &base_url,
-        &fp,
-        token.as_str(),
-        &requirements,
-        request.web_model.as_str(),
-    )
-    .await?;
-    progress.enter("initial_response");
-    let mut summary = web_start_conversation(
-        plan,
-        &base_url,
-        &fp,
-        token.as_str(),
-        &requirements,
-        conduit.as_str(),
-        &request,
-        &uploads,
-    )
-    .await?;
-    filter_uploaded_asset_ids(&mut summary, &uploads);
-    progress.observe_summary("initial_response", &summary);
-    progress.enter("quota_update");
-    apply_chatgpt_web_image_quota_request_delta_after_conversation_start(state, plan).await;
-    spawn_chatgpt_web_image_quota_refresh_after_request(state, plan, &base_url, token.as_str());
-
     let mut downloaded = resolve_and_download_images(
         state,
         plan,
@@ -1750,16 +1778,15 @@ fn web_image_storage_origin_allows_benchmarking_fake_ip(url: &url::Url) -> bool 
         && url.password().is_none()
         && url
             .host_str()
-            .is_some_and(chatgpt_web_upload_host_is_allowed)
+            .is_some_and(web_storage_host_allows_benchmarking_fake_ip)
 }
 
 /// Validate the destination returned by ChatGPT's upload-metadata endpoint.
 ///
-/// The upload URL is provider-controlled data, not a trusted request target.
-/// Keep this boundary narrower than the generic execution URL policy: uploads
-/// must go to the storage origins used by ChatGPT, over HTTPS, without
-/// credentials or fragments.  Azure SAS query parameters are intentionally
-/// retained because they carry the upload authorization.
+/// Accept the provider-supplied hostname without a storage-domain allowlist.
+/// Uploads still require HTTPS without credentials or fragments, and the upload
+/// client validates and pins the resolved addresses. Azure SAS query parameters
+/// are retained because they carry the upload authorization.
 fn validate_chatgpt_web_upload_url(
     raw_url: &str,
 ) -> Result<url::Url, ExecutionRuntimeTransportError> {
@@ -1788,9 +1815,9 @@ fn validate_chatgpt_web_upload_url(
         ));
     }
     let host = url.host_str().unwrap_or_default();
-    if host.parse::<IpAddr>().is_ok() || !chatgpt_web_upload_host_is_allowed(host) {
+    if host.parse::<IpAddr>().is_ok() || !web_dns_host_is_valid(host) {
         return Err(ExecutionRuntimeTransportError::UpstreamRequest(
-            "ChatGPT-Web upload URL host is not an allowed storage origin".to_string(),
+            "ChatGPT-Web upload URL must use a valid DNS hostname".to_string(),
         ));
     }
     if url.path().len() > CHATGPT_WEB_IMAGE_MAX_UPLOAD_URL_BYTES
@@ -1805,7 +1832,7 @@ fn validate_chatgpt_web_upload_url(
     Ok(url)
 }
 
-fn chatgpt_web_upload_host_is_allowed(host: &str) -> bool {
+fn web_storage_host_allows_benchmarking_fake_ip(host: &str) -> bool {
     if !web_dns_host_is_valid(host) {
         return false;
     }
@@ -6214,13 +6241,17 @@ data: [DONE]
     }
 
     #[test]
-    fn chatgpt_web_upload_url_is_restricted_to_signed_storage_origins() {
+    fn chatgpt_web_upload_url_accepts_provider_hosts_without_domain_allowlist() {
         for accepted in [
             "https://files.oaiusercontent.com/upload/blob?sig=abc&se=123",
             "https://cdn.files.oaiusercontent.com/upload/blob?sig=abc",
             "https://oaidalleapiprodscus.blob.core.windows.net/container/blob?sig=abc",
             "https://tenant.blob.core.windows.net/container/blob?sig=abc",
             "https://tenant.blob.core.windows.net:443/container/blob?sig=abc",
+            "https://uploads.chatgpt.com/upload/blob?sig=abc",
+            "https://storage.example.com/upload/blob?sig=abc",
+            "https://blob.core.windows.net/upload/blob?sig=abc",
+            "https://openaiassets.blob.core.windows.net/upload/blob?sig=abc",
         ] {
             assert!(
                 validate_chatgpt_web_upload_url(accepted).is_ok(),
@@ -6232,10 +6263,8 @@ data: [DONE]
             "http://files.oaiusercontent.com/upload/blob?sig=abc",
             "https://127.0.0.1/upload/blob?sig=abc",
             "https://user:pass@files.oaiusercontent.com/upload/blob?sig=abc",
-            "https://files.oaiusercontent.com.attacker.invalid/upload/blob?sig=abc",
-            "https://attacker.invalid/upload/blob?sig=abc",
-            "https://blob.core.windows.net/upload/blob?sig=abc",
-            "https://openaiassets.blob.core.windows.net/upload/blob?sig=abc",
+            "https://[::1]/upload/blob?sig=abc",
+            "https://invalid_host.example/upload/blob?sig=abc",
             "https://tenant.blob.core.windows.net:8443/upload/blob?sig=abc",
             "https://tenant.blob.core.windows.net/upload/blob?sig=abc#fragment",
         ] {

@@ -2293,6 +2293,10 @@ impl AppState {
         }
 
         supervisor.supervise_handle(
+            "image_task_worker",
+            crate::image_tasks::spawn_worker(background_state.clone()),
+        );
+        supervisor.supervise_handle(
             "image_storage_maintenance",
             crate::image_storage::spawn_worker(background_state.clone()),
         );

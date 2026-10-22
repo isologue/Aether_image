@@ -2,7 +2,7 @@ import type { UsageRecord } from '@/api/usageRecords'
 
 export type UsageBillingSnapshot = Pick<
   UsageRecord,
-  'billing_multiplier' | 'billing_cost' | 'routing_group_id' | 'routing_group_name'
+  'billing_multiplier' | 'billing_cost' | 'billing_status' | 'refund' | 'routing_group_id' | 'routing_group_name'
 >
 
 function nonnegativeFinite(value: unknown): number | undefined {
@@ -11,6 +11,7 @@ function nonnegativeFinite(value: unknown): number | undefined {
 
 export function resolveUsageBilling(record: UsageBillingSnapshot & { cost: number, actual_cost?: number | null }) {
   const capturedMultiplier = nonnegativeFinite(record.billing_multiplier)
+  if (['refunded', 'void', 'insufficient_quota'].includes(record.billing_status ?? '')) return { multiplier: capturedMultiplier ?? 1, cost: 0 }
   const multiplier = capturedMultiplier ?? 1
 
   // A present billing_cost is authoritative, including null (for example when
@@ -53,6 +54,8 @@ export function mergeUsageBillingSnapshot(
     : undefined
 
   return {
+    billing_status: (acceptNext ? next.billing_status : undefined) ?? existing.billing_status,
+    refund: (acceptNext ? next.refund : undefined) ?? existing.refund,
     routing_group_id: groupId,
     routing_group_name: (acceptNext ? next.routing_group_name?.trim() : undefined)
       || (sameGroup ? existing.routing_group_name : undefined),

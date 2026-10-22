@@ -2,7 +2,7 @@ use super::storage::{ImageStorage, MAX_IMAGE_BYTES};
 use std::{path::PathBuf, process::Stdio, time::Duration};
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub(crate) struct ImageSize {
     pub width: u32,
     pub height: u32,

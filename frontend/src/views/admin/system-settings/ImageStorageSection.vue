@@ -281,6 +281,7 @@
               图片占用
             </p><p class="mt-1 text-lg font-medium">
               {{ bytes(stats.bytes) }}
+              <span class="block text-xs text-muted-foreground">异步任务输入占用：{{ bytes(stats.task_input_bytes || 0) }}</span>
             </p>
           </div>
           <div>
@@ -398,6 +399,12 @@ async function save() {
   if (invalid) { error(invalid); return }
   busy.value = 'save'
   try {
+    if (form.value.cleanup_enabled) {
+      const policy=await adminApi.getSystemConfig('async_task_retention_days')
+      const days=Number(policy.value ?? 30)
+      const minimum=Math.max(1,Math.ceil(form.value.retention_hours/24))
+      if (!Number.isInteger(days) || days<minimum) { error(`请先将记录清理策略中的异步任务记录保留天数调整为至少 ${minimum} 天`); return }
+    }
     // Save the secret before enabling a destination; never populate the input with a masked value.
     if (password.value || clearPassword.value) {
       await adminApi.updateSystemConfig('image_webdav_password', clearPassword.value ? '' : password.value)

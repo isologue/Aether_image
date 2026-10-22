@@ -1349,12 +1349,20 @@ fn admin_usage_active_request_json(
     });
     value["billing_multiplier"] = json!(billing_multiplier);
     value["billing_cost"] = json!(billing_cost);
+    value["billing_status"] = json!(item.billing_status);
+    value["refund"] = item
+        .request_metadata
+        .as_ref()
+        .and_then(|m| m.get("refund"))
+        .cloned()
+        .unwrap_or(Value::Null);
     value["response_outcome"] = json!(admin_usage_metadata_string(item, "response_outcome"));
     value["content_refusal_reason"] =
         json!(admin_usage_metadata_string(item, "content_refusal_reason"));
     value["routing_group_id"] = json!(item.routing_group_id());
     value["routing_group_name"] = json!(item.routing_group_name());
     value["chat_pii_redaction"] = json!(admin_usage_chat_pii_redacted(item));
+    value["is_async"] = json!(item.is_async());
     value["rate_multiplier"] = json!(item.settlement_rate_multiplier());
     value["end_to_end_time_ms"] = json!(admin_usage_metadata_u64(item, "end_to_end_time_ms"));
     value["end_to_end_first_byte_time_ms"] = json!(admin_usage_metadata_u64(
@@ -1469,12 +1477,20 @@ pub fn admin_usage_record_json(
     });
     payload["billing_multiplier"] = json!(billing_multiplier);
     payload["billing_cost"] = json!(billing_cost);
+    payload["billing_status"] = json!(item.billing_status);
+    payload["refund"] = item
+        .request_metadata
+        .as_ref()
+        .and_then(|m| m.get("refund"))
+        .cloned()
+        .unwrap_or(Value::Null);
     payload["response_outcome"] = json!(admin_usage_metadata_string(item, "response_outcome"));
     payload["content_refusal_reason"] =
         json!(admin_usage_metadata_string(item, "content_refusal_reason"));
     payload["routing_group_id"] = json!(item.routing_group_id());
     payload["routing_group_name"] = json!(item.routing_group_name());
     payload["chat_pii_redaction"] = json!(admin_usage_chat_pii_redacted(item));
+    payload["is_async"] = json!(item.is_async());
     let object = payload
         .as_object_mut()
         .expect("admin usage record payload should be an object");
@@ -2631,6 +2647,12 @@ pub fn build_admin_usage_detail_payload(
     };
     payload["request_id"] = json!(item.request_id);
     payload["billing_status"] = json!(item.billing_status);
+    payload["refund"] = item
+        .request_metadata
+        .as_ref()
+        .and_then(|m| m.get("refund"))
+        .cloned()
+        .unwrap_or(Value::Null);
     payload["request_type"] = json!(item.request_type);
     payload["provider_id"] = json!(item.provider_id);
     payload["provider_endpoint_id"] = json!(item.provider_endpoint_id);
@@ -2811,6 +2833,25 @@ mod tests {
             Some(102),
         )
         .expect("usage should build")
+    }
+
+    #[test]
+    fn async_usage_flag_is_present_in_list_and_active_payloads() {
+        for is_async in [false, true] {
+            let mut item = sample_usage("pending", None, None);
+            item.request_metadata = Some(json!({"is_async": is_async}));
+            let record = admin_usage_record_json(
+                &item,
+                &BTreeMap::new(),
+                &BTreeMap::new(),
+                false,
+                false,
+                None,
+            );
+            let active = admin_usage_active_request_json(&item, None, None, None);
+            assert_eq!(record["is_async"], is_async);
+            assert_eq!(active["is_async"], is_async);
+        }
     }
 
     #[test]

@@ -696,6 +696,7 @@ export function useUsageData(options: UseUsageDataOptions) {
         has_format_conversion: record.has_format_conversion ?? existing.has_format_conversion,
         has_fallback: existing.has_fallback === true || record.has_fallback === true,
         chat_pii_redaction: existing.chat_pii_redaction === true || record.chat_pii_redaction === true,
+        is_async: existing.is_async === true || record.is_async === true,
         has_retry: existing.has_retry === true || record.has_retry === true,
         last_attempt_time_ms: record.last_attempt_time_ms ?? existing.last_attempt_time_ms,
         switch_count: record.switch_count ?? existing.switch_count,

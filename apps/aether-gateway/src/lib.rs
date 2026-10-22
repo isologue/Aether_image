@@ -56,6 +56,7 @@ mod hooks;
 mod image_capabilities;
 mod image_generation;
 mod image_storage;
+mod image_tasks;
 mod important_notification;
 mod internal_gateway_auth;
 mod local_auth_token;

@@ -84,6 +84,20 @@ impl InMemoryVideoTaskRepository {
     }
 
     fn matches_filter(task: &StoredVideoTask, filter: &VideoTaskQueryFilter) -> bool {
+        if let Some(task_id) = filter.task_id_substring.as_deref() {
+            let needle = task_id.to_ascii_lowercase();
+            if ![
+                Some(task.id.as_str()),
+                task.short_id.as_deref(),
+                task.external_task_id.as_deref(),
+            ]
+            .into_iter()
+            .flatten()
+            .any(|value| value.to_ascii_lowercase().contains(&needle))
+            {
+                return false;
+            }
+        }
         if let Some(user_id) = filter.user_id.as_deref() {
             if task.user_id.as_deref() != Some(user_id) {
                 return false;
@@ -809,6 +823,30 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn task_id_search_matches_all_ids_before_pagination_and_counting() {
+        let repo = InMemoryVideoTaskRepository::default();
+        for id in ["task-1", "task-2"] {
+            repo.upsert(sample_task(id, VideoTaskStatus::Submitted, 100))
+                .await
+                .unwrap();
+        }
+        for needle in ["TASK-1", "SHORT-TASK-1", "EXT-TASK-1", "missing", "%", "_"] {
+            let filter = VideoTaskQueryFilter {
+                task_id_substring: Some(needle.to_string()),
+                ..Default::default()
+            };
+            let expected = if needle.contains("TASK-1") { 1 } else { 0 };
+            assert_eq!(repo.count(&filter).await.unwrap(), expected);
+            let page = repo.list_page(&filter, 0, 1).await.unwrap();
+            assert_eq!(page.len() as u64, expected);
+            if let Some(task) = page.first() {
+                assert_eq!(task.id, "task-1");
+            }
+            assert!(repo.list_page(&filter, 1, 1).await.unwrap().is_empty());
+        }
+    }
+
+    #[tokio::test]
     async fn list_page_and_stats_apply_filters() {
         let repo = InMemoryVideoTaskRepository::default();
         repo.upsert(sample_task("task-1", VideoTaskStatus::Submitted, 100))
@@ -836,6 +874,7 @@ mod tests {
         .expect("upsert should succeed");
 
         let filter = VideoTaskQueryFilter {
+            task_id_substring: None,
             user_id: Some("user-2".to_string()),
             status: Some(VideoTaskStatus::Completed),
             model_substring: Some("veo".to_string()),

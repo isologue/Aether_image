@@ -642,6 +642,9 @@ async fn record_sync_terminal_usage(
             .or(analytics_context.as_ref()),
     );
     let payload_seed = build_sync_terminal_usage_payload_seed(payload);
+    if crate::image_tasks::flow::defer(context_seed.clone(), payload_seed.clone()) {
+        return;
+    }
     state
         .usage_runtime
         .record_sync_terminal(
@@ -2123,6 +2126,14 @@ async fn execute_execution_runtime_sync_impl(
                 return Ok(None);
             }
         };
+    crate::image_tasks::flow::attempt(&plan.request_id, &plan.key_id).await;
+    crate::image_tasks::flow::capture_execution(
+        &plan,
+        request_path,
+        plan_kind,
+        &report_kind,
+        report_context.as_ref(),
+    );
     let lifecycle_seed = build_lifecycle_usage_seed(&plan, report_context.as_ref());
     let usage_data = state.usage_lifecycle_data_state().as_ref().clone();
     state
