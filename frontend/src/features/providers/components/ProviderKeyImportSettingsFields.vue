@@ -66,7 +66,7 @@
           type="number"
           min="0"
           class="h-10"
-          placeholder="不限制"
+          placeholder="留空继承号池，0 不限制"
           @update:model-value="updateSetting('concurrent_limit', parseNullableNumberInput($event, { min: 0 }))"
         />
       </div>

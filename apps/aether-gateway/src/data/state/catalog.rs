@@ -41,6 +41,22 @@ impl GatewayDataState {
         }
     }
 
+    pub(crate) async fn list_request_candidates_by_request_ids(
+        &self,
+        request_ids: &[String],
+    ) -> Result<Vec<StoredRequestCandidate>, DataLayerError> {
+        if request_ids.is_empty() {
+            return Ok(Vec::new());
+        }
+        match &self.request_candidate_reader {
+            Some(repository) => repository
+                .list_by_request_ids(request_ids)
+                .await
+                .map(sanitize_request_candidate_rows),
+            None => Ok(Vec::new()),
+        }
+    }
+
     pub(crate) async fn list_attempted_request_candidates_by_request_id(
         &self,
         request_id: &str,

@@ -44,7 +44,15 @@ pub(super) async fn read_candidate_runtime_selection_snapshot(
         .iter()
         .filter_map(|(provider_id, state)| state.pool_enabled.then_some(provider_id.clone()))
         .collect::<BTreeSet<_>>();
-    let provider_key_rpm_states = read_provider_key_rpm_states(state, candidates).await?;
+    let mut provider_key_rpm_states = read_provider_key_rpm_states(state, candidates).await?;
+    // Apply inherited limits only to this request's snapshot; keep account overrides persisted.
+    for key in provider_key_rpm_states.values_mut() {
+        if key.concurrent_limit.is_none() {
+            key.concurrent_limit = provider_pool_state
+                .get(key.provider_id.as_str())
+                .and_then(|pool| pool.default_concurrent_limit);
+        }
+    }
     let recent_candidates = if runtime_snapshot_requires_recent_candidates(
         auth_snapshot,
         &provider_concurrent_limits,
@@ -355,6 +363,7 @@ async fn read_provider_quota_block_map(
 #[derive(Debug, Clone, Copy, Default)]
 struct ProviderPoolState {
     pool_enabled: bool,
+    default_concurrent_limit: Option<i32>,
     skip_exhausted_accounts: bool,
     reserve_minimum_quota: bool,
 }
@@ -398,6 +407,11 @@ async fn read_provider_pool_state_map(
                 provider.id,
                 ProviderPoolState {
                     pool_enabled: pool_advanced.is_some(),
+                    default_concurrent_limit: pool_advanced
+                        .and_then(|value| value.get("default_concurrent_limit"))
+                        .and_then(serde_json::Value::as_i64)
+                        .and_then(|value| i32::try_from(value).ok())
+                        .filter(|value| *value > 0),
                     skip_exhausted_accounts,
                     reserve_minimum_quota,
                 },
@@ -626,6 +640,7 @@ mod reserve_minimum_quota_tests {
                         candidate.provider_id.clone(),
                         ProviderPoolState {
                             pool_enabled: true,
+                            default_concurrent_limit: None,
                             reserve_minimum_quota: reserve_enabled,
                             skip_exhausted_accounts: false,
                         },

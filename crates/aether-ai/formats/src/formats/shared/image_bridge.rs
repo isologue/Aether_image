@@ -457,6 +457,11 @@ pub fn build_openai_image_response_from_response_stream_sync_body(
     provider_body_json: &Value,
     report_context: Option<&Value>,
 ) -> Option<Value> {
+    if let Some(refusal) =
+        crate::formats::openai::image::image_content_refusal_response(provider_body_json)
+    {
+        return Some(refusal);
+    }
     let output = provider_body_json.get("output").and_then(Value::as_array)?;
     let images = output
         .iter()

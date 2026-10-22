@@ -57,6 +57,32 @@ pub fn maybe_bridge_standard_sync_json_to_stream(
         return Ok(Some(outcome));
     }
     if provider_api_format == "openai:image" {
+        if let Some(refusal) = crate::formats::openai::image::image_content_refusal_for_format(
+            provider_body_json,
+            &client_api_format,
+            report_context,
+        ) {
+            if client_api_format == "openai:image" {
+                let event_name = openai_image_completed_event_name(report_context);
+                let mut event = refusal;
+                event["type"] = json!(event_name);
+                return Ok(Some(SyncToStreamBridgeOutcome {
+                    sse_body: encode_json_sse(Some(event_name), &event)?,
+                    terminal_summary: Some(openai_image_terminal_summary(
+                        event.as_object().unwrap(),
+                        report_context,
+                        0,
+                    )),
+                    response_history_record: None,
+                }));
+            }
+            return maybe_bridge_standard_sync_json_to_stream(
+                &refusal,
+                &client_api_format,
+                &client_api_format,
+                report_context,
+            );
+        }
         return match client_api_format.as_str() {
             "openai:image" => {
                 maybe_bridge_openai_image_sync_json_to_stream(provider_body_json, report_context)

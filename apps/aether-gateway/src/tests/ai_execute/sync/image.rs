@@ -1164,7 +1164,7 @@ fn gateway_plans_chatgpt_web_image_sync_with_internal_web_executor_url() {
 }
 
 async fn gateway_plans_chatgpt_web_image_sync_with_internal_web_executor_url_impl() {
-    run_chatgpt_web_image_plan_scenario(false).await;
+    run_chatgpt_web_image_plan_scenario(false, false).await;
 }
 
 #[test]
@@ -1172,11 +1172,25 @@ async fn gateway_plans_chatgpt_web_image_sync_with_internal_web_executor_url_imp
 fn gateway_plans_chatgpt_web_image_native_generation_then_local_resize() {
     run_image_sync_test(
         "gateway_plans_chatgpt_web_image_native_generation_then_local_resize",
-        || run_chatgpt_web_image_plan_scenario(true),
+        || run_chatgpt_web_image_plan_scenario(true, false),
     );
 }
 
-async fn run_chatgpt_web_image_plan_scenario(resize_enabled: bool) {
+#[test]
+fn gateway_content_refusal_completes_once_as_success_without_storing_an_image() {
+    run_image_sync_test(
+        "gateway_content_refusal_completes_once_as_success_without_storing_an_image",
+        || run_chatgpt_web_image_plan_scenario(false, true),
+    );
+}
+
+async fn run_chatgpt_web_image_plan_scenario(resize_enabled: bool, refused: bool) {
+    use aether_data_contracts::repository::candidates::{
+        RequestCandidateReadRepository, RequestCandidateStatus,
+    };
+    use std::sync::atomic::{AtomicUsize, Ordering};
+    const REFUSAL: &str =
+        "非常抱歉，该提示可能违反了我们的内容政策。如果你认为此判断有误，请重试或修改提示语。";
     const PNG: &str = "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAEUlEQVR4nGP4z8DwH4QZYAwAR8oH+WdZbrcAAAAASUVORK5CYII=";
     #[derive(Debug, Clone)]
     struct SeenExecutionRuntimeSyncRequest {
@@ -1336,11 +1350,15 @@ async fn run_chatgpt_web_image_plan_scenario(resize_enabled: bool) {
 
     let seen_execution_runtime = Arc::new(Mutex::new(None::<SeenExecutionRuntimeSyncRequest>));
     let seen_execution_runtime_clone = Arc::clone(&seen_execution_runtime);
+    let attempts = Arc::new(AtomicUsize::new(0));
+    let attempts_clone = Arc::clone(&attempts);
     let execution_runtime = Router::new().route(
         "/v1/execute/sync",
         any(move |request: Request| {
             let seen_execution_runtime_inner = Arc::clone(&seen_execution_runtime_clone);
+            let attempts = Arc::clone(&attempts_clone);
             async move {
+                attempts.fetch_add(1, Ordering::SeqCst);
                 let (parts, body) = request.into_parts();
                 let raw_body = to_bytes(body, usize::MAX).await.expect("body should read");
                 let payload: serde_json::Value = serde_json::from_slice(&raw_body)
@@ -1415,12 +1433,24 @@ async fn run_chatgpt_web_image_plan_scenario(resize_enabled: bool) {
                     },
                     "body": {
                         "body_bytes_b64": base64::engine::general_purpose::STANDARD.encode(
+                            if refused {
+                                format!("data: {}\n\ndata: [DONE]\n\n", json!({
+                                    "type":"response.completed", "response":{
+                                        "id":"resp_refused", "object":"response", "model":"gpt-image-2",
+                                        "status":"completed", "outcome":"content_refused", "refusal":REFUSAL,
+                                        "output":[{"type":"message","role":"assistant","status":"completed",
+                                            "content":[{"type":"refusal","refusal":REFUSAL}]}],
+                                        "usage":{"input_tokens":0,"output_tokens":0,"total_tokens":0}
+                                    }
+                                }))
+                            } else {
                             format!("data: {}\n\ndata: {}\n\ndata: [DONE]\n\n",
                                 json!({"type":"response.output_item.done", "output_index":0,
                                     "item":{"id":"ig_chatgpt_web_123", "type":"image_generation_call",
                                     "output_format":"png", "result": if resize_enabled { PNG } else { "aGVsbG8=" }}}),
                                 json!({"type":"response.completed", "response":{"id":"resp_chatgpt_web_123",
                                     "object":"response", "model":"gpt-image-2", "status":"completed", "output":[]}}))
+                            }
                         )
                     },
                     "telemetry": {
@@ -1450,13 +1480,14 @@ async fn run_chatgpt_web_image_plan_scenario(resize_enabled: bool) {
     ));
 
     let (execution_runtime_url, execution_runtime_handle) = start_server(execution_runtime).await;
+    let request_candidates = Arc::new(InMemoryRequestCandidateRepository::default());
     let mut gateway_state = build_state_with_execution_runtime_override(execution_runtime_url)
         .with_data_state_for_tests(
             crate::data::GatewayDataState::with_auth_candidate_selection_provider_catalog_and_request_candidate_repository_for_tests(
                 auth_repository,
                 candidate_selection_repository,
                 provider_catalog_repository,
-                Arc::new(InMemoryRequestCandidateRepository::default()),
+                request_candidates.clone(),
                 DEVELOPMENT_ENCRYPTION_KEY,
             ).with_system_config_values_for_tests([("image_storage".into(), json!({
                 "resize_enabled":resize_enabled, "storage_mode":"local", "return_format":"base64"
@@ -1486,7 +1517,23 @@ async fn run_chatgpt_web_image_plan_scenario(resize_enabled: bool) {
     let status = response.status();
     let response_json: serde_json::Value = response.json().await.expect("body should parse");
     assert_eq!(status, StatusCode::OK, "{response_json}");
-    if resize_enabled {
+    if refused {
+        assert_eq!(response_json["status"], "completed");
+        assert_eq!(response_json["outcome"], "content_refused");
+        assert_eq!(response_json["refusal"], REFUSAL);
+        assert_eq!(response_json["message"], REFUSAL);
+        assert_eq!(response_json["data"], json!([]));
+        assert!(response_json.get("error").is_none());
+        assert_eq!(attempts.load(Ordering::SeqCst), 1);
+        let candidates = request_candidates
+            .list_by_request_id("trace-chatgpt-web-image-plan-123")
+            .await
+            .expect("candidate history should read");
+        assert_eq!(candidates.len(), 1, "{candidates:?}");
+        assert_eq!(candidates[0].status, RequestCandidateStatus::Success);
+        assert_eq!(candidates[0].status_code, Some(200));
+        assert!(candidates[0].error_message.is_none());
+    } else if resize_enabled {
         let bytes = base64::engine::general_purpose::STANDARD
             .decode(
                 response_json["data"][0]["b64_json"]

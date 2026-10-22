@@ -194,7 +194,10 @@ SELECT
       OR NULLIF(BTRIM("usage".request_metadata->>'websocket_transport'), '') IS NOT NULL
       OR ("usage".request_metadata->>'usage_available') IN ('true', 'false')
       OR ("usage".request_metadata->>'usage_pricing_available') IN ('true', 'false')
+      OR ("usage".request_metadata->>'response_outcome') = 'content_refused'
       OR json_typeof("usage".request_metadata->'chat_pii_redaction') = 'boolean'
+      OR json_typeof("usage".request_metadata->'end_to_end_time_ms') = 'number'
+      OR json_typeof("usage".request_metadata->'end_to_end_first_byte_time_ms') = 'number'
       OR json_typeof("usage".request_metadata->'live_session') = 'object'
       OR json_typeof("usage".request_metadata->'realtime_session') = 'object'
       THEN (jsonb_strip_nulls(jsonb_build_object(
@@ -258,10 +261,28 @@ SELECT
             THEN ("usage".request_metadata->>'usage_pricing_available')::boolean
           ELSE NULL
         END,
+        'response_outcome',
+        CASE WHEN "usage".request_metadata->>'response_outcome' = 'content_refused'
+          THEN 'content_refused' ELSE NULL END,
+        'content_refusal_reason',
+        CASE WHEN "usage".request_metadata->>'response_outcome' = 'content_refused'
+          THEN "usage".request_metadata->>'content_refusal_reason' ELSE NULL END,
         'chat_pii_redaction',
         CASE
           WHEN json_typeof("usage".request_metadata->'chat_pii_redaction') = 'boolean'
             THEN "usage".request_metadata->'chat_pii_redaction'
+          ELSE NULL
+        END,
+        'end_to_end_time_ms',
+        CASE
+          WHEN json_typeof("usage".request_metadata->'end_to_end_time_ms') = 'number'
+            THEN "usage".request_metadata->'end_to_end_time_ms'
+          ELSE NULL
+        END,
+        'end_to_end_first_byte_time_ms',
+        CASE
+          WHEN json_typeof("usage".request_metadata->'end_to_end_first_byte_time_ms') = 'number'
+            THEN "usage".request_metadata->'end_to_end_first_byte_time_ms'
           ELSE NULL
         END,
         'live_session',

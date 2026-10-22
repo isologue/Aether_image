@@ -244,12 +244,12 @@
             :model-value="form.concurrent_limit ?? ''"
             type="number"
             min="0"
-            :placeholder="legacyT('不限制')"
+            :placeholder="legacyT('留空继承号池设置')"
             class="h-8"
             @update:model-value="(v) => form.concurrent_limit = parseNullableNumberInput(v, { min: 0 })"
           />
           <p class="text-xs text-muted-foreground mt-0.5">
-            {{ legacyT('留空或 0 表示不限制') }}
+            {{ legacyT('留空继承号池设置，0 表示不限制；未设置号池上限时不限制') }}
           </p>
         </div>
         <div>
@@ -714,7 +714,7 @@ const form = ref({
   rate_multipliers: {} as Record<string, number>,  // 按 API 格式的成本倍率
   internal_priority: 10,
   rpm_limit: undefined as number | null | undefined,  // RPM 限制（null=自适应，undefined=保持原值）
-  concurrent_limit: undefined as number | null | undefined,  // 并发请求上限（null/0=不限制，undefined=保持原值）
+  concurrent_limit: undefined as number | null | undefined,  // 并发请求上限（null=继承号池，0=不限制，undefined=保持原值）
   cache_ttl_minutes: 5,
   max_probe_interval_minutes: 32,
   note: '',

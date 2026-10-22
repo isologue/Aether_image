@@ -284,10 +284,15 @@ describe('UsageRecordsTable', () => {
   })
 
   it('shows output TPS after the request completes', () => {
-    const root = mountUsageRecordsTable([buildRecord()])
+    const root = mountUsageRecordsTable([buildRecord({
+      last_attempt_time_ms: 1000,
+      switch_count: 0,
+    })])
 
     expect(root.textContent).toContain('输出速度')
-    expect(root.textContent).toContain('0.50s / 1.00s')
+    expect(root.textContent).toContain('总耗时 1.00s')
+    expect(root.textContent).toContain('末次尝试 1.00s')
+    expect(root.textContent).toContain('切号 0次')
     expect(root.textContent).not.toContain('500ms')
     expect(root.textContent).toContain('100 tps')
     expect([...root.querySelectorAll<HTMLElement>('.text-muted-foreground')]
@@ -301,6 +306,8 @@ describe('UsageRecordsTable', () => {
     expect(titles).toContain([
       '端到端首字: 0.50s',
       '端到端总耗时: 1.00s',
+      '最后一次尝试耗时: 1.00s',
+      '切号次数: 0次',
       '成功候选首字: 0.50s',
       '成功候选耗时: 1.00s',
       '生成耗时: 0.50s',
@@ -317,10 +324,14 @@ describe('UsageRecordsTable', () => {
       first_byte_time_ms: 100,
       end_to_end_time_ms: 10_626,
       end_to_end_first_byte_time_ms: 10_120,
+      last_attempt_time_ms: 626,
+      switch_count: 1,
     })])
 
     const performanceCell = root.querySelector('table tbody tr td:last-child') as HTMLElement
-    expect(performanceCell.textContent).toContain('10.12s / 10.63s')
+    expect(performanceCell.textContent).toContain('总耗时 10.63s')
+    expect(performanceCell.textContent).toContain('末次尝试 0.63s')
+    expect(performanceCell.textContent).toContain('切号 1次')
     expect(performanceCell.textContent).toContain('95.1 tps')
     expect(performanceCell.textContent).not.toContain('98.8 tps')
 
@@ -329,6 +340,8 @@ describe('UsageRecordsTable', () => {
     expect(titles).toContain([
       '端到端首字: 10.12s',
       '端到端总耗时: 10.63s',
+      '最后一次尝试耗时: 0.63s',
+      '切号次数: 1次',
       '成功候选首字: 0.10s',
       '成功候选耗时: 0.63s',
       '生成耗时: 0.53s',
@@ -342,16 +355,22 @@ describe('UsageRecordsTable', () => {
       first_byte_time_ms: null,
       end_to_end_time_ms: 10_626,
       end_to_end_first_byte_time_ms: 10_120,
+      last_attempt_time_ms: null,
+      switch_count: null,
     })])
 
     const performanceCell = root.querySelector('table tbody tr td:last-child') as HTMLElement
-    expect(performanceCell.textContent).toContain('10.12s / 10.63s')
+    expect(performanceCell.textContent).toContain('总耗时 10.63s')
+    expect(performanceCell.textContent).toContain('末次尝试 -')
+    expect(performanceCell.textContent).toContain('切号 -')
 
     const titles = [...root.querySelectorAll<HTMLElement>('[title]')]
       .map((element) => element.getAttribute('title'))
     expect(titles).toContain([
       '端到端首字: 10.12s',
       '端到端总耗时: 10.63s',
+      '最后一次尝试耗时: -',
+      '切号次数: -',
       '成功候选首字: -',
       '成功候选耗时: -',
       '生成耗时: -',
@@ -367,7 +386,9 @@ describe('UsageRecordsTable', () => {
     })])
 
     const performanceCell = root.querySelector('table tbody tr td:last-child') as HTMLElement
-    expect(performanceCell.textContent).toContain('0.50s / 1.00s')
+    expect(performanceCell.textContent).toContain('总耗时 1.00s')
+    expect(performanceCell.textContent).toContain('末次尝试 -')
+    expect(performanceCell.textContent).toContain('切号 -')
     expect([...performanceCell.querySelectorAll<HTMLElement>('.text-muted-foreground')]
       .some((element) => element.textContent?.trim() === '-')).toBe(true)
 
@@ -375,6 +396,8 @@ describe('UsageRecordsTable', () => {
     expect(titles).toContain([
       '端到端首字: 0.50s',
       '端到端总耗时: 1.00s',
+      '最后一次尝试耗时: -',
+      '切号次数: -',
       '成功候选首字: 0.50s',
       '成功候选耗时: 1.00s',
       '生成耗时: 0.50s',
@@ -439,10 +462,15 @@ describe('UsageRecordsTable', () => {
   })
 
   it('renders output TPS in the non-admin usage table', () => {
-    const root = mountUsageRecordsTable([buildRecord()], { isAdmin: false })
+    const root = mountUsageRecordsTable([buildRecord({
+      last_attempt_time_ms: 1000,
+      switch_count: 0,
+    })], { isAdmin: false })
 
     expect(root.textContent).toContain('100 tps')
-    expect(root.textContent).toContain('0.50s / 1.00s')
+    expect(root.textContent).toContain('总 1.00s')
+    expect(root.textContent).toContain('末次 1.00s')
+    expect(root.textContent).toContain('切号 0次')
     expect(root.textContent).toContain('gpt-5')
   })
 
@@ -918,5 +946,25 @@ describe('UsageRecordsTable', () => {
     const root = mountUsageRecordsTable([buildRecord({ has_skipped_candidate: false })])
 
     expect(root.querySelector('[data-usage-attempt-marker="skipped-candidate"]')).toBeNull()
+  })
+})
+
+
+describe('successful content refusal', () => {
+  it('shows only the classification in the list and keeps the reason out of the list', () => {
+    const reason = '非常抱歉，该提示可能违反了我们的内容政策。请修改提示语。'
+    for (const isAdmin of [true, false]) {
+      const root = mountUsageRecordsTable([buildRecord({
+        status: 'completed', status_code: 200,
+        response_outcome: 'content_refused', content_refusal_reason: reason,
+      })], { isAdmin })
+      expect(root.querySelectorAll('[data-usage-outcome="content-refused"]')).toHaveLength(2)
+      expect(root.querySelectorAll('[data-usage-refusal-reason]')).toHaveLength(0)
+      expect(root.textContent).toContain('内容拒绝')
+      expect(root.textContent).not.toContain(reason)
+      for (const badge of root.querySelectorAll('[data-usage-outcome="content-refused"]')) {
+        expect(badge.parentElement?.textContent).not.toContain('失败')
+      }
+    }
   })
 })

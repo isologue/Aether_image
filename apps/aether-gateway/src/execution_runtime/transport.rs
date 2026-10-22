@@ -1180,6 +1180,35 @@ struct RelayRequestMeta {
 #[derive(Debug, Clone, Default)]
 pub(crate) struct DirectSyncExecutionRuntime;
 
+#[derive(Debug, Default)]
+pub(crate) struct BufferedBodyReadDiagnostics {
+    pub(crate) status_code: Option<u16>,
+    pub(crate) headers_ms: Option<u64>,
+    pub(crate) chunk_count: u64,
+    pub(crate) received_bytes: u64,
+    pub(crate) first_chunk_ms: Option<u64>,
+    pub(crate) last_chunk_ms: Option<u64>,
+    pub(crate) max_chunk_gap_ms: u64,
+    pub(crate) reached_eof: bool,
+}
+
+impl BufferedBodyReadDiagnostics {
+    fn observe_chunk(&mut self, length: usize, elapsed_ms: u64) {
+        if length == 0 {
+            return;
+        }
+        if let Some(previous_ms) = self.last_chunk_ms {
+            self.max_chunk_gap_ms = self
+                .max_chunk_gap_ms
+                .max(elapsed_ms.saturating_sub(previous_ms));
+        }
+        self.first_chunk_ms.get_or_insert(elapsed_ms);
+        self.last_chunk_ms = Some(elapsed_ms);
+        self.chunk_count = self.chunk_count.saturating_add(1);
+        self.received_bytes = self.received_bytes.saturating_add(length as u64);
+    }
+}
+
 #[derive(Debug, Clone, Copy, Default)]
 pub(crate) struct ExecutionTransportControls {
     follow_redirects: Option<bool>,
@@ -1283,6 +1312,28 @@ impl DirectSyncExecutionRuntime {
     where
         F: FnOnce(DirectSyncResponseStarted),
     {
+        self.execute_sync_observed(plan, on_response_started, None)
+            .await
+    }
+
+    pub(crate) async fn execute_sync_with_body_diagnostics(
+        &self,
+        plan: &ExecutionPlan,
+        diagnostics: &mut BufferedBodyReadDiagnostics,
+    ) -> Result<ExecutionResult, ExecutionRuntimeTransportError> {
+        self.execute_sync_observed(plan, |_| {}, Some(diagnostics))
+            .await
+    }
+
+    async fn execute_sync_observed<F>(
+        &self,
+        plan: &ExecutionPlan,
+        on_response_started: F,
+        mut diagnostics: Option<&mut BufferedBodyReadDiagnostics>,
+    ) -> Result<ExecutionResult, ExecutionRuntimeTransportError>
+    where
+        F: FnOnce(DirectSyncResponseStarted),
+    {
         let body_bytes = build_request_body(plan)?;
         let response_body_limit_bytes = execution_plan_response_body_limit_bytes(plan);
 
@@ -1295,6 +1346,10 @@ impl DirectSyncExecutionRuntime {
             let response_headers_observed_at_unix_ms = crate::clock::current_unix_ms();
             let status_code = response.status_code();
             let headers = response.headers();
+            if let Some(diagnostics) = diagnostics.as_deref_mut() {
+                diagnostics.status_code = Some(status_code);
+                diagnostics.headers_ms = Some(ttfb_ms);
+            }
             let response_observation = ExecutionResponseObservation {
                 request_started_at_unix_ms,
                 response_headers_observed_at_unix_ms,
@@ -1306,7 +1361,7 @@ impl DirectSyncExecutionRuntime {
                 response_observation: response_observation.clone(),
             });
             let (body_bytes, stream_ttfb_ms) = response
-                .bytes_with_stream_timeout(plan, started_at, response_body_limit_bytes)
+                .bytes_with_stream_timeout(plan, started_at, response_body_limit_bytes, diagnostics)
                 .await?;
             let decoded_body_bytes = decode_response_body_bytes_with_limit(
                 &headers,
@@ -1980,21 +2035,33 @@ impl DirectHttpResponse {
     ) -> Result<Bytes, ExecutionRuntimeTransportError> {
         let started_at = Instant::now();
         match self {
-            DirectHttpResponse::Reqwest(response) => {
-                collect_reqwest_stream_body(response, started_at, None, response_body_limit_bytes)
-                    .await
-                    .map(|(body, _)| body)
-            }
-            DirectHttpResponse::HyperH2c(response) => {
-                collect_hyper_stream_body(response, started_at, None, response_body_limit_bytes)
-                    .await
-                    .map(|(body, _)| body)
-            }
-            DirectHttpResponse::BrowserWreq(response) => {
-                collect_wreq_stream_body(response, started_at, None, response_body_limit_bytes)
-                    .await
-                    .map(|(body, _)| body)
-            }
+            DirectHttpResponse::Reqwest(response) => collect_reqwest_stream_body(
+                response,
+                started_at,
+                None,
+                response_body_limit_bytes,
+                None,
+            )
+            .await
+            .map(|(body, _)| body),
+            DirectHttpResponse::HyperH2c(response) => collect_hyper_stream_body(
+                response,
+                started_at,
+                None,
+                response_body_limit_bytes,
+                None,
+            )
+            .await
+            .map(|(body, _)| body),
+            DirectHttpResponse::BrowserWreq(response) => collect_wreq_stream_body(
+                response,
+                started_at,
+                None,
+                response_body_limit_bytes,
+                None,
+            )
+            .await
+            .map(|(body, _)| body),
         }
     }
 
@@ -2003,6 +2070,7 @@ impl DirectHttpResponse {
         plan: &ExecutionPlan,
         started_at: Instant,
         response_body_limit_bytes: usize,
+        diagnostics: Option<&mut BufferedBodyReadDiagnostics>,
     ) -> Result<(Bytes, Option<u64>), ExecutionRuntimeTransportError> {
         if !plan.stream {
             return self
@@ -2019,6 +2087,7 @@ impl DirectHttpResponse {
                     started_at,
                     first_byte_timeout,
                     response_body_limit_bytes,
+                    diagnostics,
                 )
                 .await
             }
@@ -2028,6 +2097,7 @@ impl DirectHttpResponse {
                     started_at,
                     first_byte_timeout,
                     response_body_limit_bytes,
+                    diagnostics,
                 )
                 .await
             }
@@ -2037,6 +2107,7 @@ impl DirectHttpResponse {
                     started_at,
                     first_byte_timeout,
                     response_body_limit_bytes,
+                    diagnostics,
                 )
                 .await
             }
@@ -2085,6 +2156,7 @@ async fn collect_reqwest_stream_body(
     started_at: Instant,
     first_byte_timeout: Option<Duration>,
     response_body_limit_bytes: usize,
+    mut diagnostics: Option<&mut BufferedBodyReadDiagnostics>,
 ) -> Result<(Bytes, Option<u64>), ExecutionRuntimeTransportError> {
     let mut stream = response.bytes_stream();
     let mut body_bytes = Vec::new();
@@ -2097,11 +2169,17 @@ async fn collect_reqwest_stream_body(
             stream.next().await
         };
         let Some(item) = item else {
+            if let Some(diagnostics) = diagnostics.as_deref_mut() {
+                diagnostics.reached_eof = true;
+            }
             break;
         };
         let chunk = item.map_err(|err| {
             ExecutionRuntimeTransportError::UpstreamRequest(format_upstream_request_error(&err))
         })?;
+        if let Some(diagnostics) = diagnostics.as_deref_mut() {
+            diagnostics.observe_chunk(chunk.len(), started_at.elapsed().as_millis() as u64);
+        }
         if first_byte_ms.is_none() && !chunk.is_empty() {
             first_byte_ms = Some(started_at.elapsed().as_millis() as u64);
         }
@@ -2120,6 +2198,7 @@ async fn collect_hyper_stream_body(
     started_at: Instant,
     first_byte_timeout: Option<Duration>,
     response_body_limit_bytes: usize,
+    mut diagnostics: Option<&mut BufferedBodyReadDiagnostics>,
 ) -> Result<(Bytes, Option<u64>), ExecutionRuntimeTransportError> {
     let mut stream = response.into_body().into_data_stream();
     let mut body_bytes = Vec::new();
@@ -2132,11 +2211,17 @@ async fn collect_hyper_stream_body(
             stream.next().await
         };
         let Some(item) = item else {
+            if let Some(diagnostics) = diagnostics.as_deref_mut() {
+                diagnostics.reached_eof = true;
+            }
             break;
         };
         let chunk = item.map_err(|err| {
             ExecutionRuntimeTransportError::UpstreamRequest(format_hyper_error_chain(&err))
         })?;
+        if let Some(diagnostics) = diagnostics.as_deref_mut() {
+            diagnostics.observe_chunk(chunk.len(), started_at.elapsed().as_millis() as u64);
+        }
         if first_byte_ms.is_none() && !chunk.is_empty() {
             first_byte_ms = Some(started_at.elapsed().as_millis() as u64);
         }
@@ -2155,6 +2240,7 @@ async fn collect_wreq_stream_body(
     started_at: Instant,
     first_byte_timeout: Option<Duration>,
     response_body_limit_bytes: usize,
+    mut diagnostics: Option<&mut BufferedBodyReadDiagnostics>,
 ) -> Result<(Bytes, Option<u64>), ExecutionRuntimeTransportError> {
     let mut stream = response.bytes_stream();
     let mut body_bytes = Vec::new();
@@ -2167,11 +2253,17 @@ async fn collect_wreq_stream_body(
             stream.next().await
         };
         let Some(item) = item else {
+            if let Some(diagnostics) = diagnostics.as_deref_mut() {
+                diagnostics.reached_eof = true;
+            }
             break;
         };
         let chunk = item.map_err(|err| {
             ExecutionRuntimeTransportError::BrowserBody(format_wreq_upstream_request_error(&err))
         })?;
+        if let Some(diagnostics) = diagnostics.as_deref_mut() {
+            diagnostics.observe_chunk(chunk.len(), started_at.elapsed().as_millis() as u64);
+        }
         if first_byte_ms.is_none() && !chunk.is_empty() {
             first_byte_ms = Some(started_at.elapsed().as_millis() as u64);
         }
@@ -3076,8 +3168,13 @@ async fn send_via_tunnel_relay(
         );
         let response_body_limit_bytes = execution_plan_response_body_limit_bytes(plan);
         let drain_timeout = stream_first_byte_timeout.or(total_timeout);
-        let drain =
-            collect_reqwest_stream_body(response, Instant::now(), None, response_body_limit_bytes);
+        let drain = collect_reqwest_stream_body(
+            response,
+            Instant::now(),
+            None,
+            response_body_limit_bytes,
+            None,
+        );
         let drain_result = if let Some(timeout) = drain_timeout {
             match tokio::time::timeout(timeout, drain).await {
                 Ok(result) => result,
@@ -5441,6 +5538,22 @@ mod tests {
 
     const LOCAL_HTTP_SUCCESS_TIMEOUT_MS: u64 = 15_000;
     const RELAY_TEST_SECRET: &str = "relay-test-secret-at-least-32-bytes";
+
+    #[test]
+    fn buffered_body_diagnostics_counts_nonempty_chunks_and_maximum_gap() {
+        let mut diagnostics = super::BufferedBodyReadDiagnostics::default();
+        diagnostics.observe_chunk(0, 5);
+        diagnostics.observe_chunk(10, 20);
+        diagnostics.observe_chunk(0, 50);
+        diagnostics.observe_chunk(15, 90);
+        diagnostics.observe_chunk(5, 100);
+        assert_eq!(diagnostics.chunk_count, 3);
+        assert_eq!(diagnostics.received_bytes, 30);
+        assert_eq!(diagnostics.first_chunk_ms, Some(20));
+        assert_eq!(diagnostics.last_chunk_ms, Some(100));
+        assert_eq!(diagnostics.max_chunk_gap_ms, 70);
+        assert!(!diagnostics.reached_eof);
+    }
 
     #[test]
     fn execution_upstream_url_accepts_http_and_https_with_safe_targets() {

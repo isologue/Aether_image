@@ -2,11 +2,27 @@
   <Dialog
     :model-value="modelValue"
     title="高级设置"
-    description="冷却、热池与其他高级参数"
+    description="单账号并发、冷却、热池与其他高级参数"
     size="3xl"
     @update:model-value="emit('update:modelValue', $event)"
   >
     <div class="max-h-[calc(100dvh-13rem)] space-y-5 overflow-y-auto overscroll-contain pr-1 sm:max-h-[min(72vh,42rem)] sm:space-y-6 sm:pr-2">
+      <section class="space-y-3 rounded-2xl border border-border/60 bg-card/70 p-4 sm:p-5">
+        <Label for="pool-default-concurrent-limit">单账号并发上限</Label>
+        <Input
+          id="pool-default-concurrent-limit"
+          :model-value="form.default_concurrent_limit ?? ''"
+          type="number"
+          min="0"
+          max="2147483647"
+          step="1"
+          placeholder="不限制"
+          @update:model-value="(v) => form.default_concurrent_limit = parseNum(v)"
+        />
+        <p class="text-xs leading-5 text-muted-foreground">
+          未单独配置的账号使用此上限，留空或 0 表示不限制。账号单独设置的值优先；账号留空继承此配置，填 0 表示该账号不限制。
+        </p>
+      </section>
       <section class="space-y-4 rounded-2xl border border-border/60 bg-card/70 p-4 sm:p-5">
         <div class="space-y-1">
           <div class="flex flex-wrap items-center gap-2">
@@ -568,6 +584,7 @@ const healthToggleCards = buildPoolHealthToggleCards()
 const cooldownFieldLayout = buildPoolCooldownFieldLayout()
 
 const form = ref({
+  default_concurrent_limit: null as number | null | undefined,
   rate_limit_cooldown_seconds: null as number | null | undefined,
   overload_cooldown_seconds: null as number | null | undefined,
   batch_concurrency: null as number | null | undefined,
@@ -663,6 +680,7 @@ watch([() => props.modelValue, () => props.providerId], ([open]) => {
   const scoreRules = cfg?.score_rules
   const scoreWeights = scoreRules?.weights
   form.value = {
+    default_concurrent_limit: cfg?.default_concurrent_limit ?? null,
     rate_limit_cooldown_seconds: cfg?.rate_limit_cooldown_seconds ?? null,
     overload_cooldown_seconds: cfg?.overload_cooldown_seconds ?? null,
     batch_concurrency: cfg?.batch_concurrency ?? null,
@@ -702,6 +720,11 @@ watch([() => props.modelValue, () => props.providerId], ([open]) => {
 })
 
 async function handleSave() {
+  const limit = form.value.default_concurrent_limit
+  if (limit != null && (!Number.isInteger(limit) || limit < 0 || limit > 2147483647)) {
+    showError('单账号并发上限必须是 0 到 2147483647 的整数')
+    return
+  }
   const providerId = props.providerId
   const revision = dialogRevision
   loading.value = true
@@ -737,6 +760,7 @@ async function handleSave() {
     }
     // 合并已有配置（保留 scheduling_presets 等不在此对话框编辑的字段）
     const poolAdvanced = mergePoolAdvancedPatch(existingPoolAdvanced, {
+      default_concurrent_limit: form.value.default_concurrent_limit ?? null,
       rate_limit_cooldown_seconds: form.value.rate_limit_cooldown_seconds ?? undefined,
       overload_cooldown_seconds: form.value.overload_cooldown_seconds ?? undefined,
       batch_concurrency: form.value.batch_concurrency ?? undefined,

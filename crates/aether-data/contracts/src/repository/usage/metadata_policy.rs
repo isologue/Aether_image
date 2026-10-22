@@ -169,6 +169,23 @@ pub fn sanitize_usage_request_metadata_object(source: &Map<String, Value>) -> Op
     insert_token(source, &mut target, "trace_id", 128);
     insert_token(source, &mut target, ROUTING_GROUP_ID_METADATA_KEY, 128);
     insert_bounded_text(source, &mut target, ROUTING_GROUP_NAME_METADATA_KEY, 256);
+    // Refusals are successful outcomes, with a bounded upstream explanation.
+    if source.get("response_outcome").and_then(Value::as_str) == Some("content_refused") {
+        if let Some(reason) = source
+            .get("content_refusal_reason")
+            .and_then(Value::as_str)
+            .filter(|reason| !reason.trim().is_empty() && reason.len() <= 64 * 1024)
+        {
+            target.insert(
+                "response_outcome".into(),
+                Value::String("content_refused".into()),
+            );
+            target.insert(
+                "content_refusal_reason".into(),
+                Value::String(reason.into()),
+            );
+        }
+    }
     insert_ip_address(source, &mut target, "client_ip");
     insert_client_family(source, &mut target);
     for key in [
@@ -1896,5 +1913,42 @@ mod tests {
             .expect("trace_id alone should keep the object");
             assert!(projected.get("chat_pii_redaction").is_none());
         }
+    }
+}
+
+#[cfg(test)]
+mod content_refusal_tests {
+    use super::sanitize_usage_request_metadata;
+    use serde_json::json;
+
+    #[test]
+    fn content_refusal_metadata_preserves_reason_without_captured_bodies() {
+        let reason = "非常抱歉，该提示可能违反了我们的内容政策。\n请修改提示语。";
+        let actual = sanitize_usage_request_metadata(Some(json!({
+            "response_outcome":"content_refused", "content_refusal_reason":reason,
+            "usage_available":false,"usage_pricing_available":false,
+            "response_body":{"private":"must not persist"}
+        })))
+        .unwrap();
+        assert_eq!(actual["response_outcome"], "content_refused");
+        assert_eq!(actual["content_refusal_reason"], reason);
+        assert_eq!(actual["usage_available"], false);
+        assert!(actual.get("response_body").is_none());
+        for invalid in [
+            json!(null),
+            json!(""),
+            json!(" "),
+            json!(5),
+            json!("x".repeat(65537)),
+        ] {
+            assert!(sanitize_usage_request_metadata(Some(json!({
+                "response_outcome":"content_refused", "content_refusal_reason":invalid
+            })))
+            .is_none());
+        }
+        assert!(sanitize_usage_request_metadata(Some(json!({
+            "response_outcome":"anything", "content_refusal_reason":reason
+        })))
+        .is_none());
     }
 }

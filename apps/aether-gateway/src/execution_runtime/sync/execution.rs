@@ -2822,6 +2822,11 @@ async fn execute_execution_runtime_sync_impl(
         provider_response_observation.response_headers_observed_at_unix_ms,
         &provider_response_observation.request_order_id,
     );
+    if plan.provider_api_format.eq_ignore_ascii_case("openai:image") {
+        report_context = crate::execution_runtime::chatgpt_web_image::attach_content_refusal_report_context(
+            &plan, report_context, &body_bytes,
+        );
+    }
     if let Some(error) = result.error.as_ref() {
         report_context = crate::usage::reporting::failure::execution_error_analytics_context(report_context.as_ref(), error);
     }

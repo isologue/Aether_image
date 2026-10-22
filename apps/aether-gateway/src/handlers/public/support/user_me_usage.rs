@@ -611,6 +611,8 @@ fn build_users_me_usage_record_payload(
         "request_path_and_query": users_me_usage_metadata_string(item, "request_path_and_query"),
         "status": item.status,
         "has_fallback": item.has_fallback(),
+        "last_attempt_time_ms": serde_json::Value::Null,
+        "switch_count": serde_json::Value::Null,
         "chat_pii_redaction": users_me_usage_chat_pii_redacted(item),
         "created_at": unix_secs_to_rfc3339(item.created_at_unix_ms),
         "cache_creation_input_tokens": cache_creation_input_tokens,
@@ -631,6 +633,11 @@ fn build_users_me_usage_record_payload(
         ),
     });
     payload["end_to_end_time_ms"] = json!(users_me_usage_metadata_u64(item, "end_to_end_time_ms"));
+    payload["response_outcome"] = json!(users_me_usage_metadata_string(item, "response_outcome"));
+    payload["content_refusal_reason"] = json!(users_me_usage_metadata_string(
+        item,
+        "content_refusal_reason"
+    ));
     payload["routing_group_id"] = json!(item.routing_group_id());
     payload["routing_group_name"] = json!(item.routing_group_name());
     payload["end_to_end_first_byte_time_ms"] = json!(users_me_usage_metadata_u64(
@@ -709,6 +716,11 @@ fn build_users_me_usage_active_payload(item: &StoredRequestUsageAudit) -> serde_
         "has_fallback": item.has_fallback(),
         "chat_pii_redaction": users_me_usage_chat_pii_redacted(item),
     });
+    payload["response_outcome"] = json!(users_me_usage_metadata_string(item, "response_outcome"));
+    payload["content_refusal_reason"] = json!(users_me_usage_metadata_string(
+        item,
+        "content_refusal_reason"
+    ));
     payload["routing_group_id"] = json!(item.routing_group_id());
     payload["routing_group_name"] = json!(item.routing_group_name());
     payload["end_to_end_time_ms"] = json!(users_me_usage_metadata_u64(item, "end_to_end_time_ms"));
@@ -829,6 +841,84 @@ fn users_me_usage_terminal_candidate_state_override(
         payload["status_code"] = json!(status_code);
     }
     Some(payload)
+}
+
+fn users_me_usage_attempt_metrics(
+    candidates: &[StoredRequestCandidate],
+) -> (Option<u64>, Option<u32>) {
+    let mut attempted = candidates
+        .iter()
+        .filter(|candidate| candidate.status.is_attempted(candidate.started_at_unix_ms))
+        .collect::<Vec<_>>();
+    attempted.sort_by(|left, right| {
+        left.started_at_unix_ms
+            .cmp(&right.started_at_unix_ms)
+            .then(left.candidate_index.cmp(&right.candidate_index))
+            .then(left.retry_index.cmp(&right.retry_index))
+            .then(left.created_at_unix_ms.cmp(&right.created_at_unix_ms))
+            .then(left.id.cmp(&right.id))
+    });
+
+    if attempted.is_empty() {
+        return (None, None);
+    }
+
+    let last_attempt_time_ms = attempted.last().and_then(|candidate| {
+        candidate.latency_ms.or_else(|| {
+            candidate
+                .finished_at_unix_ms
+                .zip(candidate.started_at_unix_ms)
+                .map(|(finished_at, started_at)| finished_at.saturating_sub(started_at))
+        })
+    });
+    let mut switch_count = 0_u32;
+    let mut previous_identity: Option<String> = None;
+    for candidate in attempted {
+        let identity = candidate
+            .key_id
+            .as_deref()
+            .map(|key_id| format!("key:{key_id}"))
+            .unwrap_or_else(|| format!("candidate:{}", candidate.candidate_index));
+        if previous_identity
+            .as_deref()
+            .is_some_and(|previous| previous != identity)
+        {
+            switch_count = switch_count.saturating_add(1);
+        }
+        previous_identity = Some(identity);
+    }
+
+    (last_attempt_time_ms, Some(switch_count))
+}
+
+async fn resolve_users_me_usage_attempt_metrics_by_request_id(
+    state: &AppState,
+    items: &[StoredRequestUsageAudit],
+) -> Result<BTreeMap<String, (Option<u64>, Option<u32>)>, GatewayError> {
+    if !state.has_request_candidate_data_reader() || items.is_empty() {
+        return Ok(BTreeMap::new());
+    }
+
+    let request_ids = items
+        .iter()
+        .map(|item| item.request_id.clone())
+        .collect::<BTreeSet<_>>();
+    let request_ids = request_ids.into_iter().collect::<Vec<_>>();
+    let candidates = state
+        .read_request_candidates_by_request_ids(&request_ids)
+        .await?;
+    let mut candidates_by_request_id = BTreeMap::<String, Vec<StoredRequestCandidate>>::new();
+    for candidate in candidates {
+        candidates_by_request_id
+            .entry(candidate.request_id.clone())
+            .or_default()
+            .push(candidate);
+    }
+
+    Ok(candidates_by_request_id
+        .into_iter()
+        .map(|(request_id, candidates)| (request_id, users_me_usage_attempt_metrics(&candidates)))
+        .collect())
 }
 
 async fn resolve_users_me_usage_active_state_overrides_by_request_id(
@@ -1362,15 +1452,33 @@ pub(super) async fn handle_users_me_usage_get(
         )
     };
 
+    let attempt_metrics_by_request_id =
+        match resolve_users_me_usage_attempt_metrics_by_request_id(state, &record_items).await {
+            Ok(value) => value,
+            Err(err) => {
+                return build_auth_error_response(
+                    http::StatusCode::INTERNAL_SERVER_ERROR,
+                    format!("user usage attempt metrics lookup failed: {err:?}"),
+                    false,
+                );
+            }
+        };
     let records = record_items
         .into_iter()
         .map(|item| {
-            build_users_me_usage_record_payload(
+            let mut payload = build_users_me_usage_record_payload(
                 &item,
                 include_actual_cost,
                 &api_key_names,
                 auth_api_key_reader_available,
-            )
+            );
+            if let Some((last_attempt_time_ms, switch_count)) =
+                attempt_metrics_by_request_id.get(&item.request_id)
+            {
+                payload["last_attempt_time_ms"] = json!(last_attempt_time_ms);
+                payload["switch_count"] = json!(switch_count);
+            }
+            payload
         })
         .collect::<Vec<_>>();
 
@@ -1719,7 +1827,7 @@ mod tests {
     use super::{
         build_users_me_usage_active_payload, build_users_me_usage_record_payload,
         parse_users_me_usage_ids, parse_users_me_usage_record_filter,
-        users_me_usage_client_is_stream, users_me_usage_is_failed,
+        users_me_usage_attempt_metrics, users_me_usage_client_is_stream, users_me_usage_is_failed,
         users_me_usage_terminal_candidate_state_override, users_me_usage_upstream_is_stream,
         MAX_USERS_ME_USAGE_IDS, MAX_USERS_ME_USAGE_ID_BYTES,
     };
@@ -1861,6 +1969,36 @@ mod tests {
             Some(10_210),
         )
         .expect("candidate should build")
+    }
+
+    #[test]
+    fn user_usage_attempt_metrics_ignore_same_account_retries_and_report_last_attempt() {
+        let mut first =
+            sample_candidate(RequestCandidateStatus::Failed, Some(401), Some(100), None);
+        first.started_at_unix_ms = Some(1_000);
+        first.finished_at_unix_ms = Some(1_100);
+        first.key_id = Some("account-a".to_string());
+
+        let mut retry =
+            sample_candidate(RequestCandidateStatus::Failed, Some(429), Some(250), None);
+        retry.retry_index = 1;
+        retry.created_at_unix_ms = 1_200;
+        retry.started_at_unix_ms = Some(1_200);
+        retry.finished_at_unix_ms = Some(1_450);
+        retry.key_id = Some("account-a".to_string());
+
+        let mut switched =
+            sample_candidate(RequestCandidateStatus::Success, Some(200), Some(700), None);
+        switched.candidate_index = 1;
+        switched.created_at_unix_ms = 1_500;
+        switched.started_at_unix_ms = Some(1_700);
+        switched.finished_at_unix_ms = Some(2_400);
+        switched.key_id = Some("account-b".to_string());
+
+        assert_eq!(
+            users_me_usage_attempt_metrics(&[first, retry, switched]),
+            (Some(700), Some(1))
+        );
     }
 
     #[test]
@@ -2401,5 +2539,23 @@ mod tests {
         assert_eq!(active_payload["client_is_stream"], false);
         assert_eq!(record_payload["chat_pii_redaction"], true);
         assert_eq!(active_payload["chat_pii_redaction"], true);
+    }
+
+    #[test]
+    fn user_content_refusal_record_is_completed_and_preserves_reason() {
+        let reason = "非常抱歉，该提示可能违反了我们的内容政策。\nPlease revise the prompt.";
+        let item = StoredRequestUsageAudit {
+            request_metadata: Some(
+                json!({"response_outcome":"content_refused", "content_refusal_reason":reason}),
+            ),
+            ..sample_usage("completed")
+        };
+        let record = build_users_me_usage_record_payload(&item, false, &BTreeMap::new(), false);
+        let active = build_users_me_usage_active_payload(&item);
+        for payload in [record, active] {
+            assert_eq!(payload["response_outcome"], "content_refused");
+            assert_eq!(payload["content_refusal_reason"], reason);
+            assert_eq!(payload["status"], "completed");
+        }
     }
 }

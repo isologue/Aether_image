@@ -128,7 +128,7 @@
               type="number"
               min="0"
               class="h-9"
-              placeholder="留空为不限制"
+              placeholder="留空继承号池，0 不限制"
               :disabled="!settingsSelection.concurrent_limit"
               @update:model-value="settingsDraft.concurrent_limit = parseNullableNumberInput($event, { min: 0 })"
             />

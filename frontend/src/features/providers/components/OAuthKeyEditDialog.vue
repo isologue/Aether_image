@@ -83,12 +83,12 @@
             :model-value="form.concurrent_limit ?? ''"
             type="number"
             min="0"
-            placeholder="不限制"
+            placeholder="留空继承号池设置"
             class="h-8"
             @update:model-value="(v) => form.concurrent_limit = parseNullableNumberInput(v, { min: 0 })"
           />
           <p class="text-xs text-muted-foreground mt-0.5">
-            留空或 0 表示不限制
+            留空继承号池设置，0 表示不限制；未设置号池上限时不限制
           </p>
         </div>
         <div>

@@ -243,12 +243,20 @@ fn provider_key_concurrency_state(
     keys: Vec<StoredProviderCatalogKey>,
     request_candidates: Vec<StoredRequestCandidate>,
 ) -> AppState {
+    provider_key_concurrency_state_with_pool_config(rows, keys, request_candidates, None)
+}
+
+fn provider_key_concurrency_state_with_pool_config(
+    rows: Vec<StoredMinimalCandidateSelectionRow>,
+    keys: Vec<StoredProviderCatalogKey>,
+    request_candidates: Vec<StoredRequestCandidate>,
+    pool_config: Option<serde_json::Value>,
+) -> AppState {
     let candidates = Arc::new(InMemoryMinimalCandidateSelectionReadRepository::seed(rows));
+    let mut pool_provider = sample_provider("test-provider-a", None);
+    pool_provider.config = pool_config.map(|config| json!({"pool_advanced": config}));
     let provider_catalog = Arc::new(InMemoryProviderCatalogReadRepository::seed(
-        vec![
-            sample_provider("test-provider-a", None),
-            sample_provider("test-provider-b", None),
-        ],
+        vec![pool_provider, sample_provider("test-provider-b", None)],
         Vec::new(),
         keys,
     ));
@@ -1148,6 +1156,159 @@ async fn selects_next_candidate_when_first_provider_concurrent_limit_is_reached(
 
     assert_eq!(selected.provider_id, "provider-b");
     assert_eq!(selected.key_id, "key-b");
+}
+
+#[tokio::test]
+async fn pool_default_concurrent_limit_is_inherited_and_account_overrides_take_precedence() {
+    for (pool_config, account_limit, active_count, allowed) in [
+        (Some(json!({"default_concurrent_limit": 3})), None, 2, true),
+        (Some(json!({"default_concurrent_limit": 3})), None, 3, false),
+        (
+            Some(json!({"default_concurrent_limit": 3})),
+            Some(2),
+            1,
+            true,
+        ),
+        (
+            Some(json!({"default_concurrent_limit": 3})),
+            Some(2),
+            2,
+            false,
+        ),
+        (
+            Some(json!({"default_concurrent_limit": 3})),
+            Some(5),
+            3,
+            true,
+        ),
+        (
+            Some(json!({"default_concurrent_limit": 3})),
+            Some(5),
+            5,
+            false,
+        ),
+        (
+            Some(json!({"default_concurrent_limit": 3})),
+            Some(0),
+            6,
+            true,
+        ),
+        (Some(json!({"default_concurrent_limit": 0})), None, 6, true),
+        (
+            Some(json!({"default_concurrent_limit": null})),
+            None,
+            6,
+            true,
+        ),
+        (Some(json!({})), None, 6, true),
+        (None, None, 6, true),
+    ] {
+        let active = (0..active_count)
+            .map(|index| {
+                active_provider_key_candidate(
+                    &format!("candidate-{index}"),
+                    &format!("request-{index}"),
+                    "test-provider-a",
+                    "endpoint-a",
+                    "provider-key-a",
+                    RequestCandidateStatus::Streaming,
+                )
+            })
+            .collect();
+        let state = provider_key_concurrency_state_with_pool_config(
+            vec![provider_key_concurrency_row(
+                "test-provider-a",
+                "endpoint-a",
+                "provider-key-a",
+                "alpha",
+                0,
+                0,
+            )],
+            vec![provider_key_with_concurrent_limit(
+                "provider-key-a",
+                "test-provider-a",
+                account_limit,
+            )],
+            active,
+            pool_config.clone(),
+        );
+        let selected = select_candidate(
+            state.data.as_ref(),
+            &state,
+            "openai:chat",
+            "gpt-4.1",
+            false,
+            None,
+            100,
+        )
+        .await
+        .expect("selection should succeed");
+        assert_eq!(
+            selected.is_some(),
+            allowed,
+            "pool={pool_config:?}, account={account_limit:?}, active={active_count}"
+        );
+    }
+}
+
+#[tokio::test]
+async fn pool_default_concurrent_limit_only_affects_accounts_in_its_own_pool() {
+    let state = provider_key_concurrency_state_with_pool_config(
+        vec![
+            provider_key_concurrency_row(
+                "test-provider-a",
+                "endpoint-a",
+                "provider-key-a",
+                "alpha",
+                0,
+                0,
+            ),
+            provider_key_concurrency_row(
+                "test-provider-b",
+                "endpoint-b",
+                "provider-key-b",
+                "beta",
+                1,
+                0,
+            ),
+        ],
+        vec![
+            provider_key_with_concurrent_limit("provider-key-a", "test-provider-a", None),
+            provider_key_with_concurrent_limit("provider-key-b", "test-provider-b", None),
+        ],
+        vec![
+            active_provider_key_candidate(
+                "candidate-a",
+                "request-a",
+                "test-provider-a",
+                "endpoint-a",
+                "provider-key-a",
+                RequestCandidateStatus::Streaming,
+            ),
+            active_provider_key_candidate(
+                "candidate-b",
+                "request-b",
+                "test-provider-b",
+                "endpoint-b",
+                "provider-key-b",
+                RequestCandidateStatus::Streaming,
+            ),
+        ],
+        Some(json!({"default_concurrent_limit": 1})),
+    );
+    let selected = select_candidate(
+        state.data.as_ref(),
+        &state,
+        "openai:chat",
+        "gpt-4.1",
+        false,
+        None,
+        100,
+    )
+    .await
+    .expect("selection should succeed")
+    .expect("unlimited account should be selectable");
+    assert_eq!(selected.key_id, "provider-key-b");
 }
 
 #[tokio::test]

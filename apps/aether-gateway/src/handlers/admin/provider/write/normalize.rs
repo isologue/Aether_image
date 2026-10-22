@@ -181,7 +181,20 @@ pub(crate) fn normalize_pool_advanced_config(
     match value {
         serde_json::Value::Null => Ok(None),
         // `pool_advanced: {}` still means "enable pool mode with defaults".
-        serde_json::Value::Object(map) => Ok(Some(serde_json::Value::Object(map))),
+        serde_json::Value::Object(map) => {
+            if let Some(limit) = map
+                .get("default_concurrent_limit")
+                .filter(|value| !value.is_null())
+            {
+                if !limit
+                    .as_i64()
+                    .is_some_and(|value| (0..=i32::MAX as i64).contains(&value))
+                {
+                    return Err("pool_advanced.default_concurrent_limit 必须是 0 到 2147483647 的整数或 null".to_string());
+                }
+            }
+            Ok(Some(serde_json::Value::Object(map)))
+        }
         _ => Err("pool_advanced 必须是 JSON 对象".to_string()),
     }
 }
@@ -317,6 +330,29 @@ mod tests {
             normalize_pool_advanced_config(Some(json!({}))).expect("empty object should normalize"),
             Some(json!({}))
         );
+    }
+
+    #[test]
+    fn normalize_pool_advanced_validates_default_concurrent_limit() {
+        for limit in [json!(null), json!(0), json!(3), json!(i32::MAX)] {
+            let config = json!({"default_concurrent_limit": limit, "probing_enabled": true});
+            assert_eq!(
+                normalize_pool_advanced_config(Some(config.clone())).unwrap(),
+                Some(config)
+            );
+        }
+        for limit in [
+            json!(-1),
+            json!(1.5),
+            json!("3"),
+            json!(true),
+            json!(2147483648_i64),
+        ] {
+            assert!(normalize_pool_advanced_config(Some(
+                json!({"default_concurrent_limit": limit})
+            ))
+            .is_err());
+        }
     }
 
     #[test]

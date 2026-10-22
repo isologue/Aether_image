@@ -132,6 +132,33 @@ impl RequestCandidateReadRepository for InMemoryRequestCandidateRepository {
         Ok(rows)
     }
 
+    async fn list_by_request_ids(
+        &self,
+        request_ids: &[String],
+    ) -> Result<Vec<StoredRequestCandidate>, DataLayerError> {
+        let request_ids = request_ids
+            .iter()
+            .map(String::as_str)
+            .collect::<BTreeSet<_>>();
+        let mut rows = self
+            .rows
+            .read()
+            .expect("request candidate repository lock")
+            .by_id
+            .values()
+            .filter(|row| request_ids.contains(row.request_id.as_str()))
+            .cloned()
+            .collect::<Vec<_>>();
+        rows.sort_by(|left, right| {
+            left.request_id
+                .cmp(&right.request_id)
+                .then(left.candidate_index.cmp(&right.candidate_index))
+                .then(left.retry_index.cmp(&right.retry_index))
+                .then(left.created_at_unix_ms.cmp(&right.created_at_unix_ms))
+        });
+        Ok(rows)
+    }
+
     async fn list_recent(
         &self,
         limit: usize,
@@ -598,6 +625,30 @@ mod tests {
         assert_eq!(rows.len(), 2);
         assert_eq!(rows[0].request_id, "req-1");
         assert_eq!(rows[1].request_id, "req-1");
+    }
+
+    #[tokio::test]
+    async fn lists_request_candidates_for_multiple_request_ids_in_stable_order() {
+        let repository = InMemoryRequestCandidateRepository::seed(vec![
+            sample_candidate("cand-2", "req-1", 200),
+            sample_candidate("cand-1", "req-1", 100),
+            sample_candidate("cand-3", "req-2", 300),
+        ]);
+        let request_ids = vec![
+            "req-2".to_string(),
+            "req-1".to_string(),
+            "req-2".to_string(),
+        ];
+
+        let rows = repository
+            .list_by_request_ids(&request_ids)
+            .await
+            .expect("batch list should succeed");
+
+        assert_eq!(
+            rows.iter().map(|row| row.id.as_str()).collect::<Vec<_>>(),
+            vec!["cand-1", "cand-2", "cand-3"]
+        );
     }
 
     #[tokio::test]

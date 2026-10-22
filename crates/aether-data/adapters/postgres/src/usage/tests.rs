@@ -3719,6 +3719,7 @@ async fn live_usage_list_metadata_preserves_boolean_chat_pii_redaction() {
     ] {
         // Extract the entire outer CASE, including its gate, instead of duplicating the
         // production expression. Omitting the marker from either branch must fail.
+        let prefix = normalize_newlines(prefix);
         let projection = prefix
             .split_once("NULL::bytea AS client_response_body_compressed,\n")
             .and_then(|(_, tail)| tail.split_once("  END AS request_metadata,"))
@@ -3773,6 +3774,82 @@ async fn live_usage_list_metadata_preserves_boolean_chat_pii_redaction() {
                     projected, expected,
                     "{path} projection changed {label} marker with user_agent={user_agent:?}"
                 );
+            }
+        }
+
+        // A completed refusal must retain its full reason even without body capture
+        // or any other metadata that would satisfy the outer CASE gate.
+        for user_agent in [None, Some("refusal-probe")] {
+            let reason = "非常抱歉，该提示可能违反了我们的内容政策。\nPlease revise the prompt.";
+            let mut metadata = json!({
+                "response_outcome":"content_refused", "content_refusal_reason":reason,
+                "private_probe":"must not appear"
+            });
+            let mut expected = json!({
+                "response_outcome":"content_refused", "content_refusal_reason":reason
+            });
+            if let Some(user_agent) = user_agent {
+                metadata["user_agent"] = json!(user_agent);
+                expected["user_agent"] = json!(user_agent);
+            }
+            sqlx::query("TRUNCATE usage_list_metadata_probe")
+                .execute(&mut *conn)
+                .await
+                .expect("probe table should reset");
+            sqlx::query("INSERT INTO usage_list_metadata_probe VALUES ($1)")
+                .bind(metadata)
+                .execute(&mut *conn)
+                .await
+                .expect("refusal probe should insert");
+            let projected: Option<serde_json::Value> = sqlx::query_scalar(&sql)
+                .fetch_one(&mut *conn)
+                .await
+                .expect("production refusal projection should execute");
+            assert_eq!(projected, Some(expected), "{path} lost the refusal reason");
+        }
+
+        // Timings must survive both the CASE gate (a timing-only record) and the
+        // bounded field selection. Keep arbitrary metadata out of list responses.
+        for key in ["end_to_end_time_ms", "end_to_end_first_byte_time_ms"] {
+            for user_agent in [None, Some("timing-probe")] {
+                for (value, expected_value) in [
+                    (Some(json!(177_716)), Some(json!(177_716))),
+                    (Some(json!(0)), Some(json!(0))),
+                    (Some(json!("177716")), None),
+                    (Some(json!(true)), None),
+                    (Some(json!(null)), None),
+                    (Some(json!({"private": "value"})), None),
+                    (Some(json!([177_716])), None),
+                    (None, None),
+                ] {
+                    let mut metadata = json!({"private_probe": "must not appear"});
+                    let mut expected = serde_json::Map::new();
+                    if let Some(value) = value {
+                        metadata[key] = value;
+                    }
+                    if let Some(value) = expected_value {
+                        expected.insert(key.into(), value);
+                    }
+                    if let Some(user_agent) = user_agent {
+                        metadata["user_agent"] = json!(user_agent);
+                        expected.insert("user_agent".into(), json!(user_agent));
+                    }
+                    sqlx::query("TRUNCATE usage_list_metadata_probe")
+                        .execute(&mut *conn)
+                        .await
+                        .expect("probe table should reset");
+                    sqlx::query("INSERT INTO usage_list_metadata_probe VALUES ($1)")
+                        .bind(metadata)
+                        .execute(&mut *conn)
+                        .await
+                        .expect("timing probe should insert");
+                    let projected: Option<serde_json::Value> = sqlx::query_scalar(&sql)
+                        .fetch_one(&mut *conn)
+                        .await
+                        .expect("production timing projection should execute");
+                    let expected = (!expected.is_empty()).then(|| json!(expected));
+                    assert_eq!(projected, expected, "{path} projection changed {key}");
+                }
             }
         }
     }

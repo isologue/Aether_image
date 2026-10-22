@@ -65,6 +65,13 @@ impl RequestCandidateReadRepository for CachedRequestCandidateReadRepository {
         self.inner.list_by_request_id(request_id).await
     }
 
+    async fn list_by_request_ids(
+        &self,
+        request_ids: &[String],
+    ) -> Result<Vec<StoredRequestCandidate>, aether_data::DataLayerError> {
+        self.inner.list_by_request_ids(request_ids).await
+    }
+
     async fn list_attempted_by_request_id(
         &self,
         request_id: &str,

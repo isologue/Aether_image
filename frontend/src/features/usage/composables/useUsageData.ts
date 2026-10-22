@@ -640,6 +640,12 @@ export function useUsageData(options: UseUsageDataOptions) {
         cost: mergedCost,
         actual_cost: mergeSparseRecordMetric(existing.actual_cost, record.actual_cost) ?? record.actual_cost,
         response_time_ms: responseTiming.response_time_ms,
+        end_to_end_time_ms: statusProgressed
+          ? (record.end_to_end_time_ms ?? existing.end_to_end_time_ms)
+          : existing.end_to_end_time_ms,
+        end_to_end_first_byte_time_ms: statusProgressed
+          ? (record.end_to_end_first_byte_time_ms ?? existing.end_to_end_first_byte_time_ms)
+          : existing.end_to_end_first_byte_time_ms,
         first_byte_time_ms: mergeUsageRecordFirstByteTimeMs(
           existing.first_byte_time_ms,
           record.first_byte_time_ms,
@@ -691,6 +697,10 @@ export function useUsageData(options: UseUsageDataOptions) {
         has_fallback: existing.has_fallback === true || record.has_fallback === true,
         chat_pii_redaction: existing.chat_pii_redaction === true || record.chat_pii_redaction === true,
         has_retry: existing.has_retry === true || record.has_retry === true,
+        last_attempt_time_ms: record.last_attempt_time_ms ?? existing.last_attempt_time_ms,
+        switch_count: record.switch_count ?? existing.switch_count,
+        response_outcome: record.response_outcome ?? existing.response_outcome,
+        content_refusal_reason: record.content_refusal_reason ?? existing.content_refusal_reason,
         api_key_name: record.api_key_name || existing.api_key_name,
         provider_key_name: statusProgressed
           ? (record.provider_key_name || existing.provider_key_name)

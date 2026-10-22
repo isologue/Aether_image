@@ -578,7 +578,7 @@ pub fn apply_admin_pool_key_settings(
         };
     }
     if let Some(value) = settings.get("concurrent_limit") {
-        key.concurrent_limit = if value.is_null() || value.as_i64() == Some(0) {
+        key.concurrent_limit = if value.is_null() {
             None
         } else {
             Some(value.as_i64().expect("validated concurrent_limit") as i32)
@@ -1070,6 +1070,20 @@ mod tests {
 
         assert!(validate_admin_pool_key_settings_payload(&json!({ "rpm_limit": 0 })).is_err());
         assert!(validate_admin_pool_key_settings_payload(&json!({ "unknown": true })).is_err());
+    }
+
+    #[test]
+    fn shared_key_concurrent_limit_distinguishes_inheritance_from_unlimited() {
+        let mut key = sample_key(None);
+        for (value, expected) in [
+            (json!(2), Some(2)),
+            (json!(0), Some(0)),
+            (json!(null), None),
+        ] {
+            apply_admin_pool_key_settings(&mut key, &json!({"concurrent_limit": value}))
+                .expect("settings should apply");
+            assert_eq!(key.concurrent_limit, expected);
+        }
     }
 
     #[test]

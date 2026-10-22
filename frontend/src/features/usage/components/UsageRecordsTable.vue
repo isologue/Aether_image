@@ -249,6 +249,14 @@
                 失败
               </Badge>
               <Badge
+                v-else-if="record.response_outcome === 'content_refused'"
+                variant="outline"
+                data-usage-outcome="content-refused"
+                class="whitespace-nowrap border-amber-500/50 text-amber-700 dark:text-amber-400 text-[10px] px-1.5 h-4 leading-4"
+              >
+                内容拒绝
+              </Badge>
+              <Badge
                 v-else-if="getDisplayStatus(record) === 'pending'"
                 variant="outline"
                 class="whitespace-nowrap animate-pulse border-muted-foreground/30 text-muted-foreground text-[10px] px-1.5 h-4 leading-4 inline-flex items-center flex-shrink-0"
@@ -365,7 +373,7 @@
         <!-- 第四行：性能指标 -->
         <div class="mt-1.5 flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-1 text-[10px] leading-3.5 text-muted-foreground">
           <span
-            class="min-w-0 truncate whitespace-nowrap tabular-nums text-foreground"
+            class="inline-flex min-w-0 flex-wrap items-center gap-x-1 tabular-nums text-foreground"
             :title="getRecordPerformanceTitle(record)"
           >
             <span class="text-muted-foreground">耗时&amp;速度</span>
@@ -384,8 +392,15 @@
             </template>
             <span
               v-else-if="hasRecordDisplayLatency(record)"
-              class="ml-1"
-            >{{ formatRecordLatencyPair(record) }} / {{ formatOutputRate(getRecordDisplayOutputRate(record)) }}</span>
+              class="ml-1 inline-flex min-w-0 flex-wrap items-center justify-end gap-x-1"
+            >
+              <span>总 {{ formatRecordDurationSeconds(getRecordTotalTimeMs(record)) }}</span>
+              <span class="text-muted-foreground/50">·</span>
+              <span>末次 {{ formatRecordDurationSeconds(record.last_attempt_time_ms) }}</span>
+              <span class="text-muted-foreground/50">·</span>
+              <span>切号 {{ formatRecordSwitchCount(record) }}</span>
+              <span class="text-muted-foreground">/ {{ formatOutputRate(getRecordDisplayOutputRate(record)) }}</span>
+            </span>
             <span
               v-else
               class="ml-1"
@@ -422,103 +437,14 @@
 
     <!-- 桌面端表格视图 -->
     <Table
-      class="hidden md:table table-fixed w-full"
-      :class="[desktopTableMinWidthClass]"
+      class="hidden md:table table-fixed w-full min-w-[var(--usage-table-min-width)]"
+      :style="{ '--usage-table-min-width': `${desktopTableMinWidth}px` }"
     >
-      <colgroup v-if="isAdmin">
+      <colgroup>
         <col
-          v-if="isColumnVisible('time')"
-          class="w-[8%]"
-        >
-        <col
-          v-if="isColumnVisible('user')"
-          class="w-[12%]"
-        >
-        <col
-          v-if="isColumnVisible('model')"
-          class="w-[14%]"
-        >
-        <col
-          v-if="isColumnVisible('provider')"
-          class="w-[16%]"
-        >
-        <col
-          v-if="isColumnVisible('api_format')"
-          class="w-[15%]"
-        >
-        <col
-          v-if="isColumnVisible('status')"
-          class="w-[10%]"
-        >
-        <col
-          v-if="isColumnVisible('tokens')"
-          class="w-[10%]"
-        >
-        <col
-          v-if="isColumnVisible('cost')"
-          class="w-[6%]"
-        >
-        <col
-          v-if="isColumnVisible('performance')"
-          class="w-[9%]"
-        >
-        <col
-          v-if="isColumnVisible('client_family')"
-          class="w-[12%]"
-        >
-        <col
-          v-if="isColumnVisible('client_ip')"
-          class="w-[10%]"
-        >
-        <col
-          v-if="isColumnVisible('user_agent')"
-          class="w-[13%]"
-        >
-      </colgroup>
-      <colgroup v-else>
-        <col
-          v-if="isColumnVisible('time')"
-          class="w-[9%]"
-        >
-        <col
-          v-if="isColumnVisible('key')"
-          class="w-[17%]"
-        >
-        <col
-          v-if="isColumnVisible('model')"
-          class="w-[22%]"
-        >
-        <col
-          v-if="isColumnVisible('api_format')"
-          class="w-[14%]"
-        >
-        <col
-          v-if="isColumnVisible('status')"
-          class="w-[10%]"
-        >
-        <col
-          v-if="isColumnVisible('tokens')"
-          class="w-[11%]"
-        >
-        <col
-          v-if="isColumnVisible('cost')"
-          class="w-[7%]"
-        >
-        <col
-          v-if="isColumnVisible('performance')"
-          class="w-[10%]"
-        >
-        <col
-          v-if="isColumnVisible('client_family')"
-          class="w-[12%]"
-        >
-        <col
-          v-if="isColumnVisible('client_ip')"
-          class="w-[10%]"
-        >
-        <col
-          v-if="isColumnVisible('user_agent')"
-          class="w-[13%]"
+          v-for="column in desktopColumns"
+          :key="column.id"
+          :style="{ width: `${column.width}px` }"
         >
       </colgroup>
       <TableHeader>
@@ -647,12 +573,11 @@
           </TableHead>
           <TableHead
             v-if="isColumnVisible('performance')"
-            class="h-12 font-semibold w-[9%] text-right"
+            class="h-12 font-semibold text-right"
           >
-            <div class="flex flex-col items-end text-[11px] leading-3">
-              <span class="whitespace-nowrap">端到端</span>
-              <span class="whitespace-nowrap">首字/总耗时</span>
-              <span class="text-muted-foreground font-normal">输出速度</span>
+            <div class="flex flex-col items-end gap-0.5 leading-4">
+              <span>耗时 / 切号</span>
+              <span class="text-[11px] text-muted-foreground font-normal">总耗时 · 末次 · 输出速度</span>
             </div>
           </TableHead>
           <SortableTableHead
@@ -860,6 +785,14 @@
               失败
             </Badge>
             <Badge
+              v-else-if="record.response_outcome === 'content_refused'"
+              variant="outline"
+              data-usage-outcome="content-refused"
+              class="whitespace-nowrap border-amber-500/50 text-amber-700 dark:text-amber-400"
+            >
+              内容拒绝
+            </Badge>
+            <Badge
               v-else-if="getDisplayStatus(record) === 'pending'"
               variant="outline"
               class="whitespace-nowrap animate-pulse border-muted-foreground/30 text-muted-foreground"
@@ -974,7 +907,7 @@
           </TableCell>
           <TableCell
             v-if="isColumnVisible('performance')"
-            class="text-right py-4 w-[9%]"
+            class="text-right py-4"
           >
             <!-- pending/streaming 状态：首字与动态总耗时保留在同一行 -->
             <div
@@ -993,16 +926,22 @@
                 />
               </span>
             </div>
-            <!-- 已完成状态：首字 + 总耗时 -->
+            <!-- 已完成状态：总耗时、末次尝试耗时与切号次数 -->
             <div
               v-else-if="hasRecordDisplayLatency(record)"
               class="flex flex-col items-end text-xs gap-0.5"
               :title="getRecordPerformanceTitle(record)"
             >
-              <span class="tabular-nums whitespace-nowrap">{{ formatRecordLatencyPair(record) }}</span>
-              <span class="text-muted-foreground tabular-nums whitespace-nowrap">
-                {{ formatOutputRate(getRecordDisplayOutputRate(record)) }}
+              <span class="tabular-nums whitespace-nowrap">
+                总耗时 {{ formatRecordDurationSeconds(getRecordTotalTimeMs(record)) }}
               </span>
+              <span class="text-muted-foreground tabular-nums whitespace-nowrap">
+                末次尝试 {{ formatRecordDurationSeconds(record.last_attempt_time_ms) }}
+              </span>
+              <div class="flex max-w-full flex-wrap justify-end gap-x-2 text-muted-foreground tabular-nums">
+                <span class="whitespace-nowrap">切号 {{ formatRecordSwitchCount(record) }}</span>
+                <span class="text-muted-foreground whitespace-nowrap">{{ formatOutputRate(getRecordDisplayOutputRate(record)) }}</span>
+              </div>
             </div>
             <span
               v-else
@@ -1289,16 +1228,30 @@ const visibleColumnIds = computed<UsageRecordColumnId[]>({
 
 const visibleColumnSet = computed(() => new Set<UsageRecordColumnId>(visibleColumnIds.value))
 const visibleColumnCount = computed(() => visibleColumnIds.value.length)
-const desktopTableMinWidthClass = computed(() => {
-  const metadataColumnCount = visibleColumnIds.value.filter(column => (
-    column === 'client_family' ||
-    column === 'client_ip' ||
-    column === 'user_agent'
-  )).length
-  if (metadataColumnCount >= 3) return 'min-w-[1520px]'
-  if (metadataColumnCount > 0) return 'min-w-[1320px]'
-  return props.isAdmin ? 'min-w-[1120px]' : 'min-w-[960px]'
-})
+// 按可见列的实际宽度提供横向滚动，避免百分比挤压后文字越过相邻单元格。
+const desktopColumnWidths: Record<UsageRecordColumnId, number> = {
+  time: 88,
+  user: 132,
+  key: 184,
+  model: 156,
+  provider: 176,
+  api_format: 160,
+  status: 100,
+  tokens: 132,
+  cost: 96,
+  performance: 176,
+  client_family: 144,
+  client_ip: 144,
+  user_agent: 208,
+}
+const desktopColumns = computed(() => roleColumnOptions.value
+  .filter(column => isColumnVisible(column.id))
+  .map(column => ({
+    id: column.id,
+    width: column.id === 'model' && !props.isAdmin ? 224 : desktopColumnWidths[column.id],
+  })))
+const desktopTableMinWidth = computed(() => desktopColumns.value
+  .reduce((total, column) => total + column.width, 0))
 
 const columnSelectOptions = computed<MultiSelectOption[]>(() => roleColumnOptions.value.map(column => ({
   value: column.id,
@@ -1514,12 +1467,14 @@ function getRecordCacheTokensTitle(record: UsageRecord): string {
   ].join('\n')
 }
 
-function formatRecordLatencyPair(record: UsageRecord): string {
-  const firstByte = formatRecordDurationSeconds(
-    record.end_to_end_first_byte_time_ms ?? record.first_byte_time_ms,
-  )
-  const total = formatRecordDurationSeconds(record.end_to_end_time_ms ?? record.response_time_ms)
-  return `${firstByte} / ${total}`
+function getRecordTotalTimeMs(record: UsageRecord): number | null | undefined {
+  return record.end_to_end_time_ms ?? record.response_time_ms
+}
+
+function formatRecordSwitchCount(record: UsageRecord): string {
+  const count = record.switch_count
+  if (count == null || !Number.isFinite(count)) return '-'
+  return `${count}次`
 }
 
 function formatRecordDurationSeconds(ms: number | null | undefined): string {
@@ -1532,6 +1487,8 @@ function hasRecordDisplayLatency(record: UsageRecord): boolean {
     || record.end_to_end_first_byte_time_ms != null
     || record.response_time_ms != null
     || record.first_byte_time_ms != null
+    || record.last_attempt_time_ms != null
+    || record.switch_count != null
 }
 
 function getRecordDisplayOutputRate(record: UsageRecord): number | null {
@@ -1548,7 +1505,9 @@ function getRecordPerformanceTitle(record: UsageRecord): string {
   const outputRate = getRecordDisplayOutputRate(record)
   return [
     `端到端首字: ${formatRecordDurationSeconds(record.end_to_end_first_byte_time_ms ?? record.first_byte_time_ms)}`,
-    `端到端总耗时: ${formatRecordDurationSeconds(record.end_to_end_time_ms ?? record.response_time_ms)}`,
+    `端到端总耗时: ${formatRecordDurationSeconds(getRecordTotalTimeMs(record))}`,
+    `最后一次尝试耗时: ${formatRecordDurationSeconds(record.last_attempt_time_ms)}`,
+    `切号次数: ${formatRecordSwitchCount(record)}`,
     `成功候选首字: ${formatRecordDurationSeconds(record.first_byte_time_ms)}`,
     `成功候选耗时: ${formatRecordDurationSeconds(record.response_time_ms)}`,
     `生成耗时: ${formatRecordDurationSeconds(getGenerationTimeMs(record))}`,

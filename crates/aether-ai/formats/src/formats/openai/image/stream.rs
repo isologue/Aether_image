@@ -246,6 +246,17 @@ impl OpenAiImageStreamState {
                 });
             }
         }
+        if self.latest_image.is_none() {
+            if let Some(reason) = event.get("response").and_then(super::image_content_refusal) {
+                return encode_json_sse(
+                    Some(image_completed_event_name(report_context)),
+                    &serde_json::json!({
+                        "type": image_completed_event_name(report_context),
+                        "status": "completed", "outcome": "content_refused", "refusal": reason,
+                    }),
+                );
+            }
+        }
         let Some(latest_image) = self.latest_image.clone() else {
             return Ok(Vec::new());
         };
@@ -409,6 +420,28 @@ impl OpenAiImageChatStreamState {
     ) -> Result<Vec<u8>, AiSurfaceFinalizeError> {
         if self.finished || self.emitted_failure {
             return Ok(Vec::new());
+        }
+        if let Some(response) = event.get("response") {
+            self.update_identity_from_response(response);
+        }
+        if let Some(reason) = event
+            .get("response")
+            .and_then(super::image_content_refusal)
+            .filter(|_| self.latest_image.is_none())
+        {
+            let mut output = self.ensure_started(report_context)?;
+            let (response_id, model) = self.identity(report_context);
+            output.extend(encode_json_sse(
+                None,
+                &build_openai_chat_chunk(&response_id, &model, reason.to_string(), None, None),
+            )?);
+            output.extend(encode_json_sse(
+                None,
+                &build_openai_chat_finish_chunk(&response_id, &model, Some("stop")),
+            )?);
+            output.extend(encode_done_sse());
+            self.finished = true;
+            return Ok(output);
         }
         if let Some(response) = event.get("response") {
             self.update_identity_from_response(response);
@@ -1312,6 +1345,12 @@ pub fn maybe_build_openai_image_sync_finalize_product(
         return Ok(None);
     }
     if let Some(provider_body_json) = body_json {
+        if let Some(client_body_json) = super::image_content_refusal_response(provider_body_json) {
+            return Ok(Some(OpenAiImageSyncFinalizeProduct {
+                client_body_json,
+                provider_body_json: provider_body_json.clone(),
+            }));
+        }
         if openai_image_response_has_standard_data(provider_body_json) {
             let Some(client_body_json) = crate::formats::shared::image_bridge::
                 build_openai_image_response_from_standard_image_response(
@@ -1428,6 +1467,17 @@ pub fn maybe_build_openai_image_sync_finalize_product(
     }
 
     if images.is_empty() {
+        if let Some(response) = completed_response.as_ref() {
+            let provider_body_json = Value::Object(response.clone());
+            if let Some(client_body_json) =
+                super::image_content_refusal_response(&provider_body_json)
+            {
+                return Ok(Some(OpenAiImageSyncFinalizeProduct {
+                    client_body_json,
+                    provider_body_json,
+                }));
+            }
+        }
         return Ok(None);
     }
 
@@ -2127,5 +2177,112 @@ mod tests {
             crate::formats::openai::image::MAX_OPENAI_IMAGE_DATA_BYTES
         );
         assert!(returned.as_bytes().iter().all(|byte| *byte == b'A'));
+    }
+}
+
+#[cfg(test)]
+mod content_refusal_tests {
+    use super::*;
+    use base64::Engine as _;
+    use serde_json::json;
+
+    fn completed() -> Value {
+        json!({"id":"resp-refusal","object":"response","model":"gpt-image-2","created_at":123,
+            "status":"completed","outcome":"content_refused","refusal":"This prompt violates our content policy.",
+            "output":[{"type":"message","role":"assistant","content":[{"type":"refusal","refusal":"This prompt violates our content policy."}]}],
+            "usage":{"input_tokens":0,"output_tokens":0,"total_tokens":0}})
+    }
+
+    #[test]
+    fn content_refusal_streams_complete_without_failure_or_invented_images() {
+        let response = completed();
+        let event = format!(
+            "data: {}\n\ndata: [DONE]\n\n",
+            json!({"type":"response.completed","response":response})
+        );
+        let ctx = json!({"provider_api_format":"openai:image","client_api_format":"openai:image","image_request":{"operation":"generate"}});
+        let mut image = OpenAiImageStreamState::default();
+        let output = String::from_utf8(image.push_chunk(&ctx, event.as_bytes()).unwrap()).unwrap();
+        assert!(output.contains("image_generation.completed"));
+        assert!(output.contains("content_refused"));
+        assert!(output.contains(response["refusal"].as_str().unwrap()));
+        assert!(!output.contains("failed"));
+        assert!(!output.contains("b64_json"));
+        let mut chat = OpenAiImageChatStreamState::default();
+        let output = String::from_utf8(chat.push_chunk(&ctx, event.as_bytes()).unwrap()).unwrap();
+        assert!(output.contains(response["refusal"].as_str().unwrap()));
+        assert!(output.contains("chatcmpl-refusal"));
+        assert!(output.contains("\"finish_reason\":\"stop\""));
+        assert!(output.contains("[DONE]"));
+        let mut terminal = OpenAiImageStreamTerminalState::default();
+        for line in event.split_inclusive('\n') {
+            terminal.push_line(&ctx, line.as_bytes().to_vec()).unwrap();
+        }
+        let summary = terminal.finish(&ctx).unwrap().unwrap();
+        assert!(summary.observed_finish);
+        assert!(summary.parser_error.is_none());
+        if let Some(usage) = summary.standardized_usage {
+            assert_eq!(usage.output_tokens, 0);
+            assert!(!usage.dimensions.contains_key("image_count"));
+        }
+    }
+
+    #[test]
+    fn content_refusal_sync_and_cross_format_preserve_reason() {
+        let response = completed();
+        let ctx = json!({"provider_api_format":"openai:image","client_api_format":"openai:image"});
+        let event = format!(
+            "data: {}\n\ndata: [DONE]\n\n",
+            json!({"type":"response.completed","response":response})
+        );
+        let b64 = base64::engine::general_purpose::STANDARD.encode(event);
+        for (body, base64) in [(Some(&response), None), (None, Some(b64.as_str()))] {
+            let product = maybe_build_openai_image_sync_finalize_product(
+                "openai_image_sync_finalize",
+                200,
+                Some(&ctx),
+                body,
+                base64,
+            )
+            .unwrap()
+            .unwrap();
+            assert_eq!(product.client_body_json["data"], json!([]));
+            assert_eq!(product.client_body_json["refusal"], response["refusal"]);
+            assert_eq!(product.client_body_json["status"], "completed");
+        }
+        for client in [
+            "openai:image",
+            "openai:chat",
+            "openai:responses",
+            "gemini:generate_content",
+        ] {
+            let value =
+                super::super::image_content_refusal_for_format(&response, client, Some(&ctx))
+                    .unwrap();
+            assert!(value
+                .to_string()
+                .contains(response["refusal"].as_str().unwrap()));
+            let stream =
+                crate::formats::shared::sync_to_stream::maybe_bridge_standard_sync_json_to_stream(
+                    &response,
+                    "openai:image",
+                    client,
+                    Some(&ctx),
+                )
+                .unwrap()
+                .unwrap();
+            let text = String::from_utf8(stream.sse_body).unwrap();
+            assert!(
+                text.contains(response["refusal"].as_str().unwrap()),
+                "{client}: {text}"
+            );
+            assert!(!text.contains("response.failed"), "{client}: {text}");
+        }
+        let mut with_image = response.clone();
+        with_image["output"]
+            .as_array_mut()
+            .unwrap()
+            .push(json!({"type":"image_generation_call","result":"aGVsbG8="}));
+        assert!(super::super::image_content_refusal(&with_image).is_none());
     }
 }

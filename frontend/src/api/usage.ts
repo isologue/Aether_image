@@ -49,7 +49,11 @@ export interface UsageRecord {
   updated_at?: string | null
   response_time_updated_at?: string | null
   has_fallback?: boolean // 🆕 是否发生了 fallback
+  last_attempt_time_ms?: number | null
+  switch_count?: number | null
   chat_pii_redaction?: boolean // 请求体实际发生过敏感信息脱敏
+  response_outcome?: 'content_refused' | null
+  content_refusal_reason?: string | null
   client_family?: string | null
   client_ip?: string | null
   user_agent?: string | null
@@ -651,7 +655,11 @@ export const usageApi = {
       client_is_stream?: boolean | null
       has_format_conversion?: boolean | null
       has_fallback?: boolean | null
+      last_attempt_time_ms?: number | null
+      switch_count?: number | null
       chat_pii_redaction?: boolean | null
+      response_outcome?: 'content_refused' | null
+      content_refusal_reason?: string | null
       target_model?: string | null
       response_model?: string | null
       request_type?: string | null
@@ -728,7 +736,11 @@ export const usageApi = {
       client_is_stream?: boolean | null
       has_format_conversion?: boolean | null
       has_fallback?: boolean | null
+      last_attempt_time_ms?: number | null
+      switch_count?: number | null
       chat_pii_redaction?: boolean | null
+      response_outcome?: 'content_refused' | null
+      content_refusal_reason?: string | null
       target_model?: string | null
       response_model?: string | null
       request_type?: string | null

@@ -1174,6 +1174,21 @@ pub fn maybe_build_standard_cross_format_sync_product(
     let provider_api_format = provider_api_format.trim().to_ascii_lowercase();
     let client_api_format = client_api_format.trim().to_ascii_lowercase();
 
+    if provider_api_format == "openai:image" {
+        if let Some(client_body_json) =
+            crate::formats::openai::image::image_content_refusal_for_format(
+                &provider_body_json,
+                &client_api_format,
+                Some(report_context),
+            )
+        {
+            return Some(StandardCrossFormatSyncProduct {
+                client_body_json,
+                provider_body_json,
+            });
+        }
+    }
+
     if provider_api_format == "openai:image" && client_api_format == "gemini:generate_content" {
         let client_body_json = match (
             provider_body_json.get("data").and_then(Value::as_array),

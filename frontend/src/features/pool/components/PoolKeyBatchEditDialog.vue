@@ -114,7 +114,7 @@
                   v-model="form.concurrentLimit"
                   type="number"
                   min="0"
-                  placeholder="不限制"
+                  placeholder="留空继承号池，0 不限制"
                   class="h-9"
                   :disabled="!form.applyConcurrentLimit"
                 />

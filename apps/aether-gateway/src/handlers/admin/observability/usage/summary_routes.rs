@@ -93,6 +93,10 @@ fn apply_admin_usage_status_filter(query: &mut UsageAuditListQuery, status: Opti
 struct AdminUsageAttemptFlags {
     has_fallback: bool,
     has_retry: bool,
+    /// 最后一个真正发起过请求的候选耗时，不包含调度跳过的候选。
+    last_attempt_time_ms: Option<u64>,
+    /// 相邻实际尝试的 key_id 发生变化的次数；同账号重试不计入切号。
+    switch_count: Option<u32>,
     /// 是否存在"被调度跳过"的候选（调度阶段判定本次不可用，从未向上游发起请求）。
     ///
     /// 这是与 has_fallback 正交的信号：has_fallback 表示"更靠前的候选真的失败并被换掉"，
@@ -122,6 +126,58 @@ fn admin_usage_candidate_failed_before_fallback(candidate: &StoredRequestCandida
 
 fn admin_usage_candidate_was_retried(candidate: &StoredRequestCandidate) -> bool {
     candidate.retry_index > 0 && candidate.status.is_attempted(candidate.started_at_unix_ms)
+}
+
+fn admin_usage_candidate_latency_ms(candidate: &StoredRequestCandidate) -> Option<u64> {
+    candidate.latency_ms.or_else(|| {
+        candidate
+            .finished_at_unix_ms
+            .zip(candidate.started_at_unix_ms)
+            .map(|(finished_at, started_at)| finished_at.saturating_sub(started_at))
+    })
+}
+
+fn admin_usage_attempt_metrics(
+    candidates: &[StoredRequestCandidate],
+) -> (Option<u64>, Option<u32>) {
+    let mut attempted = candidates
+        .iter()
+        .filter(|candidate| candidate.status.is_attempted(candidate.started_at_unix_ms))
+        .collect::<Vec<_>>();
+    attempted.sort_by(|left, right| {
+        left.started_at_unix_ms
+            .cmp(&right.started_at_unix_ms)
+            .then(left.candidate_index.cmp(&right.candidate_index))
+            .then(left.retry_index.cmp(&right.retry_index))
+            .then(left.created_at_unix_ms.cmp(&right.created_at_unix_ms))
+            .then(left.id.cmp(&right.id))
+    });
+
+    if attempted.is_empty() {
+        return (None, None);
+    }
+    let last_attempt_time_ms = attempted
+        .last()
+        .and_then(|candidate| admin_usage_candidate_latency_ms(candidate));
+
+    let mut switch_count = 0_u32;
+    let mut previous_identity: Option<String> = None;
+    for candidate in attempted {
+        let identity = candidate
+            .key_id
+            .as_deref()
+            .map(|key_id| format!("key:{key_id}"))
+            .unwrap_or_else(|| format!("candidate:{}", candidate.candidate_index));
+        if previous_identity
+            .as_deref()
+            .is_some_and(|previous| previous != identity)
+        {
+            switch_count = switch_count.saturating_add(1);
+        }
+        previous_identity = Some(identity);
+    }
+
+    (last_attempt_time_ms, Some(switch_count))
 }
 
 fn admin_usage_final_candidate_index(
@@ -163,10 +219,13 @@ fn admin_usage_attempt_flags_from_candidates(
     });
     let has_retry = candidates.iter().any(admin_usage_candidate_was_retried);
     let skipped_candidate_reasons = admin_usage_skipped_candidate_reasons(candidates);
+    let (last_attempt_time_ms, switch_count) = admin_usage_attempt_metrics(candidates);
 
     AdminUsageAttemptFlags {
         has_fallback,
         has_retry,
+        last_attempt_time_ms,
+        switch_count,
         has_skipped_candidate: !skipped_candidate_reasons.is_empty(),
         skipped_candidate_reasons,
     }
@@ -206,6 +265,8 @@ fn admin_usage_attempt_flags_for_item(
             AdminUsageAttemptFlags {
                 has_fallback: admin_usage_has_fallback(item),
                 has_retry: false,
+                last_attempt_time_ms: None,
+                switch_count: None,
                 has_skipped_candidate: false,
                 skipped_candidate_reasons: Vec::new(),
             }
@@ -225,15 +286,17 @@ async fn resolve_admin_usage_attempt_flags_by_usage_id(
         .iter()
         .map(|item| item.request_id.clone())
         .collect::<BTreeSet<_>>();
-    let mut candidates_by_request_id = BTreeMap::new();
-    for request_id in request_ids {
-        candidates_by_request_id.insert(
-            request_id.clone(),
-            state
-                .app()
-                .read_request_candidates_by_request_id(&request_id)
-                .await?,
-        );
+    let request_ids = request_ids.into_iter().collect::<Vec<_>>();
+    let candidates = state
+        .app()
+        .read_request_candidates_by_request_ids(&request_ids)
+        .await?;
+    let mut candidates_by_request_id = BTreeMap::<String, Vec<StoredRequestCandidate>>::new();
+    for candidate in candidates {
+        candidates_by_request_id
+            .entry(candidate.request_id.clone())
+            .or_default()
+            .push(candidate);
     }
 
     Ok(items
@@ -549,6 +612,8 @@ fn build_admin_usage_records_response_with_attempt_flags(
             );
             record["has_fallback"] = json!(flags.has_fallback);
             record["has_retry"] = json!(flags.has_retry);
+            record["last_attempt_time_ms"] = json!(flags.last_attempt_time_ms);
+            record["switch_count"] = json!(flags.switch_count);
             // 被跳过的候选：前端据此提示"这次没用某个提供商，是因为它在调度阶段就被排除了"。
             record["has_skipped_candidate"] = json!(flags.has_skipped_candidate);
             record["skipped_candidate_reasons"] = json!(flags.skipped_candidate_reasons);
@@ -1351,6 +1416,47 @@ mod tests {
         let flags = admin_usage_attempt_flags_from_candidates(&sample_usage_audit(), &candidates);
 
         assert!(flags.has_skipped_candidate);
+        assert!(flags.has_fallback);
+    }
+
+    #[test]
+    fn attempt_metrics_report_last_attempt_and_real_account_switches() {
+        let mut first = sample_candidate(
+            0,
+            RequestCandidateStatus::Failed,
+            Some(401),
+            Some(100),
+            None,
+        );
+        first.key_id = Some("account-a".to_string());
+
+        let mut same_account_retry = sample_candidate(
+            0,
+            RequestCandidateStatus::Failed,
+            Some(429),
+            Some(250),
+            None,
+        );
+        same_account_retry.retry_index = 1;
+        same_account_retry.key_id = Some("account-a".to_string());
+
+        let mut switched_account = sample_candidate(
+            1,
+            RequestCandidateStatus::Success,
+            Some(200),
+            Some(700),
+            None,
+        );
+        switched_account.key_id = Some("account-b".to_string());
+
+        let flags = admin_usage_attempt_flags_from_candidates(
+            &sample_usage_audit(),
+            &[first, same_account_retry, switched_account],
+        );
+
+        assert_eq!(flags.last_attempt_time_ms, Some(700));
+        assert_eq!(flags.switch_count, Some(1));
+        assert!(flags.has_retry);
         assert!(flags.has_fallback);
     }
 

@@ -209,6 +209,40 @@ describe('useUsageData', () => {
     })
   })
 
+  it.each([true, false])('keeps end-to-end timings through sparse and stale refreshes (admin=%s)', async (admin) => {
+    const { loadRecords, currentRecords } = useUsageData({ isAdminPage: ref(admin) })
+    const range = { preset: 'today', tz_offset_minutes: 0 }
+    const loader = admin ? getAllUsageRecordsMock : meGetUsageMock
+    const completed = buildUsageRecord({
+      response_time_ms: 65_667,
+      end_to_end_time_ms: 177_716,
+      end_to_end_first_byte_time_ms: 177_600,
+      last_attempt_time_ms: 65_667,
+      switch_count: 3,
+      updated_at: '2026-10-21T14:48:13Z',
+    })
+    loader.mockResolvedValueOnce({ records: [completed], total: 1 })
+    await loadRecords({ page: 1, pageSize: 20 }, undefined, range)
+
+    loader.mockResolvedValueOnce({ records: [buildUsageRecord({
+      response_time_ms: 65_667,
+      end_to_end_time_ms: null,
+      end_to_end_first_byte_time_ms: null,
+      updated_at: completed.updated_at,
+    })], total: 1 })
+    await loadRecords({ page: 1, pageSize: 20 }, undefined, range)
+    expect(currentRecords.value[0]).toMatchObject(completed)
+
+    loader.mockResolvedValueOnce({ records: [buildUsageRecord({
+      status: 'pending',
+      end_to_end_time_ms: 5_000,
+      end_to_end_first_byte_time_ms: 4_000,
+      updated_at: '2026-10-21T14:45:20Z',
+    })], total: 1 })
+    await loadRecords({ page: 1, pageSize: 20 }, undefined, range)
+    expect(currentRecords.value[0]).toMatchObject(completed)
+  })
+
   it('clears a failed candidate Cyber snapshot when the final candidate completes', async () => {
     const isAdminPage = ref(true)
     const { loadRecords, currentRecords } = useUsageData({ isAdminPage })

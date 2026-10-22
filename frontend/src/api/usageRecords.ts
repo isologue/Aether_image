@@ -72,8 +72,14 @@ export interface UsageRecord {
   response_time_updated_at?: string | null
   has_fallback?: boolean
   has_retry?: boolean
+  /** 最后一个实际尝试候选的耗时；无候选审计数据时为空。 */
+  last_attempt_time_ms?: number | null
+  /** 相邻实际尝试切换账号的次数；同账号重试不计入。 */
+  switch_count?: number | null
   /** 请求体实际发生过敏感信息脱敏（上游收到的是占位符）。 */
   chat_pii_redaction?: boolean
+  response_outcome?: 'content_refused' | null
+  content_refusal_reason?: string | null
   /**
    * 是否存在被调度跳过的候选（候选在调度阶段即被判定不可用，从未向上游发起请求）。
    * 与 has_fallback 的区别：has_fallback 代表"更靠前的候选真的失败了"，

@@ -1349,6 +1349,9 @@ fn admin_usage_active_request_json(
     });
     value["billing_multiplier"] = json!(billing_multiplier);
     value["billing_cost"] = json!(billing_cost);
+    value["response_outcome"] = json!(admin_usage_metadata_string(item, "response_outcome"));
+    value["content_refusal_reason"] =
+        json!(admin_usage_metadata_string(item, "content_refusal_reason"));
     value["routing_group_id"] = json!(item.routing_group_id());
     value["routing_group_name"] = json!(item.routing_group_name());
     value["chat_pii_redaction"] = json!(admin_usage_chat_pii_redacted(item));
@@ -1466,6 +1469,9 @@ pub fn admin_usage_record_json(
     });
     payload["billing_multiplier"] = json!(billing_multiplier);
     payload["billing_cost"] = json!(billing_cost);
+    payload["response_outcome"] = json!(admin_usage_metadata_string(item, "response_outcome"));
+    payload["content_refusal_reason"] =
+        json!(admin_usage_metadata_string(item, "content_refusal_reason"));
     payload["routing_group_id"] = json!(item.routing_group_id());
     payload["routing_group_name"] = json!(item.routing_group_name());
     payload["chat_pii_redaction"] = json!(admin_usage_chat_pii_redacted(item));
@@ -4423,5 +4429,30 @@ mod tests {
             None,
         );
         assert_eq!(record["chat_pii_redaction"], false);
+    }
+
+    #[test]
+    fn admin_content_refusal_record_is_completed_and_preserves_reason() {
+        let reason = "非常抱歉，该提示可能违反了我们的内容政策。\nPlease revise the prompt.";
+        let item = StoredRequestUsageAudit {
+            request_metadata: Some(
+                json!({"response_outcome":"content_refused", "content_refusal_reason":reason}),
+            ),
+            ..sample_usage("completed", Some(200), None)
+        };
+        let record = admin_usage_record_json(
+            &item,
+            &BTreeMap::new(),
+            &BTreeMap::new(),
+            false,
+            false,
+            None,
+        );
+        let active = admin_usage_active_request_json(&item, None, None, None);
+        for payload in [record, active] {
+            assert_eq!(payload["response_outcome"], "content_refused");
+            assert_eq!(payload["content_refusal_reason"], reason);
+            assert_eq!(payload["status"], "completed");
+        }
     }
 }
