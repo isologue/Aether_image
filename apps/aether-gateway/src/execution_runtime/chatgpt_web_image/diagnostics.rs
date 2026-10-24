@@ -57,6 +57,7 @@ struct EventDiagnostic {
 
 #[derive(Debug, Clone, Default)]
 struct MessageDiagnostic {
+    id: Option<String>,
     anchored: bool,
     source: Option<&'static str>,
     role: Option<String>,
@@ -361,7 +362,19 @@ impl WebImageSseDiagnostics {
         }
         // A new message identity must never inherit the previous message's
         // role/end_turn/status. Require a fresh full snapshot as the anchor.
-        if path == "/message/id" || (path == "/message" && patch_value.is_none()) {
+        if path == "/message/id" {
+            let id = patch_value
+                .and_then(Value::as_str)
+                .filter(|id| id.len() <= 256);
+            if id != self.last_message.id.as_deref() {
+                self.last_message = MessageDiagnostic {
+                    id: id.map(str::to_owned),
+                    ..MessageDiagnostic::default()
+                };
+            }
+            return true;
+        }
+        if path == "/message" && patch_value.is_none() {
             self.last_message = MessageDiagnostic::default();
             return true;
         }
@@ -429,6 +442,13 @@ impl WebImageSseDiagnostics {
 
     pub(super) fn has_current_message(&self) -> bool {
         self.last_message.source.is_some()
+    }
+
+    pub(super) fn current_assistant_text(&self) -> Option<&str> {
+        let message = &self.last_message;
+        (message.anchored && message.role.as_deref() == Some("assistant"))
+            .then_some(message.text.complete.as_deref())
+            .flatten()
     }
 
     pub(super) fn completed_assistant_text(&self) -> Option<(&str, bool)> {
@@ -553,6 +573,11 @@ pub(super) fn current_message(value: &Value) -> Option<&Value> {
 impl MessageDiagnostic {
     fn from_message(message: &Value, source: &'static str) -> Self {
         let mut result = Self {
+            id: message
+                .get("id")
+                .and_then(Value::as_str)
+                .filter(|id| id.len() <= 256)
+                .map(str::to_owned),
             anchored: message
                 .pointer("/author/role")
                 .and_then(Value::as_str)
@@ -573,7 +598,7 @@ impl MessageDiagnostic {
         self.anchored
             && self.role.as_deref() == Some("assistant")
             && self.recipient.as_deref() == Some("all")
-            && matches!(self.channel.as_deref(), None | Some("final"))
+            && matches!(self.channel.as_deref(), None | Some("final" | "commentary"))
             && self.status.as_deref() == Some("finished_successfully")
             && self.end_turn == Some(true)
     }
@@ -817,6 +842,13 @@ impl<'a> InitialResponseDiagnostics<'a> {
             ExecutionRuntimeTransportError::UpstreamResponseDecode { .. } => "response_decode",
             _ => "other",
         });
+        let upstream_error = error.and_then(|error| match error {
+            ExecutionRuntimeTransportError::UpstreamHttpStatus {
+                response_body: Some(body),
+                ..
+            } => body.get("error"),
+            _ => None,
+        });
         info!(
             event_name = "chatgpt_web_image_initial_response_diagnostics",
             request_id = %self.plan.request_id,
@@ -856,6 +888,10 @@ impl<'a> InitialResponseDiagnostics<'a> {
             turn_finished = ?summary.map(|summary| summary.turn_finished),
             asset_count = ?summary.map(WebImageSseSummary::retained_item_count),
             error_kind,
+            upstream_error_type = ?upstream_error.and_then(|body| body.get("type")).and_then(|value| value.as_str()),
+            upstream_error_code = ?upstream_error.and_then(|body| body.get("code")).and_then(|value| value.as_str()),
+            upstream_error_param = ?upstream_error.and_then(|body| body.get("param")).and_then(|value| value.as_str()),
+            upstream_error_message = ?upstream_error.and_then(|body| body.get("message")).and_then(|value| value.as_str()),
             error = ?error.map(safe_transport_error_message),
             "ChatGPT-Web initial response read and SSE diagnostics"
         );
@@ -873,6 +909,38 @@ impl Drop for InitialResponseDiagnostics<'_> {
 
 #[cfg(test)]
 mod tests {
+
+    #[test]
+    fn audit_same_message_id_patch_keeps_terminal_anchor_and_full_text() {
+        let mut message = assistant_message();
+        message["id"] = json!("assistant-one");
+        message["channel"] = json!("commentary");
+        message["content"]["parts"] = json!(["U"]);
+        let summary = summary_events([
+            json!({"message":message}),
+            json!({"p":"/message/id","o":"replace","v":"assistant-one"}),
+            json!({"p":"/message/content/parts/0","o":"append","v":"nable to generate an image."}),
+        ]);
+        assert!(summary.turn_finished);
+        assert_eq!(
+            summary.last_text.as_deref(),
+            Some("Unable to generate an image.")
+        );
+    }
+
+    #[test]
+    fn audit_new_message_id_and_transport_done_cannot_reuse_old_terminal() {
+        let mut message = assistant_message();
+        message["id"] = json!("assistant-one");
+        let summary = summary_events([
+            json!({"message":message}),
+            json!({"p":"/message/id","o":"replace","v":"assistant-two"}),
+        ]);
+        assert!(!summary.turn_finished);
+        assert!(summary.diagnostics.completed_assistant_text().is_none());
+        assert!(!parse_web_image_sse(b"data: [DONE]\n\n").turn_finished);
+    }
+
     use super::*;
 
     #[test]
@@ -933,7 +1001,12 @@ mod tests {
 
     #[test]
     fn terminal_without_channel_requires_all_other_terminal_metadata() {
-        for channel in [None, Some(Value::Null), Some(json!("final"))] {
+        for channel in [
+            None,
+            Some(Value::Null),
+            Some(json!("final")),
+            Some(json!("commentary")),
+        ] {
             let mut message = assistant_message();
             if let Some(channel) = channel {
                 message["channel"] = channel;
@@ -945,7 +1018,6 @@ mod tests {
         }
         for (field, value) in [
             ("channel", json!("analysis")),
-            ("channel", json!("commentary")),
             ("channel", json!(123)),
             ("recipient", json!("imagegen")),
             ("status", json!("in_progress")),

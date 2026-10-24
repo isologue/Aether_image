@@ -1,0 +1,2384 @@
+[
+  {
+    "request_id": "f620d2d2-6aae-4604-9a38-665b5db32c15",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 406560,
+        "utf8_bytes": 406560,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "e0ae23e3-17be-497a-9566-24412ea60365",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 240172,
+        "utf8_bytes": 240172,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "59477a3b-617c-4869-a2de-44b9dce3276e",
+    "shape": {
+      "images": {
+        "type": "array",
+        "count": 3,
+        "items": [
+          {
+            "image_url": {
+              "type": "string",
+              "chars": 94,
+              "utf8_bytes": 94,
+              "kind": "uri",
+              "scheme": "https",
+              "host": "fuduo-framework.oss-cn-hangzhou.aliyuncs.com"
+            }
+          },
+          {
+            "image_url": {
+              "type": "string",
+              "chars": 94,
+              "utf8_bytes": 94,
+              "kind": "uri",
+              "scheme": "https",
+              "host": "fuduo-framework.oss-cn-hangzhou.aliyuncs.com"
+            }
+          },
+          {
+            "image_url": {
+              "type": "string",
+              "chars": 94,
+              "utf8_bytes": 94,
+              "kind": "uri",
+              "scheme": "https",
+              "host": "fuduo-framework.oss-cn-hangzhou.aliyuncs.com"
+            }
+          }
+        ]
+      },
+      "model": {
+        "type": "string",
+        "chars": 11,
+        "utf8_bytes": 11
+      },
+      "n": {
+        "type": "int"
+      },
+      "prompt": {
+        "type": "string",
+        "chars": 21729,
+        "utf8_bytes": 59632
+      }
+    },
+    "model": "gpt-image-2",
+    "n": 1
+  },
+  {
+    "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 210052,
+        "utf8_bytes": 210052,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "b1c04e19-a18b-44fc-95c2-e05039b49319",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 513680,
+        "utf8_bytes": 513680,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "051b664e-6c71-4775-a716-3e0ad0b8159a",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 513680,
+        "utf8_bytes": 513680,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "f2ebe94d-342f-407b-b572-5ad4290af4ae",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 513680,
+        "utf8_bytes": 513680,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "4f8f1af8-f1d7-465b-a9e3-1a38ca950b56",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 406560,
+        "utf8_bytes": 406560,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "8d74ef79-397e-4762-827f-fe3444831c31",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 406560,
+        "utf8_bytes": 406560,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "316547ad-f979-4569-8a66-1d9c80814c24",
+    "shape": {
+      "images": {
+        "type": "array",
+        "count": 3,
+        "items": [
+          {
+            "image_url": {
+              "type": "string",
+              "chars": 94,
+              "utf8_bytes": 94,
+              "kind": "uri",
+              "scheme": "https",
+              "host": "fuduo-framework.oss-cn-hangzhou.aliyuncs.com"
+            }
+          },
+          {
+            "image_url": {
+              "type": "string",
+              "chars": 94,
+              "utf8_bytes": 94,
+              "kind": "uri",
+              "scheme": "https",
+              "host": "fuduo-framework.oss-cn-hangzhou.aliyuncs.com"
+            }
+          },
+          {
+            "image_url": {
+              "type": "string",
+              "chars": 94,
+              "utf8_bytes": 94,
+              "kind": "uri",
+              "scheme": "https",
+              "host": "fuduo-framework.oss-cn-hangzhou.aliyuncs.com"
+            }
+          }
+        ]
+      },
+      "model": {
+        "type": "string",
+        "chars": 11,
+        "utf8_bytes": 11
+      },
+      "n": {
+        "type": "int"
+      },
+      "prompt": {
+        "type": "string",
+        "chars": 21732,
+        "utf8_bytes": 59641
+      }
+    },
+    "model": "gpt-image-2",
+    "n": 1
+  },
+  {
+    "request_id": "cf2480b1-cfac-4289-a096-f9d86144dc5d",
+    "shape": {
+      "images": {
+        "type": "array",
+        "count": 3,
+        "items": [
+          {
+            "image_url": {
+              "type": "string",
+              "chars": 94,
+              "utf8_bytes": 94,
+              "kind": "uri",
+              "scheme": "https",
+              "host": "fuduo-framework.oss-cn-hangzhou.aliyuncs.com"
+            }
+          },
+          {
+            "image_url": {
+              "type": "string",
+              "chars": 94,
+              "utf8_bytes": 94,
+              "kind": "uri",
+              "scheme": "https",
+              "host": "fuduo-framework.oss-cn-hangzhou.aliyuncs.com"
+            }
+          },
+          {
+            "image_url": {
+              "type": "string",
+              "chars": 94,
+              "utf8_bytes": 94,
+              "kind": "uri",
+              "scheme": "https",
+              "host": "fuduo-framework.oss-cn-hangzhou.aliyuncs.com"
+            }
+          }
+        ]
+      },
+      "model": {
+        "type": "string",
+        "chars": 11,
+        "utf8_bytes": 11
+      },
+      "n": {
+        "type": "int"
+      },
+      "prompt": {
+        "type": "string",
+        "chars": 21731,
+        "utf8_bytes": 59638
+      }
+    },
+    "model": "gpt-image-2",
+    "n": 1
+  },
+  {
+    "request_id": "f51da7ce-b68e-4402-bc51-e0e86f3db1dd",
+    "shape": {
+      "images": {
+        "type": "array",
+        "count": 3,
+        "items": [
+          {
+            "image_url": {
+              "type": "string",
+              "chars": 94,
+              "utf8_bytes": 94,
+              "kind": "uri",
+              "scheme": "https",
+              "host": "fuduo-framework.oss-cn-hangzhou.aliyuncs.com"
+            }
+          },
+          {
+            "image_url": {
+              "type": "string",
+              "chars": 94,
+              "utf8_bytes": 94,
+              "kind": "uri",
+              "scheme": "https",
+              "host": "fuduo-framework.oss-cn-hangzhou.aliyuncs.com"
+            }
+          },
+          {
+            "image_url": {
+              "type": "string",
+              "chars": 94,
+              "utf8_bytes": 94,
+              "kind": "uri",
+              "scheme": "https",
+              "host": "fuduo-framework.oss-cn-hangzhou.aliyuncs.com"
+            }
+          }
+        ]
+      },
+      "model": {
+        "type": "string",
+        "chars": 11,
+        "utf8_bytes": 11
+      },
+      "n": {
+        "type": "int"
+      },
+      "prompt": {
+        "type": "string",
+        "chars": 21759,
+        "utf8_bytes": 59716
+      }
+    },
+    "model": "gpt-image-2",
+    "n": 1
+  },
+  {
+    "request_id": "2a522fcf-dfc4-41fd-89fe-b5b528e7207e",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 406560,
+        "utf8_bytes": 406560,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "97de52c9-4c0a-4250-a1b1-fe355a5289cf",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 406560,
+        "utf8_bytes": 406560,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "897f4162-104e-4098-a768-5c7c1e899d4a",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 406560,
+        "utf8_bytes": 406560,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "3a39f9cf-6018-4c03-bc57-0211011f7d27",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 406560,
+        "utf8_bytes": 406560,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "34bf29be-f7f5-4160-82c4-16f0221d7a86",
+    "shape": {
+      "images": {
+        "type": "array",
+        "count": 3,
+        "items": [
+          {
+            "image_url": {
+              "type": "string",
+              "chars": 94,
+              "utf8_bytes": 94,
+              "kind": "uri",
+              "scheme": "https",
+              "host": "fuduo-framework.oss-cn-hangzhou.aliyuncs.com"
+            }
+          },
+          {
+            "image_url": {
+              "type": "string",
+              "chars": 94,
+              "utf8_bytes": 94,
+              "kind": "uri",
+              "scheme": "https",
+              "host": "fuduo-framework.oss-cn-hangzhou.aliyuncs.com"
+            }
+          },
+          {
+            "image_url": {
+              "type": "string",
+              "chars": 94,
+              "utf8_bytes": 94,
+              "kind": "uri",
+              "scheme": "https",
+              "host": "fuduo-framework.oss-cn-hangzhou.aliyuncs.com"
+            }
+          }
+        ]
+      },
+      "model": {
+        "type": "string",
+        "chars": 11,
+        "utf8_bytes": 11
+      },
+      "n": {
+        "type": "int"
+      },
+      "prompt": {
+        "type": "string",
+        "chars": 22153,
+        "utf8_bytes": 60734
+      }
+    },
+    "model": "gpt-image-2",
+    "n": 1
+  },
+  {
+    "request_id": "a9faa2e9-8c67-4f27-a940-5ccede2ce4bb",
+    "shape": {
+      "images": {
+        "type": "array",
+        "count": 3,
+        "items": [
+          {
+            "image_url": {
+              "type": "string",
+              "chars": 94,
+              "utf8_bytes": 94,
+              "kind": "uri",
+              "scheme": "https",
+              "host": "fuduo-framework.oss-cn-hangzhou.aliyuncs.com"
+            }
+          },
+          {
+            "image_url": {
+              "type": "string",
+              "chars": 94,
+              "utf8_bytes": 94,
+              "kind": "uri",
+              "scheme": "https",
+              "host": "fuduo-framework.oss-cn-hangzhou.aliyuncs.com"
+            }
+          },
+          {
+            "image_url": {
+              "type": "string",
+              "chars": 94,
+              "utf8_bytes": 94,
+              "kind": "uri",
+              "scheme": "https",
+              "host": "fuduo-framework.oss-cn-hangzhou.aliyuncs.com"
+            }
+          }
+        ]
+      },
+      "model": {
+        "type": "string",
+        "chars": 11,
+        "utf8_bytes": 11
+      },
+      "n": {
+        "type": "int"
+      },
+      "prompt": {
+        "type": "string",
+        "chars": 22342,
+        "utf8_bytes": 61187
+      }
+    },
+    "model": "gpt-image-2",
+    "n": 1
+  },
+  {
+    "request_id": "6f83c71b-45f5-4753-957c-639efae32c59",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 406560,
+        "utf8_bytes": 406560,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "1a3d762c-c6b9-4dc7-9716-c5ef8c94259d",
+    "shape": {
+      "images": {
+        "type": "array",
+        "count": 3,
+        "items": [
+          {
+            "image_url": {
+              "type": "string",
+              "chars": 94,
+              "utf8_bytes": 94,
+              "kind": "uri",
+              "scheme": "https",
+              "host": "fuduo-framework.oss-cn-hangzhou.aliyuncs.com"
+            }
+          },
+          {
+            "image_url": {
+              "type": "string",
+              "chars": 94,
+              "utf8_bytes": 94,
+              "kind": "uri",
+              "scheme": "https",
+              "host": "fuduo-framework.oss-cn-hangzhou.aliyuncs.com"
+            }
+          },
+          {
+            "image_url": {
+              "type": "string",
+              "chars": 94,
+              "utf8_bytes": 94,
+              "kind": "uri",
+              "scheme": "https",
+              "host": "fuduo-framework.oss-cn-hangzhou.aliyuncs.com"
+            }
+          }
+        ]
+      },
+      "model": {
+        "type": "string",
+        "chars": 11,
+        "utf8_bytes": 11
+      },
+      "n": {
+        "type": "int"
+      },
+      "prompt": {
+        "type": "string",
+        "chars": 22239,
+        "utf8_bytes": 60938
+      }
+    },
+    "model": "gpt-image-2",
+    "n": 1
+  },
+  {
+    "request_id": "706468af-8b30-41e9-bed2-c8c574334c84",
+    "shape": {
+      "images": {
+        "type": "array",
+        "count": 3,
+        "items": [
+          {
+            "image_url": {
+              "type": "string",
+              "chars": 94,
+              "utf8_bytes": 94,
+              "kind": "uri",
+              "scheme": "https",
+              "host": "fuduo-framework.oss-cn-hangzhou.aliyuncs.com"
+            }
+          },
+          {
+            "image_url": {
+              "type": "string",
+              "chars": 94,
+              "utf8_bytes": 94,
+              "kind": "uri",
+              "scheme": "https",
+              "host": "fuduo-framework.oss-cn-hangzhou.aliyuncs.com"
+            }
+          },
+          {
+            "image_url": {
+              "type": "string",
+              "chars": 94,
+              "utf8_bytes": 94,
+              "kind": "uri",
+              "scheme": "https",
+              "host": "fuduo-framework.oss-cn-hangzhou.aliyuncs.com"
+            }
+          }
+        ]
+      },
+      "model": {
+        "type": "string",
+        "chars": 11,
+        "utf8_bytes": 11
+      },
+      "n": {
+        "type": "int"
+      },
+      "prompt": {
+        "type": "string",
+        "chars": 22518,
+        "utf8_bytes": 61551
+      }
+    },
+    "model": "gpt-image-2",
+    "n": 1
+  },
+  {
+    "request_id": "79869f1e-26eb-47fa-9d8a-e8523f6ba4ac",
+    "shape": {
+      "images": {
+        "type": "array",
+        "count": 3,
+        "items": [
+          {
+            "image_url": {
+              "type": "string",
+              "chars": 94,
+              "utf8_bytes": 94,
+              "kind": "uri",
+              "scheme": "https",
+              "host": "fuduo-framework.oss-cn-hangzhou.aliyuncs.com"
+            }
+          },
+          {
+            "image_url": {
+              "type": "string",
+              "chars": 94,
+              "utf8_bytes": 94,
+              "kind": "uri",
+              "scheme": "https",
+              "host": "fuduo-framework.oss-cn-hangzhou.aliyuncs.com"
+            }
+          },
+          {
+            "image_url": {
+              "type": "string",
+              "chars": 94,
+              "utf8_bytes": 94,
+              "kind": "uri",
+              "scheme": "https",
+              "host": "fuduo-framework.oss-cn-hangzhou.aliyuncs.com"
+            }
+          }
+        ]
+      },
+      "model": {
+        "type": "string",
+        "chars": 11,
+        "utf8_bytes": 11
+      },
+      "n": {
+        "type": "int"
+      },
+      "prompt": {
+        "type": "string",
+        "chars": 22236,
+        "utf8_bytes": 60943
+      }
+    },
+    "model": "gpt-image-2",
+    "n": 1
+  },
+  {
+    "request_id": "0d96d4f9-3877-4857-993a-3755ff516a87",
+    "shape": {
+      "images": {
+        "type": "array",
+        "count": 3,
+        "items": [
+          {
+            "image_url": {
+              "type": "string",
+              "chars": 94,
+              "utf8_bytes": 94,
+              "kind": "uri",
+              "scheme": "https",
+              "host": "fuduo-framework.oss-cn-hangzhou.aliyuncs.com"
+            }
+          },
+          {
+            "image_url": {
+              "type": "string",
+              "chars": 94,
+              "utf8_bytes": 94,
+              "kind": "uri",
+              "scheme": "https",
+              "host": "fuduo-framework.oss-cn-hangzhou.aliyuncs.com"
+            }
+          },
+          {
+            "image_url": {
+              "type": "string",
+              "chars": 94,
+              "utf8_bytes": 94,
+              "kind": "uri",
+              "scheme": "https",
+              "host": "fuduo-framework.oss-cn-hangzhou.aliyuncs.com"
+            }
+          }
+        ]
+      },
+      "model": {
+        "type": "string",
+        "chars": 11,
+        "utf8_bytes": 11
+      },
+      "n": {
+        "type": "int"
+      },
+      "prompt": {
+        "type": "string",
+        "chars": 22088,
+        "utf8_bytes": 60563
+      }
+    },
+    "model": "gpt-image-2",
+    "n": 1
+  },
+  {
+    "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 510628,
+        "utf8_bytes": 510628,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "eac587f1-0492-4fbb-a0d2-60a4284bc55d",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 406560,
+        "utf8_bytes": 406560,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "dfdbf3e0-8ef6-48cd-8500-5739d9e2af5c",
+    "shape": {
+      "images": {
+        "type": "array",
+        "count": 3,
+        "items": [
+          {
+            "image_url": {
+              "type": "string",
+              "chars": 94,
+              "utf8_bytes": 94,
+              "kind": "uri",
+              "scheme": "https",
+              "host": "fuduo-framework.oss-cn-hangzhou.aliyuncs.com"
+            }
+          },
+          {
+            "image_url": {
+              "type": "string",
+              "chars": 94,
+              "utf8_bytes": 94,
+              "kind": "uri",
+              "scheme": "https",
+              "host": "fuduo-framework.oss-cn-hangzhou.aliyuncs.com"
+            }
+          },
+          {
+            "image_url": {
+              "type": "string",
+              "chars": 94,
+              "utf8_bytes": 94,
+              "kind": "uri",
+              "scheme": "https",
+              "host": "fuduo-framework.oss-cn-hangzhou.aliyuncs.com"
+            }
+          }
+        ]
+      },
+      "model": {
+        "type": "string",
+        "chars": 11,
+        "utf8_bytes": 11
+      },
+      "n": {
+        "type": "int"
+      },
+      "prompt": {
+        "type": "string",
+        "chars": 22379,
+        "utf8_bytes": 61298
+      }
+    },
+    "model": "gpt-image-2",
+    "n": 1
+  },
+  {
+    "request_id": "f125a2e0-0c0b-4893-bb23-d443d87b18e9",
+    "shape": {
+      "images": {
+        "type": "array",
+        "count": 3,
+        "items": [
+          {
+            "image_url": {
+              "type": "string",
+              "chars": 94,
+              "utf8_bytes": 94,
+              "kind": "uri",
+              "scheme": "https",
+              "host": "fuduo-framework.oss-cn-hangzhou.aliyuncs.com"
+            }
+          },
+          {
+            "image_url": {
+              "type": "string",
+              "chars": 94,
+              "utf8_bytes": 94,
+              "kind": "uri",
+              "scheme": "https",
+              "host": "fuduo-framework.oss-cn-hangzhou.aliyuncs.com"
+            }
+          },
+          {
+            "image_url": {
+              "type": "string",
+              "chars": 94,
+              "utf8_bytes": 94,
+              "kind": "uri",
+              "scheme": "https",
+              "host": "fuduo-framework.oss-cn-hangzhou.aliyuncs.com"
+            }
+          }
+        ]
+      },
+      "model": {
+        "type": "string",
+        "chars": 11,
+        "utf8_bytes": 11
+      },
+      "n": {
+        "type": "int"
+      },
+      "prompt": {
+        "type": "string",
+        "chars": 22165,
+        "utf8_bytes": 60734
+      }
+    },
+    "model": "gpt-image-2",
+    "n": 1
+  },
+  {
+    "request_id": "53ca422a-8d37-4048-9100-f59348e878b5",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 196364,
+        "utf8_bytes": 196364,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+    "shape": {
+      "n": {
+        "type": "int"
+      },
+      "size": {
+        "type": "string",
+        "chars": 8,
+        "utf8_bytes": 8
+      },
+      "model": {
+        "type": "string",
+        "chars": 11,
+        "utf8_bytes": 11
+      },
+      "images": {
+        "type": "array",
+        "count": 2,
+        "items": [
+          {
+            "image_url": {
+              "type": "string",
+              "chars": 119,
+              "utf8_bytes": 119,
+              "kind": "uri",
+              "scheme": "https",
+              "host": "imagedav.boieds.rest"
+            }
+          },
+          {
+            "image_url": {
+              "type": "string",
+              "chars": 104,
+              "utf8_bytes": 104,
+              "kind": "uri",
+              "scheme": "https",
+              "host": "imagedav.boieds.rest"
+            }
+          }
+        ]
+      },
+      "prompt": {
+        "type": "string",
+        "chars": 85,
+        "utf8_bytes": 247
+      },
+      "output_format": {
+        "type": "string",
+        "chars": 3,
+        "utf8_bytes": 3
+      }
+    },
+    "model": "gpt-image-2",
+    "size": "1248x832",
+    "n": 1
+  },
+  {
+    "request_id": "df70b8c3-07fa-4f21-b1f2-ae5072ca9a2f",
+    "shape": {
+      "input": {
+        "type": "array",
+        "count": 1,
+        "items": [
+          {
+            "content": {
+              "type": "array",
+              "count": 1,
+              "items": [
+                {
+                  "text": {
+                    "type": "str"
+                  },
+                  "type": {
+                    "type": "str"
+                  }
+                }
+              ]
+            },
+            "role": {
+              "type": "string",
+              "chars": 4,
+              "utf8_bytes": 4
+            }
+          }
+        ]
+      },
+      "max_output_tokens": {
+        "type": "int"
+      },
+      "model": {
+        "type": "string",
+        "chars": 19,
+        "utf8_bytes": 19
+      },
+      "stream": {
+        "type": "bool"
+      },
+      "tool_choice": {
+        "type": "string",
+        "chars": 8,
+        "utf8_bytes": 8
+      },
+      "tools": {
+        "type": "array",
+        "count": 1,
+        "items": [
+          {
+            "description": {
+              "type": "string",
+              "chars": 38,
+              "utf8_bytes": 38
+            },
+            "name": {
+              "type": "string",
+              "chars": 10,
+              "utf8_bytes": 10
+            },
+            "parameters": {
+              "properties": {
+                "ok": {
+                  "type": "dict"
+                }
+              },
+              "required": {
+                "type": "array",
+                "count": 1,
+                "items": [
+                  {
+                    "type": "str"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "chars": 6,
+                "utf8_bytes": 6
+              }
+            },
+            "type": {
+              "type": "string",
+              "chars": 8,
+              "utf8_bytes": 8
+            }
+          }
+        ]
+      }
+    },
+    "model": "gpt-image-2.5-flare"
+  },
+  {
+    "request_id": "84ecd70e-1556-4182-860c-fe1a2dc3a033",
+    "shape": {
+      "input": {
+        "type": "array",
+        "count": 1,
+        "items": [
+          {
+            "content": {
+              "type": "array",
+              "count": 1,
+              "items": [
+                {
+                  "text": {
+                    "type": "str"
+                  },
+                  "type": {
+                    "type": "str"
+                  }
+                }
+              ]
+            },
+            "role": {
+              "type": "string",
+              "chars": 4,
+              "utf8_bytes": 4
+            }
+          }
+        ]
+      },
+      "max_output_tokens": {
+        "type": "int"
+      },
+      "model": {
+        "type": "string",
+        "chars": 19,
+        "utf8_bytes": 19
+      },
+      "stream": {
+        "type": "bool"
+      },
+      "tool_choice": {
+        "type": "string",
+        "chars": 8,
+        "utf8_bytes": 8
+      },
+      "tools": {
+        "type": "array",
+        "count": 1,
+        "items": [
+          {
+            "description": {
+              "type": "string",
+              "chars": 38,
+              "utf8_bytes": 38
+            },
+            "name": {
+              "type": "string",
+              "chars": 10,
+              "utf8_bytes": 10
+            },
+            "parameters": {
+              "properties": {
+                "ok": {
+                  "type": "dict"
+                }
+              },
+              "required": {
+                "type": "array",
+                "count": 1,
+                "items": [
+                  {
+                    "type": "str"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "chars": 6,
+                "utf8_bytes": 6
+              }
+            },
+            "type": {
+              "type": "string",
+              "chars": 8,
+              "utf8_bytes": 8
+            }
+          }
+        ]
+      }
+    },
+    "model": "gpt-image-2.5-flare"
+  },
+  {
+    "request_id": "imgtask_30858cdb58704eb5a6b3dd01a8012b35",
+    "shape": {
+      "n": {
+        "type": "int"
+      },
+      "size": {
+        "type": "string",
+        "chars": 8,
+        "utf8_bytes": 8
+      },
+      "model": {
+        "type": "string",
+        "chars": 11,
+        "utf8_bytes": 11
+      },
+      "images": {
+        "type": "array",
+        "count": 2,
+        "items": [
+          {
+            "image_url": {
+              "type": "string",
+              "chars": 119,
+              "utf8_bytes": 119,
+              "kind": "uri",
+              "scheme": "https",
+              "host": "imagedav.boieds.rest"
+            }
+          },
+          {
+            "image_url": {
+              "type": "string",
+              "chars": 104,
+              "utf8_bytes": 104,
+              "kind": "uri",
+              "scheme": "https",
+              "host": "imagedav.boieds.rest"
+            }
+          }
+        ]
+      },
+      "prompt": {
+        "type": "string",
+        "chars": 85,
+        "utf8_bytes": 247
+      },
+      "output_format": {
+        "type": "string",
+        "chars": 3,
+        "utf8_bytes": 3
+      }
+    },
+    "model": "gpt-image-2",
+    "size": "1248x832",
+    "n": 1
+  },
+  {
+    "request_id": "93f8c53d-a98f-4b4a-8582-0b7528cd3162",
+    "shape": {
+      "input": {
+        "type": "array",
+        "count": 1,
+        "items": [
+          {
+            "content": {
+              "type": "array",
+              "count": 1,
+              "items": [
+                {
+                  "text": {
+                    "type": "str"
+                  },
+                  "type": {
+                    "type": "str"
+                  }
+                }
+              ]
+            },
+            "role": {
+              "type": "string",
+              "chars": 4,
+              "utf8_bytes": 4
+            }
+          }
+        ]
+      },
+      "max_output_tokens": {
+        "type": "int"
+      },
+      "model": {
+        "type": "string",
+        "chars": 19,
+        "utf8_bytes": 19
+      },
+      "stream": {
+        "type": "bool"
+      },
+      "tool_choice": {
+        "type": "string",
+        "chars": 8,
+        "utf8_bytes": 8
+      },
+      "tools": {
+        "type": "array",
+        "count": 1,
+        "items": [
+          {
+            "description": {
+              "type": "string",
+              "chars": 38,
+              "utf8_bytes": 38
+            },
+            "name": {
+              "type": "string",
+              "chars": 10,
+              "utf8_bytes": 10
+            },
+            "parameters": {
+              "properties": {
+                "ok": {
+                  "type": "dict"
+                }
+              },
+              "required": {
+                "type": "array",
+                "count": 1,
+                "items": [
+                  {
+                    "type": "str"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "chars": 6,
+                "utf8_bytes": 6
+              }
+            },
+            "type": {
+              "type": "string",
+              "chars": 8,
+              "utf8_bytes": 8
+            }
+          }
+        ]
+      }
+    },
+    "model": "gpt-image-2.5-flare"
+  },
+  {
+    "request_id": "221b26d0-6782-4f2a-a1be-64882079bc7f",
+    "shape": {
+      "input": {
+        "type": "array",
+        "count": 1,
+        "items": [
+          {
+            "content": {
+              "type": "array",
+              "count": 1,
+              "items": [
+                {
+                  "text": {
+                    "type": "str"
+                  },
+                  "type": {
+                    "type": "str"
+                  }
+                }
+              ]
+            },
+            "role": {
+              "type": "string",
+              "chars": 4,
+              "utf8_bytes": 4
+            }
+          }
+        ]
+      },
+      "max_output_tokens": {
+        "type": "int"
+      },
+      "model": {
+        "type": "string",
+        "chars": 11,
+        "utf8_bytes": 11
+      },
+      "stream": {
+        "type": "bool"
+      },
+      "tool_choice": {
+        "type": "string",
+        "chars": 8,
+        "utf8_bytes": 8
+      },
+      "tools": {
+        "type": "array",
+        "count": 1,
+        "items": [
+          {
+            "description": {
+              "type": "string",
+              "chars": 38,
+              "utf8_bytes": 38
+            },
+            "name": {
+              "type": "string",
+              "chars": 10,
+              "utf8_bytes": 10
+            },
+            "parameters": {
+              "properties": {
+                "ok": {
+                  "type": "dict"
+                }
+              },
+              "required": {
+                "type": "array",
+                "count": 1,
+                "items": [
+                  {
+                    "type": "str"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "chars": 6,
+                "utf8_bytes": 6
+              }
+            },
+            "type": {
+              "type": "string",
+              "chars": 8,
+              "utf8_bytes": 8
+            }
+          }
+        ]
+      }
+    },
+    "model": "gpt-image-2"
+  },
+  {
+    "request_id": "e2706b9c-aa01-4b20-a358-beecbb2ac752",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 38612,
+        "utf8_bytes": 38612,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "ebdfcd6f-d3c4-4b4d-a207-c282e987626a",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 38612,
+        "utf8_bytes": 38612,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "9d009778-8110-4c42-90a2-e20d8401b9b2",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 38612,
+        "utf8_bytes": 38612,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "57eb0fcf-50ba-4a72-bf14-e13191a7ba8c",
+    "shape": {
+      "input": {
+        "type": "array",
+        "count": 1,
+        "items": [
+          {
+            "content": {
+              "type": "array",
+              "count": 1,
+              "items": [
+                {
+                  "text": {
+                    "type": "str"
+                  },
+                  "type": {
+                    "type": "str"
+                  }
+                }
+              ]
+            },
+            "role": {
+              "type": "string",
+              "chars": 4,
+              "utf8_bytes": 4
+            }
+          }
+        ]
+      },
+      "max_output_tokens": {
+        "type": "int"
+      },
+      "model": {
+        "type": "string",
+        "chars": 11,
+        "utf8_bytes": 11
+      },
+      "stream": {
+        "type": "bool"
+      },
+      "tool_choice": {
+        "type": "string",
+        "chars": 8,
+        "utf8_bytes": 8
+      },
+      "tools": {
+        "type": "array",
+        "count": 1,
+        "items": [
+          {
+            "description": {
+              "type": "string",
+              "chars": 38,
+              "utf8_bytes": 38
+            },
+            "name": {
+              "type": "string",
+              "chars": 10,
+              "utf8_bytes": 10
+            },
+            "parameters": {
+              "properties": {
+                "ok": {
+                  "type": "dict"
+                }
+              },
+              "required": {
+                "type": "array",
+                "count": 1,
+                "items": [
+                  {
+                    "type": "str"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "chars": 6,
+                "utf8_bytes": 6
+              }
+            },
+            "type": {
+              "type": "string",
+              "chars": 8,
+              "utf8_bytes": 8
+            }
+          }
+        ]
+      }
+    },
+    "model": "gpt-image-2"
+  },
+  {
+    "request_id": "5074f517-2309-467a-a360-6915f1799520",
+    "shape": {
+      "input": {
+        "type": "array",
+        "count": 1,
+        "items": [
+          {
+            "content": {
+              "type": "array",
+              "count": 1,
+              "items": [
+                {
+                  "text": {
+                    "type": "str"
+                  },
+                  "type": {
+                    "type": "str"
+                  }
+                }
+              ]
+            },
+            "role": {
+              "type": "string",
+              "chars": 4,
+              "utf8_bytes": 4
+            }
+          }
+        ]
+      },
+      "max_output_tokens": {
+        "type": "int"
+      },
+      "model": {
+        "type": "string",
+        "chars": 11,
+        "utf8_bytes": 11
+      },
+      "stream": {
+        "type": "bool"
+      },
+      "tool_choice": {
+        "type": "string",
+        "chars": 8,
+        "utf8_bytes": 8
+      },
+      "tools": {
+        "type": "array",
+        "count": 1,
+        "items": [
+          {
+            "description": {
+              "type": "string",
+              "chars": 38,
+              "utf8_bytes": 38
+            },
+            "name": {
+              "type": "string",
+              "chars": 10,
+              "utf8_bytes": 10
+            },
+            "parameters": {
+              "properties": {
+                "ok": {
+                  "type": "dict"
+                }
+              },
+              "required": {
+                "type": "array",
+                "count": 1,
+                "items": [
+                  {
+                    "type": "str"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "chars": 6,
+                "utf8_bytes": 6
+              }
+            },
+            "type": {
+              "type": "string",
+              "chars": 8,
+              "utf8_bytes": 8
+            }
+          }
+        ]
+      }
+    },
+    "model": "gpt-image-2"
+  },
+  {
+    "request_id": "bd5235af-e9ad-44e7-837a-3ecd3950a10a",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 654452,
+        "utf8_bytes": 654452,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "fb7158bb-9571-4a93-94b0-28200ac998b6",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 471040,
+        "utf8_bytes": 471040,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "3c32b614-a37d-4f6e-899a-570a408069c1",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 635372,
+        "utf8_bytes": 635372,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "5169b9a4-9163-4111-aca6-7b668703ba07",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 635416,
+        "utf8_bytes": 635416,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "5ef50029-06bf-4fc5-b02a-0acb4d50e6a7",
+    "shape": {
+      "input": {
+        "type": "array",
+        "count": 1,
+        "items": [
+          {
+            "content": {
+              "type": "array",
+              "count": 1,
+              "items": [
+                {
+                  "text": {
+                    "type": "str"
+                  },
+                  "type": {
+                    "type": "str"
+                  }
+                }
+              ]
+            },
+            "role": {
+              "type": "string",
+              "chars": 4,
+              "utf8_bytes": 4
+            }
+          }
+        ]
+      },
+      "max_output_tokens": {
+        "type": "int"
+      },
+      "model": {
+        "type": "string",
+        "chars": 11,
+        "utf8_bytes": 11
+      },
+      "stream": {
+        "type": "bool"
+      },
+      "tool_choice": {
+        "type": "string",
+        "chars": 8,
+        "utf8_bytes": 8
+      },
+      "tools": {
+        "type": "array",
+        "count": 1,
+        "items": [
+          {
+            "description": {
+              "type": "string",
+              "chars": 38,
+              "utf8_bytes": 38
+            },
+            "name": {
+              "type": "string",
+              "chars": 10,
+              "utf8_bytes": 10
+            },
+            "parameters": {
+              "properties": {
+                "ok": {
+                  "type": "dict"
+                }
+              },
+              "required": {
+                "type": "array",
+                "count": 1,
+                "items": [
+                  {
+                    "type": "str"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "chars": 6,
+                "utf8_bytes": 6
+              }
+            },
+            "type": {
+              "type": "string",
+              "chars": 8,
+              "utf8_bytes": 8
+            }
+          }
+        ]
+      }
+    },
+    "model": "gpt-image-2"
+  },
+  {
+    "request_id": "02b5a394-b72b-4761-9fa6-5b8a2b6cb1d0",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 500020,
+        "utf8_bytes": 500020,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "60c96d01-fb34-4300-8136-9b50d7209b5a",
+    "shape": {
+      "input": {
+        "type": "array",
+        "count": 1,
+        "items": [
+          {
+            "content": {
+              "type": "array",
+              "count": 1,
+              "items": [
+                {
+                  "text": {
+                    "type": "str"
+                  },
+                  "type": {
+                    "type": "str"
+                  }
+                }
+              ]
+            },
+            "role": {
+              "type": "string",
+              "chars": 4,
+              "utf8_bytes": 4
+            }
+          }
+        ]
+      },
+      "max_output_tokens": {
+        "type": "int"
+      },
+      "model": {
+        "type": "string",
+        "chars": 11,
+        "utf8_bytes": 11
+      },
+      "stream": {
+        "type": "bool"
+      },
+      "tool_choice": {
+        "type": "string",
+        "chars": 8,
+        "utf8_bytes": 8
+      },
+      "tools": {
+        "type": "array",
+        "count": 1,
+        "items": [
+          {
+            "description": {
+              "type": "string",
+              "chars": 38,
+              "utf8_bytes": 38
+            },
+            "name": {
+              "type": "string",
+              "chars": 10,
+              "utf8_bytes": 10
+            },
+            "parameters": {
+              "properties": {
+                "ok": {
+                  "type": "dict"
+                }
+              },
+              "required": {
+                "type": "array",
+                "count": 1,
+                "items": [
+                  {
+                    "type": "str"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "chars": 6,
+                "utf8_bytes": 6
+              }
+            },
+            "type": {
+              "type": "string",
+              "chars": 8,
+              "utf8_bytes": 8
+            }
+          }
+        ]
+      }
+    },
+    "model": "gpt-image-2"
+  },
+  {
+    "request_id": "7ef724d6-1236-417b-a518-e037e24c42bc",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 514696,
+        "utf8_bytes": 514696,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "722aa949-5651-40cb-addc-97811dbdef96",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 38612,
+        "utf8_bytes": 38612,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "dde478cb-6696-4903-9ba1-70e61e9cd245",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 639792,
+        "utf8_bytes": 639792,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "ae3245bc-d5ef-45ef-925a-94b2b3226d9a",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 443416,
+        "utf8_bytes": 443416,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "a9a3cb57-3de4-48f8-b3d0-6a37eca88412",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 617080,
+        "utf8_bytes": 617080,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "c0552f4c-7991-4471-94cb-004868a80ca9",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 636136,
+        "utf8_bytes": 636136,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "181ede00-cdba-4253-95db-22e833fcb656",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 495616,
+        "utf8_bytes": 495616,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "088b3e69-590e-4cd4-85c9-535c8dbfcec4",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 654452,
+        "utf8_bytes": 654452,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "02a2f970-c7ae-4712-87c0-90a43e3a9816",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 654456,
+        "utf8_bytes": 654456,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "29991925-f5b9-42fe-b371-8d6de5d0c44f",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 639784,
+        "utf8_bytes": 639784,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "8500bfe3-0e12-44c5-9673-95038140cf61",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 500004,
+        "utf8_bytes": 500004,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "e571b8fa-8f1d-4dd9-ac62-9d3f461a727a",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 514696,
+        "utf8_bytes": 514696,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "747d7506-b985-428f-a736-af8f04b3eb35",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 443404,
+        "utf8_bytes": 443404,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "0e051dc9-7692-4f43-a009-f59d97751fa0",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 471040,
+        "utf8_bytes": 471040,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "63b6a43e-abcb-49de-b66e-a797004de56b",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 631804,
+        "utf8_bytes": 631804,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "6e65273e-832a-4c6f-801c-8fbccc936068",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 617100,
+        "utf8_bytes": 617100,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "3505cee7-e284-4cf7-81fb-5f77fa95e852",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 631816,
+        "utf8_bytes": 631816,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "e76beb34-446a-4e89-82e7-acdc5074e5c8",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 443348,
+        "utf8_bytes": 443348,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "f3787e8c-03c1-4557-94be-ad400f462017",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 687340,
+        "utf8_bytes": 687340,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "2c2c7ce1-1fd3-4b60-a0c5-8dcaa33443e1",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 545656,
+        "utf8_bytes": 545656,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "7a194e9d-0bf2-42eb-96ba-06b0eef5b470",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 495124,
+        "utf8_bytes": 495124,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "8dc83e7f-54a9-4678-9ddf-7749a29866ee",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 681988,
+        "utf8_bytes": 681988,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "f378a000-212c-4d2d-b8af-76b27cdf7dac",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 663660,
+        "utf8_bytes": 663660,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "e8e13ebf-bb11-44cd-9106-82e2f6ae5803",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 443348,
+        "utf8_bytes": 443348,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "4d08df96-c2e9-4e3b-866e-dffbbf4c935e",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 654452,
+        "utf8_bytes": 654452,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "8124bc6d-4e73-4234-86f2-940e90c0bc6a",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 545644,
+        "utf8_bytes": 545644,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "a5eaf348-4b37-4625-993f-848e72bbd434",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 545644,
+        "utf8_bytes": 545644,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "f1f2a15d-3e6e-4c07-92b5-225c79522f72",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 420432,
+        "utf8_bytes": 420432,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "8da5d288-0c26-4a19-9982-104c5d494970",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 471040,
+        "utf8_bytes": 471040,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "1d04b711-133f-42c4-bcf2-475ec6c25e27",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 617080,
+        "utf8_bytes": 617080,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "677bd683-3a43-47c2-a59e-513401270d81",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 635416,
+        "utf8_bytes": 635416,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "f116705a-27b6-497e-a012-754f7a6f3d51",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 500020,
+        "utf8_bytes": 500020,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "a07d039c-bac9-4ad1-8e4d-ac1f30587af0",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 639788,
+        "utf8_bytes": 639788,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "5357e1ae-1fa1-4a22-bfec-678d3eefcc92",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 495124,
+        "utf8_bytes": 495124,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "29bec5f6-5ed6-465b-855a-c5be50b73e59",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 510360,
+        "utf8_bytes": 510360,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "2312fa34-b3f7-4ae2-9225-1a6fe9d7b163",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 472264,
+        "utf8_bytes": 472264,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "1180b920-9191-456b-a2e7-9139df142b12",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 617092,
+        "utf8_bytes": 617092,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "562ce25b-70b1-434c-9740-a8a8bb158db2",
+    "shape": {
+      "input": {
+        "type": "array",
+        "count": 1,
+        "items": [
+          {
+            "content": {
+              "type": "array",
+              "count": 1,
+              "items": [
+                {
+                  "text": {
+                    "type": "str"
+                  },
+                  "type": {
+                    "type": "str"
+                  }
+                }
+              ]
+            },
+            "role": {
+              "type": "string",
+              "chars": 4,
+              "utf8_bytes": 4
+            }
+          }
+        ]
+      },
+      "max_output_tokens": {
+        "type": "int"
+      },
+      "model": {
+        "type": "string",
+        "chars": 11,
+        "utf8_bytes": 11
+      },
+      "stream": {
+        "type": "bool"
+      },
+      "tool_choice": {
+        "type": "string",
+        "chars": 8,
+        "utf8_bytes": 8
+      },
+      "tools": {
+        "type": "array",
+        "count": 1,
+        "items": [
+          {
+            "description": {
+              "type": "string",
+              "chars": 38,
+              "utf8_bytes": 38
+            },
+            "name": {
+              "type": "string",
+              "chars": 10,
+              "utf8_bytes": 10
+            },
+            "parameters": {
+              "properties": {
+                "ok": {
+                  "type": "dict"
+                }
+              },
+              "required": {
+                "type": "array",
+                "count": 1,
+                "items": [
+                  {
+                    "type": "str"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "chars": 6,
+                "utf8_bytes": 6
+              }
+            },
+            "type": {
+              "type": "string",
+              "chars": 8,
+              "utf8_bytes": 8
+            }
+          }
+        ]
+      }
+    },
+    "model": "gpt-image-2"
+  },
+  {
+    "request_id": "8d64f643-61ec-463c-a8aa-45283e361e6e",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 471040,
+        "utf8_bytes": 471040,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "8194c968-6bb8-4391-aa33-f590705ea206",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 500020,
+        "utf8_bytes": 500020,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "eedc35a9-7cf3-49fe-8d55-5f57064b0399",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 495616,
+        "utf8_bytes": 495616,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "ab9dc378-1fa7-4c78-bf18-4a5248d6b12e",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 495140,
+        "utf8_bytes": 495140,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "8c57e612-3cf2-4266-b614-a240fd8002ac",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 495600,
+        "utf8_bytes": 495600,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "bb08577e-8172-4b40-a437-1debf5dfa0fd",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 495208,
+        "utf8_bytes": 495208,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "0fdfa21b-dc44-4ec3-83d4-9d1c4d06989f",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 495660,
+        "utf8_bytes": 495660,
+        "kind": "possible_raw_base64"
+      }
+    }
+  },
+  {
+    "request_id": "2b1b5dd0-121b-4b70-9983-b136eaa2f7e8",
+    "shape": {
+      "body_bytes_b64": {
+        "type": "string",
+        "chars": 472280,
+        "utf8_bytes": 472280,
+        "kind": "possible_raw_base64"
+      }
+    }
+  }
+]

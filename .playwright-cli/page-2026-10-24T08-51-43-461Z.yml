@@ -1,0 +1,76 @@
+- generic [ref=f5e3]:
+  - generic [ref=f5e5]:
+    - heading "使用记录" [level=3] [ref=f5e7]
+    - generic [ref=f5e8]:
+      - generic [ref=f5e9]:
+        - combobox "时间范围" [ref=f5e10] [cursor=pointer]:
+          - generic [ref=f5e11]: 今天
+        - combobox [aria-hidden] [ref=f5e12]
+      - textbox "搜索用户/密钥" [ref=f5e16]
+      - button "已选择 4 项" [ref=f5e19] [cursor=pointer]
+      - button "隐藏 unknown 模型或提供商的请求" [ref=f5e24] [cursor=pointer]
+      - button "点击开启自动刷新" [ref=f5e30] [cursor=pointer]
+  - table [ref=f5e37]:
+    - rowgroup [ref=f5e43]:
+      - row [ref=f5e44]:
+        - columnheader "筛选类型 类型" [ref=f5e45]:
+          - generic [ref=f5e46]:
+            - button "筛选类型" [ref=f5e47] [cursor=pointer]
+            - generic [ref=f5e49]: 类型
+        - columnheader "是否异步" [ref=f5e50]
+        - columnheader "Tokens" [ref=f5e52]
+        - columnheader "费用" [ref=f5e53]
+    - rowgroup [ref=f5e54]:
+      - row [ref=f5e55] [cursor=pointer]:
+        - cell "内容拒绝" [ref=f5e56]
+        - cell "否" [ref=f5e58]
+        - cell "不可用" [ref=f5e60]:
+          - generic "上游未提供可验证的 token/费用用量" [ref=f5e61]: 不可用
+        - cell "不可用" [ref=f5e62]:
+          - generic "上游未提供可验证的 token/费用用量" [ref=f5e64]: 不可用
+      - row [ref=f5e65] [cursor=pointer]:
+        - cell "流式" [ref=f5e66]
+        - cell "否" [ref=f5e68]
+        - cell "267 / 8.23K - / -" [ref=f5e70]:
+          - generic [ref=f5e71]:
+            - generic [ref=f5e72]: "267"
+            - generic [ref=f5e73]: /
+            - generic [ref=f5e74]: 8.23K
+          - generic [ref=f5e75]:
+            - generic [ref=f5e76]: "-"
+            - generic [ref=f5e77]: /
+            - generic [ref=f5e78]: "-"
+        - cell "$0.01" [ref=f5e79]
+      - row [ref=f5e82] [cursor=pointer]:
+        - cell "流式" [ref=f5e83]
+        - cell "是" [ref=f5e85]
+        - cell "267 / 8.23K - / -" [ref=f5e87]:
+          - generic [ref=f5e88]:
+            - generic [ref=f5e89]: "267"
+            - generic [ref=f5e90]: /
+            - generic [ref=f5e91]: 8.23K
+          - generic [ref=f5e92]:
+            - generic [ref=f5e93]: "-"
+            - generic [ref=f5e94]: /
+            - generic [ref=f5e95]: "-"
+        - cell "$0.01" [ref=f5e96]
+      - row [ref=f5e99] [cursor=pointer]:
+        - cell "失败" [ref=f5e100]
+        - cell "是" [ref=f5e102]
+        - cell "267 / 8.23K - / -" [ref=f5e104]:
+          - generic [ref=f5e105]:
+            - generic [ref=f5e106]: "267"
+            - generic [ref=f5e107]: /
+            - generic [ref=f5e108]: 8.23K
+          - generic [ref=f5e109]:
+            - generic [ref=f5e110]: "-"
+            - generic [ref=f5e111]: /
+            - generic [ref=f5e112]: "-"
+        - cell "$0.01" [ref=f5e113]
+  - generic [ref=f5e116]:
+    - generic [ref=f5e117]:
+      - generic [ref=f5e118]: 显示 1-4 条，共 4 条
+      - combobox "每页条数" [ref=f5e119] [cursor=pointer]:
+        - generic [ref=f5e120]: 20 条/页
+      - combobox [aria-hidden] [ref=f5e122]
+    - button "第 1 页" [ref=f5e124] [cursor=pointer]: "1"

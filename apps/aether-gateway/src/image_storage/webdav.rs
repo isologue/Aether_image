@@ -3,7 +3,6 @@ use super::{
     storage::{now, ImageRecord, ImageStorage, MAX_IMAGE_BYTES},
 };
 use futures_util::StreamExt;
-use sha2::{Digest, Sha256};
 
 pub(crate) fn joined_url(base: &str, path: &str) -> Result<url::Url, String> {
     let mut url = validate_http_url(base)?;
@@ -98,8 +97,6 @@ impl ImageStorage {
     ) -> Result<String, String> {
         let remote = self.dav_directories(config, password, relative).await?;
         let public = joined_url(&config.webdav_public_url, relative)?.to_string();
-        let expected_hash = Sha256::digest(&bytes);
-        let expected_size = bytes.len();
         let response = self
             .dav_client
             .put(remote)
@@ -115,14 +112,8 @@ impl ImageStorage {
                 response.status().as_u16()
             ));
         }
-        // Use a separate client with no Authorization to verify public mapping and file contents.
-        let downloaded = self
-            .download(&public)
-            .await
-            .map_err(|error| format!("已上传，但公开访问验证失败：{error}"))?;
-        if downloaded.len() != expected_size || Sha256::digest(&downloaded) != expected_hash {
-            return Err("已上传，但公开地址未返回同一图片，请检查公开前缀映射".into());
-        }
+        // A successful PUT completes storage; public/CDN readback must not delay delivery.
+        // Public mapping can still be checked explicitly with test_webdav.
         Ok(public)
     }
     /// Store an image directly from memory, without creating a local image or index record.
@@ -163,7 +154,7 @@ impl ImageStorage {
             self.dav_put(config, password, &relative, bytes, content_type),
         )
         .await
-        .unwrap_or_else(|_| Err("WebDAV 上传或公开访问验证超过 30 秒".into()))
+        .unwrap_or_else(|_| Err("WebDAV 上传超过 30 秒".into()))
     }
     pub async fn upload(
         &self,
@@ -202,7 +193,7 @@ impl ImageStorage {
                 .await
         })
         .await
-        .unwrap_or_else(|_| Err("WebDAV 上传或公开访问验证超过 30 秒".into()));
+        .unwrap_or_else(|_| Err("WebDAV 上传超过 30 秒".into()));
         let mut updated = record.clone();
         updated.destination = Some(destination);
         updated.attempts = if record.destination == updated.destination {

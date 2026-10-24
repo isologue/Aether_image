@@ -57,10 +57,16 @@ pub(crate) fn is_sensitive_admin_system_config_key(key: &str) -> bool {
 }
 
 fn admin_system_config_default_value(key: &str) -> Option<serde_json::Value> {
+    if key == crate::image_generation::MAX_IMAGE_COUNT_KEY {
+        return Some(json!(crate::image_generation::DEFAULT_MAX_IMAGE_COUNT));
+    }
     if key == crate::image_generation::NO_ASSET_GRACE_KEY {
         return Some(json!(
             crate::image_generation::DEFAULT_NO_ASSET_GRACE_SECONDS
         ));
+    }
+    if key == crate::image_generation::MAX_PROMPT_CHARS_KEY {
+        return Some(json!(crate::image_generation::DEFAULT_MAX_PROMPT_CHARS));
     }
     admin_system_config_default_value_pure(key)
 }
@@ -253,12 +259,30 @@ pub(crate) async fn apply_admin_system_config_update(
         }
     }
 
+    if normalized_key == crate::image_generation::MAX_IMAGE_COUNT_KEY
+        && crate::image_generation::parse_max_image_count(&value).is_none()
+    {
+        return Ok(Err((
+            http::StatusCode::BAD_REQUEST,
+            json!({"detail":"ChatGPT Web 单次请求图片数量上限必须为 1–10 的整数"}),
+        )));
+    }
+
     if normalized_key == crate::image_generation::NO_ASSET_GRACE_KEY
         && crate::image_generation::parse_no_asset_grace_seconds(&value).is_none()
     {
         return Ok(Err((
             http::StatusCode::BAD_REQUEST,
             json!({"detail":"无图片补查等待时间必须为 0–120 秒的整数"}),
+        )));
+    }
+
+    if normalized_key == crate::image_generation::MAX_PROMPT_CHARS_KEY
+        && crate::image_generation::parse_max_prompt_chars(&value).is_none()
+    {
+        return Ok(Err((
+            http::StatusCode::BAD_REQUEST,
+            json!({"detail":"ChatGPT Web 提示词本地长度限制必须为 0–1000000 的整数，0 表示不限制"}),
         )));
     }
 
@@ -458,6 +482,88 @@ mod tests {
     use super::*;
     use crate::image_generation::{no_asset_poll_grace, NO_ASSET_GRACE_KEY};
     use std::time::Duration;
+
+    #[tokio::test]
+    async fn image_generation_admin_config_hot_updates_image_count_limit() {
+        use crate::image_generation::{max_image_count, MAX_IMAGE_COUNT_KEY};
+        let app = crate::AppState::new().unwrap().with_data_state_for_tests(
+            crate::data::GatewayDataState::disabled().with_system_config_values_for_tests([]),
+        );
+        let state = AdminAppState::new(&app);
+        let detail = build_admin_system_config_detail_payload(&state, MAX_IMAGE_COUNT_KEY)
+            .await
+            .unwrap()
+            .unwrap();
+        assert_eq!(detail["value"], 1);
+        assert_eq!(max_image_count(&app).await, 1);
+        for value in [
+            json!(0),
+            json!(-1),
+            json!(11),
+            json!(1.5),
+            json!("2"),
+            serde_json::Value::Null,
+        ] {
+            let body = Bytes::from(serde_json::to_vec(&json!({"value": value})).unwrap());
+            let error = apply_admin_system_config_update(&state, MAX_IMAGE_COUNT_KEY, &body)
+                .await
+                .unwrap()
+                .unwrap_err();
+            assert_eq!(error.0, http::StatusCode::BAD_REQUEST);
+            assert_eq!(max_image_count(&app).await, 1);
+        }
+        for count in [2, 10, 1] {
+            let body = Bytes::from(serde_json::to_vec(&json!({"value": count})).unwrap());
+            apply_admin_system_config_update(&state, MAX_IMAGE_COUNT_KEY, &body)
+                .await
+                .unwrap()
+                .unwrap();
+            assert_eq!(max_image_count(&app).await, count);
+            let detail = build_admin_system_config_detail_payload(&state, MAX_IMAGE_COUNT_KEY)
+                .await
+                .unwrap()
+                .unwrap();
+            assert_eq!(detail["value"], count);
+        }
+    }
+
+    #[tokio::test]
+    async fn image_generation_admin_config_defaults_validates_and_hot_updates_prompt_limit() {
+        use crate::image_generation::{max_prompt_chars, MAX_PROMPT_CHARS_KEY};
+        let app = crate::AppState::new().unwrap().with_data_state_for_tests(
+            crate::data::GatewayDataState::disabled().with_system_config_values_for_tests([]),
+        );
+        let state = AdminAppState::new(&app);
+        let detail = build_admin_system_config_detail_payload(&state, MAX_PROMPT_CHARS_KEY)
+            .await
+            .unwrap()
+            .unwrap();
+        assert_eq!(detail["value"], 32_768);
+        assert_eq!(max_prompt_chars(&app).await, 32_768);
+        for value in [
+            json!(-1),
+            json!(1_000_001),
+            json!(1.5),
+            json!("32768"),
+            serde_json::Value::Null,
+        ] {
+            let body = Bytes::from(serde_json::to_vec(&json!({"value": value})).unwrap());
+            let error = apply_admin_system_config_update(&state, MAX_PROMPT_CHARS_KEY, &body)
+                .await
+                .unwrap()
+                .unwrap_err();
+            assert_eq!(error.0, http::StatusCode::BAD_REQUEST);
+            assert_eq!(max_prompt_chars(&app).await, 32_768);
+        }
+        for chars in [0, 123, 1_000_000] {
+            let body = Bytes::from(serde_json::to_vec(&json!({"value": chars})).unwrap());
+            apply_admin_system_config_update(&state, MAX_PROMPT_CHARS_KEY, &body)
+                .await
+                .unwrap()
+                .unwrap();
+            assert_eq!(max_prompt_chars(&app).await, chars);
+        }
+    }
 
     #[tokio::test]
     async fn image_generation_admin_config_defaults_validates_and_hot_updates_grace() {

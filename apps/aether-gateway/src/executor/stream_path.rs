@@ -54,6 +54,14 @@ pub(crate) async fn maybe_execute_via_stream_decision_path(
 
     let parse_started_at = std::time::Instant::now();
     let Some((body_json, body_base64)) = parse_local_request_body(parts, body_bytes) else {
+        crate::ai_serving::set_local_runtime_miss_diagnostic_reason(
+            state,
+            trace_id,
+            decision,
+            plan_kind,
+            None,
+            "request_body_parse_failed",
+        );
         observe_gateway_stage_ms(
             "frontdoor_stream_parse",
             parse_started_at.elapsed().as_millis() as u64,
@@ -100,6 +108,14 @@ pub(crate) async fn maybe_execute_via_stream_decision_path(
         bypass_started_at.elapsed().as_millis() as u64,
     );
     if skip_direct_plan {
+        crate::ai_serving::set_local_runtime_miss_diagnostic_reason(
+            state,
+            trace_id,
+            decision,
+            plan_kind,
+            body_json.get("model").and_then(serde_json::Value::as_str),
+            "direct_plan_recent_miss",
+        );
         return Ok(LocalExecutionRequestOutcome::NoPath);
     }
     let transfer_tracker = ProviderTransferTracker::for_request(parts);

@@ -257,6 +257,9 @@ pub fn sanitize_usage_request_metadata_object(source: &Map<String, Value>) -> Op
     ] {
         insert_u64(source, &mut target, key);
     }
+    for key in ["first_attempt_error", "last_attempt_error"] {
+        insert_bounded_text(source, &mut target, key, 512);
+    }
     insert_bounded_u64(source, &mut target, "client_response_status_code", 599);
     if let Some(body_size) = source.get("body_size").and_then(project_body_size) {
         target.insert("body_size".to_string(), body_size);
@@ -1950,5 +1953,21 @@ mod content_refusal_tests {
             "response_outcome":"anything", "content_refusal_reason":reason
         })))
         .is_none());
+    }
+}
+
+#[cfg(test)]
+mod audit_failure_tests {
+    #[test]
+    fn audit_failure_summaries_survive_projection_but_raw_payloads_do_not() {
+        let metadata = super::sanitize_usage_request_metadata(Some(serde_json::json!({
+            "first_attempt_error":"first cause","last_attempt_error":"final cause",
+            "request_body":{"secret":"do not copy"},"end_to_end_time_ms":1234
+        })))
+        .unwrap();
+        assert_eq!(metadata["first_attempt_error"], "first cause");
+        assert_eq!(metadata["last_attempt_error"], "final cause");
+        assert_eq!(metadata["end_to_end_time_ms"], 1234);
+        assert!(metadata.get("request_body").is_none());
     }
 }

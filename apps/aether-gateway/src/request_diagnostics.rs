@@ -20,6 +20,9 @@ struct RequestDiagnosticsInner {
     request_accepted_at: Option<Instant>,
     db_operations: BTreeMap<&'static str, DbOperationTiming>,
     db_pool: Option<DbPoolObservation>,
+    failure_candidates: std::collections::BTreeSet<String>,
+    first_attempt_error: Option<String>,
+    last_attempt_error: Option<String>,
 }
 
 #[derive(Debug, Clone, Copy, Default)]
@@ -39,6 +42,35 @@ struct DbPoolObservation {
 }
 
 impl RequestDiagnostics {
+    fn record_candidate_failure(&self, candidate_id: &str, message: &str) {
+        let summary = safe_failure_summary(message);
+        if summary.is_empty() {
+            return;
+        }
+        let Ok(mut inner) = self.inner.lock() else {
+            return;
+        };
+        // Some terminal paths report the same candidate twice. Keep the first
+        // authoritative failure instead of overwriting it with a generic report.
+        if inner.failure_candidates.len() >= 256
+            || !inner.failure_candidates.insert(candidate_id.to_owned())
+        {
+            return;
+        }
+        inner
+            .first_attempt_error
+            .get_or_insert_with(|| summary.clone());
+        inner.last_attempt_error = Some(summary);
+    }
+
+    fn failure_metadata(&self) -> Option<(String, String)> {
+        let inner = self.inner.lock().ok()?;
+        Some((
+            inner.first_attempt_error.clone()?,
+            inner.last_attempt_error.clone()?,
+        ))
+    }
+
     fn record_request_accepted_at(&self, accepted_at: Instant) {
         let Ok(mut inner) = self.inner.lock() else {
             return;
@@ -220,6 +252,27 @@ pub(crate) fn record_db_pool_summary(summary: DatabasePoolSummary) {
     }
 }
 
+pub(crate) fn safe_failure_summary(message: &str) -> String {
+    use std::sync::LazyLock;
+    static PRIVATE: LazyLock<regex::Regex> = LazyLock::new(|| {
+        regex::Regex::new(
+        r#"(?i)(?:https?://|data:|sediment://|file-service://)[^\s<>"']+|[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}|[A-Z0-9_+/=-]{40,}"#,
+    ).expect("failure summary regex")
+    });
+    let redacted = crate::error::redact_error_str(message);
+    PRIVATE
+        .replace_all(&redacted, "[REDACTED]")
+        .chars()
+        .map(|ch| if ch.is_control() { ' ' } else { ch })
+        .collect()
+}
+
+pub(crate) fn record_candidate_failure(candidate_id: &str, message: &str) {
+    if let Some(diagnostics) = current_request_diagnostics() {
+        diagnostics.record_candidate_failure(candidate_id, message);
+    }
+}
+
 pub(crate) fn attach_request_diagnostics_to_report_context(
     report_context: Option<Value>,
     diagnostics: Option<&Arc<RequestDiagnostics>>,
@@ -227,7 +280,8 @@ pub(crate) fn attach_request_diagnostics_to_report_context(
     let db_timings_ms = diagnostics.and_then(|diagnostics| diagnostics.db_timings_metadata());
     let end_to_end_time_ms =
         diagnostics.and_then(|diagnostics| diagnostics.request_accepted_elapsed_ms());
-    if db_timings_ms.is_none() && end_to_end_time_ms.is_none() {
+    let failures = diagnostics.and_then(|diagnostics| diagnostics.failure_metadata());
+    if db_timings_ms.is_none() && end_to_end_time_ms.is_none() && failures.is_none() {
         return report_context;
     }
 
@@ -236,6 +290,10 @@ pub(crate) fn attach_request_diagnostics_to_report_context(
         Some(other) => Map::from_iter([("seed".to_string(), other)]),
         None => Map::new(),
     };
+    if let Some((first, last)) = failures {
+        object.insert("first_attempt_error".into(), Value::String(first));
+        object.insert("last_attempt_error".into(), Value::String(last));
+    }
     if let Some(db_timings_ms) = db_timings_ms {
         object.insert("db_timings_ms".to_string(), db_timings_ms);
     }
@@ -388,6 +446,50 @@ pub(crate) fn attach_current_request_diagnostics_to_report_context(
 
 #[cfg(test)]
 mod tests {
+
+    #[test]
+    fn audit_failures_keep_first_and_last_and_dedupe_candidate_reports() {
+        let diagnostics = Arc::new(RequestDiagnostics::default());
+        diagnostics.record_candidate_failure("one", "first failure");
+        diagnostics.record_candidate_failure("one", "generic replacement");
+        diagnostics.record_candidate_failure("two", "final failure");
+        let context =
+            super::attach_request_diagnostics_to_report_context(None, Some(&diagnostics)).unwrap();
+        assert_eq!(context["first_attempt_error"], "first failure");
+        assert_eq!(context["last_attempt_error"], "final failure");
+    }
+
+    #[test]
+    fn audit_failure_summaries_are_bounded_and_redact_private_values() {
+        let message = format!("input 404 https://example.test/private?token=secret alice@example.test Bearer secret-token data:image/png;base64,{}\nerror", "A".repeat(500));
+        let result = super::safe_failure_summary(&message);
+        assert!(result.len() <= 512);
+        assert!(!result.chars().any(char::is_control));
+        for secret in [
+            "https://",
+            "example.test",
+            "secret",
+            "data:image",
+            &"A".repeat(40),
+        ] {
+            assert!(!result.contains(secret), "must redact {secret}");
+        }
+    }
+
+    #[tokio::test]
+    async fn audit_diagnostics_survive_explicit_task_scope_handoff() {
+        let diagnostics = Arc::new(RequestDiagnostics::default());
+        let captured = super::scope_request_diagnostics_with(Some(diagnostics.clone()), async {
+            super::record_candidate_failure("one", "specific cause");
+            super::current_request_diagnostics().unwrap()
+        })
+        .await;
+        assert!(super::current_request_diagnostics().is_none());
+        let context =
+            super::attach_request_diagnostics_to_report_context(None, Some(&captured)).unwrap();
+        assert_eq!(context["last_attempt_error"], "specific cause");
+    }
+
     use std::sync::Arc;
     use std::time::{Duration, Instant};
 

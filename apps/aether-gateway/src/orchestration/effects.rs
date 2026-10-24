@@ -1845,6 +1845,7 @@ fn local_candidate_failure_should_invalidate_affinity(
         }
         LocalFailoverClassification::StopErrorPattern
         | LocalFailoverClassification::StopExecutionError
+        | LocalFailoverClassification::RetryAccountUnavailable
         | LocalFailoverClassification::StopCyberPolicy => false,
     }
 }
@@ -1875,6 +1876,13 @@ fn local_candidate_failure_should_apply_key_effects(
     classification: LocalFailoverClassification,
     status_code: u16,
 ) -> bool {
+    if matches!(
+        classification,
+        LocalFailoverClassification::StopExecutionError
+            | LocalFailoverClassification::RetryAccountUnavailable
+    ) {
+        return false;
+    }
     if !provider_api_format
         .trim()
         .eq_ignore_ascii_case("claude:messages")
@@ -2116,6 +2124,31 @@ fn pool_score_delta_for_status(status_code: u16) -> i32 {
 
 #[cfg(test)]
 mod tests {
+
+    #[test]
+    fn audit_input_errors_and_local_selection_races_do_not_penalize_keys() {
+        for classification in [
+            LocalFailoverClassification::StopExecutionError,
+            LocalFailoverClassification::RetryAccountUnavailable,
+        ] {
+            for status in [400, 409, 413, 422] {
+                assert!(!local_candidate_failure_should_apply_key_effects(
+                    "openai:image",
+                    classification,
+                    status
+                ));
+                assert!(!super::local_candidate_failure_should_invalidate_affinity(
+                    classification,
+                    status
+                ));
+                assert!(!super::local_candidate_failure_should_record_pool_error(
+                    classification,
+                    status
+                ));
+            }
+        }
+    }
+
     use std::collections::BTreeMap;
     use std::sync::Arc;
 

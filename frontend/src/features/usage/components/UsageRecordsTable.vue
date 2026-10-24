@@ -568,9 +568,9 @@
           </SortableTableHead>
           <TableHead
             v-if="isColumnVisible('is_async')"
-            class="h-12 font-semibold text-center"
+            class="h-12 font-semibold"
           >
-            是否异步
+            <span class="flex w-full justify-center">是否异步</span>
           </TableHead>
           <TableHead
             v-if="isColumnVisible('tokens')"
@@ -858,11 +858,11 @@
           </TableCell>
           <TableCell
             v-if="isColumnVisible('is_async')"
-            class="py-4 text-center align-top"
+            class="text-center py-4 align-middle"
           >
             <Badge
               :variant="record.is_async ? 'secondary' : 'outline'"
-              class="text-xs"
+              class="whitespace-nowrap"
               data-usage-async
             >
               {{ record.is_async ? '是' : '否' }}

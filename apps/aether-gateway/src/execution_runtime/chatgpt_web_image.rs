@@ -80,12 +80,13 @@ const CHATGPT_WEB_IMAGE_POLL_INTERVAL: Duration = Duration::from_secs(5);
 const CHATGPT_WEB_OPAQUE_ID_MAX_BYTES: usize = 256;
 const CHATGPT_WEB_IMAGE_MAX_UPLOAD_URL_BYTES: usize = 64 * 1024;
 const CHATGPT_WEB_IMAGE_UPLOAD_RESPONSE_LIMIT_BYTES: usize = 64 * 1024;
-const CHATGPT_WEB_IMAGE_MAX_PROMPT_BYTES: usize = 32 * 1024;
+const CHATGPT_WEB_IMAGE_MAX_PROMPT_CHARS: u64 = 32 * 1024;
 const CHATGPT_WEB_IMAGE_MAX_MODEL_BYTES: usize = 256;
 const CHATGPT_WEB_IMAGE_MAX_OPTION_BYTES: usize = 128;
 const CHATGPT_WEB_IMAGE_MAX_EXTERNAL_URL_BYTES: usize = 64 * 1024;
 const CHATGPT_WEB_IMAGE_MAX_INPUT_IMAGES: usize = 16;
 const CHATGPT_WEB_IMAGE_MAX_DIMENSION: u32 = 16_384;
+const CHATGPT_WEB_UPSTREAM_ERROR_BODY_LIMIT_BYTES: usize = 16 * 1024;
 // Values in a provider SSE/poll response are merged across the initial
 // response and up to 24 follow-up polls.  Keep the retained candidate set
 // bounded independently of the per-response body limit so a peer cannot make
@@ -267,6 +268,102 @@ struct WebImageAttemptProgress<'a> {
     finished: bool,
 }
 
+struct ChatGptWebErrorDiagnostics<'a> {
+    kind: &'static str,
+    status_code: Option<u16>,
+    error_type: Option<&'a str>,
+    error_code: Option<&'a str>,
+    error_param: Option<&'a str>,
+    error_message: Option<&'a str>,
+}
+
+fn chatgpt_web_error_diagnostics(
+    error: &ExecutionRuntimeTransportError,
+) -> ChatGptWebErrorDiagnostics<'_> {
+    match error {
+        ExecutionRuntimeTransportError::UpstreamHttpStatus {
+            status_code,
+            response_body,
+            ..
+        } => {
+            let body = response_body.as_ref().and_then(|body| body.get("error"));
+            ChatGptWebErrorDiagnostics {
+                kind: "http_status",
+                status_code: Some(*status_code),
+                error_type: body
+                    .and_then(|body| body.get("type"))
+                    .and_then(Value::as_str),
+                error_code: body
+                    .and_then(|body| body.get("code"))
+                    .and_then(Value::as_str),
+                error_param: body
+                    .and_then(|body| body.get("param"))
+                    .and_then(Value::as_str),
+                error_message: body
+                    .and_then(|body| body.get("message"))
+                    .and_then(Value::as_str),
+            }
+        }
+        ExecutionRuntimeTransportError::ImageInput {
+            status_code,
+            code,
+            param,
+            message,
+        } => ChatGptWebErrorDiagnostics {
+            kind: "input_error",
+            status_code: Some(*status_code),
+            error_type: Some("invalid_request_error"),
+            error_code: Some(code),
+            error_param: Some(param),
+            error_message: Some(message),
+        },
+        ExecutionRuntimeTransportError::UpstreamRequest(_) => ChatGptWebErrorDiagnostics {
+            kind: "upstream_request",
+            status_code: None,
+            error_type: None,
+            error_code: None,
+            error_param: None,
+            error_message: None,
+        },
+        ExecutionRuntimeTransportError::BrowserBody(_) => ChatGptWebErrorDiagnostics {
+            kind: "body_read",
+            status_code: None,
+            error_type: None,
+            error_code: None,
+            error_param: None,
+            error_message: None,
+        },
+        ExecutionRuntimeTransportError::UpstreamResponseTooLarge { .. } => {
+            ChatGptWebErrorDiagnostics {
+                kind: "body_limit",
+                status_code: None,
+                error_type: None,
+                error_code: None,
+                error_param: None,
+                error_message: None,
+            }
+        }
+        ExecutionRuntimeTransportError::UpstreamResponseDecode { .. } => {
+            ChatGptWebErrorDiagnostics {
+                kind: "response_decode",
+                status_code: None,
+                error_type: None,
+                error_code: None,
+                error_param: None,
+                error_message: None,
+            }
+        }
+        _ => ChatGptWebErrorDiagnostics {
+            kind: "other",
+            status_code: None,
+            error_type: None,
+            error_code: None,
+            error_param: None,
+            error_message: None,
+        },
+    }
+}
+
 impl<'a> WebImageAttemptProgress<'a> {
     fn new(plan: &'a ExecutionPlan, started_at: Instant) -> Self {
         Self {
@@ -344,23 +441,32 @@ impl<'a> WebImageAttemptProgress<'a> {
                 downloaded_count = self.downloaded_count,
                 "ChatGPT-Web image attempt returned a response"
             ),
-            Err(error) => warn!(
-                event_name = "chatgpt_web_image_attempt_failed",
-                request_id = %self.plan.request_id,
-                candidate_id = ?self.plan.candidate_id,
-                key_id = %self.plan.key_id,
-                stage = self.stage,
-                stage_elapsed_ms = self.stage_started_at.elapsed().as_millis() as u64,
-                elapsed_ms = self.started_at.elapsed().as_millis() as u64,
-                has_conversation_id = self.has_conversation_id,
-                turn_finished = self.turn_finished,
-                has_failure = self.has_failure,
-                asset_count = self.asset_count,
-                poll_count = self.poll_count,
-                downloaded_count = self.downloaded_count,
-                error = %safe_transport_error_message(error),
-                "ChatGPT-Web image attempt failed during a stage"
-            ),
+            Err(error) => {
+                let diagnostics = chatgpt_web_error_diagnostics(error);
+                warn!(
+                    event_name = "chatgpt_web_image_attempt_failed",
+                    request_id = %self.plan.request_id,
+                    candidate_id = ?self.plan.candidate_id,
+                    key_id = %self.plan.key_id,
+                    stage = self.stage,
+                    stage_elapsed_ms = self.stage_started_at.elapsed().as_millis() as u64,
+                    elapsed_ms = self.started_at.elapsed().as_millis() as u64,
+                    has_conversation_id = self.has_conversation_id,
+                    turn_finished = self.turn_finished,
+                    has_failure = self.has_failure,
+                    asset_count = self.asset_count,
+                    poll_count = self.poll_count,
+                    downloaded_count = self.downloaded_count,
+                    error_kind = diagnostics.kind,
+                    upstream_status_code = ?diagnostics.status_code,
+                    upstream_error_type = ?diagnostics.error_type,
+                    upstream_error_code = ?diagnostics.error_code,
+                    upstream_error_param = ?diagnostics.error_param,
+                    upstream_error_message = ?diagnostics.error_message,
+                    error = %safe_transport_error_message(error),
+                    "ChatGPT-Web image attempt failed during a stage"
+                );
+            }
         }
     }
 }
@@ -405,11 +511,29 @@ pub(crate) async fn maybe_execute_chatgpt_web_image_sync(
             Err(ExecutionRuntimeTransportError::UpstreamHttpStatus {
                 status_code,
                 message,
+                response_body,
             }) => chatgpt_web_http_error_execution_result(
                 plan,
                 started_at,
                 status_code,
                 message.as_str(),
+                response_body,
+            ),
+            Err(ExecutionRuntimeTransportError::ImageAccountUnavailable) => {
+                chatgpt_web_account_unavailable_result(plan, started_at)
+            }
+            Err(ExecutionRuntimeTransportError::ImageInput {
+                status_code,
+                code,
+                param,
+                message,
+            }) => chatgpt_web_input_error_execution_result(
+                plan,
+                started_at,
+                status_code,
+                code,
+                param,
+                &message,
             ),
             Err(error) => return Err(error),
         };
@@ -432,9 +556,30 @@ pub(crate) async fn maybe_execute_chatgpt_web_image_stream(
         Err(ExecutionRuntimeTransportError::UpstreamHttpStatus {
             status_code,
             message,
-        }) => {
-            chatgpt_web_http_error_execution_result(plan, started_at, status_code, message.as_str())
+            response_body,
+        }) => chatgpt_web_http_error_execution_result(
+            plan,
+            started_at,
+            status_code,
+            message.as_str(),
+            response_body,
+        ),
+        Err(ExecutionRuntimeTransportError::ImageAccountUnavailable) => {
+            chatgpt_web_account_unavailable_result(plan, started_at)
         }
+        Err(ExecutionRuntimeTransportError::ImageInput {
+            status_code,
+            code,
+            param,
+            message,
+        }) => chatgpt_web_input_error_execution_result(
+            plan,
+            started_at,
+            status_code,
+            code,
+            param,
+            &message,
+        ),
         Err(error) => return Err(error),
     };
     // Avoid an extra decode/allocation for large successful image envelopes.
@@ -537,7 +682,10 @@ async fn execute_chatgpt_web_image_with_progress(
         ));
     }
 
-    let request = ChatGptWebImageRequest::from_body(body)?;
+    let request = ChatGptWebImageRequest::from_body_with_prompt_limit(
+        body,
+        crate::image_generation::max_prompt_chars(state).await,
+    )?;
     let base_url = chatgpt_web_base_url_from_plan(plan);
     let token = bearer_token_from_headers(&plan.headers).unwrap_or_default();
     let recovery = crate::image_tasks::flow::recovery();
@@ -577,13 +725,59 @@ async fn execute_chatgpt_web_image_with_progress(
         summary.conversation_id = Some(conversation.to_owned());
         (fp, uploads, summary)
     } else {
+        // Resolve caller-owned inputs before authenticated upstream calls or task submission.
+        // A missing reference or malformed data URL cannot be fixed by rotating credentials.
+        progress.enter("input_validation");
         let fp = WebFingerprint::new();
+        let mut input_images = Vec::with_capacity(request.images.len());
+        let mut retained_input_bytes = 0usize;
+        let input_budget =
+            maximum_base64_len_for_decoded_limit(chatgpt_web_image_raw_payload_limit_bytes());
+        for image in &request.images {
+            let encoded_len = if image
+                .get(..5)
+                .is_some_and(|p| p.eq_ignore_ascii_case("data:"))
+            {
+                image
+                    .split_once(',')
+                    .map_or(image.len(), |(_, data)| data.len())
+            } else {
+                0
+            };
+            if encoded_len > input_budget.saturating_sub(retained_input_bytes) {
+                return Err(image_input_error(
+                    "image_input_too_large",
+                    "images",
+                    "Combined reference images exceed the local input memory budget",
+                ));
+            }
+            let downloaded = web_download_image(
+                state,
+                plan,
+                &base_url,
+                &fp,
+                token.as_str(),
+                image,
+                WebImageDownloadTrust::UntrustedInput,
+            )
+            .await?;
+            retained_input_bytes = retained_input_bytes.saturating_add(downloaded.b64_json.len());
+            if retained_input_bytes > input_budget {
+                return Err(image_input_error(
+                    "image_input_too_large",
+                    "images",
+                    "Combined reference images exceed the local input memory budget",
+                ));
+            }
+            input_images.push(downloaded);
+        }
+        recheck_chatgpt_web_image_account(state, plan).await?;
         progress.enter("bootstrap");
         web_bootstrap(plan, &base_url, &fp).await?;
         progress.enter("requirements");
         let requirements = web_requirements(plan, &base_url, &fp, token.as_str()).await?;
         let mut uploads = Vec::new();
-        for (index, image) in request.images.iter().enumerate() {
+        for (index, image) in input_images.into_iter().enumerate() {
             progress.enter("upload");
             uploads.push(
                 web_upload_image(
@@ -609,6 +803,9 @@ async fn execute_chatgpt_web_image_with_progress(
             request.web_model.as_str(),
         )
         .await?;
+        // Uploads can take seconds. Recheck again immediately before creating
+        // a new upstream task; already running tasks remain unaffected.
+        recheck_chatgpt_web_image_account(state, plan).await?;
         progress.enter("initial_response");
         let mut summary = web_start_conversation(
             plan,
@@ -640,6 +837,7 @@ async fn execute_chatgpt_web_image_with_progress(
         token.as_str(),
         &mut summary,
         &uploads,
+        request.count,
         progress,
     )
     .await?;
@@ -719,6 +917,7 @@ async fn execute_chatgpt_web_image_with_progress(
                     token.as_str(),
                     &mut summary,
                     &uploads,
+                    request.count,
                     progress,
                 )
                 .await?;
@@ -758,11 +957,26 @@ async fn execute_chatgpt_web_image_with_progress(
         );
     }
 
+    if downloaded.is_empty()
+        && summary
+            .failure
+            .as_ref()
+            .is_some_and(web_failure_is_image_quota_exhausted)
+    {
+        if let Err(error) = update_chatgpt_web_image_quota(state, plan, true).await {
+            warn!(event_name = "chatgpt_web_image_quota_exhaustion_update_failed",
+                request_id = %plan.request_id, key_id = %plan.key_id, error = %error,
+                "Could not persist explicit image quota exhaustion");
+        }
+    }
     progress.enter("response_build");
     let body = if let Some(failure) = summary.failure.as_ref().filter(|_| downloaded.is_empty()) {
         build_failed_sse(&request, failure)
-    } else if let Some(image) = downloaded.into_iter().next() {
-        build_success_sse(&request, &image, report_context)
+    } else if !downloaded.is_empty() {
+        info!(event_name = "chatgpt_web_image_output_count", request_id = %plan.request_id,
+            requested_count = request.count, returned_count = downloaded.len(),
+            "ChatGPT-Web image output count");
+        build_success_sse(&request, &downloaded, report_context)
     } else if let Some(reason) = content_refusal {
         info!(
             event_name = "chatgpt_web_image_content_refused",
@@ -811,20 +1025,27 @@ struct ChatGptWebImageRequest {
     output_format: String,
     quality: Option<String>,
     partial_images: u64,
+    count: u64,
     images: Vec<String>,
 }
 
 impl ChatGptWebImageRequest {
     fn from_body(body: &Value) -> Result<Self, ExecutionRuntimeTransportError> {
+        Self::from_body_with_prompt_limit(body, CHATGPT_WEB_IMAGE_MAX_PROMPT_CHARS)
+    }
+
+    fn from_body_with_prompt_limit(
+        body: &Value,
+        max_prompt_chars: u64,
+    ) -> Result<Self, ExecutionRuntimeTransportError> {
         let model =
             bounded_chatgpt_web_text_field(body, "model", CHATGPT_WEB_IMAGE_MAX_MODEL_BYTES)?
                 .unwrap_or_else(|| "gpt-image-2".to_string());
         let web_model =
             bounded_chatgpt_web_text_field(body, "web_model", CHATGPT_WEB_IMAGE_MAX_MODEL_BYTES)?
                 .unwrap_or_else(|| "gpt-5-5-thinking".to_string());
-        let prompt =
-            bounded_chatgpt_web_text_field(body, "prompt", CHATGPT_WEB_IMAGE_MAX_PROMPT_BYTES)?
-                .unwrap_or_else(|| "Generate a high quality image.".to_string());
+        let prompt = bounded_chatgpt_web_prompt_field(body, "prompt", max_prompt_chars)?
+            .unwrap_or_else(|| "Generate a high quality image.".to_string());
         let size =
             bounded_chatgpt_web_text_field(body, "size", CHATGPT_WEB_IMAGE_MAX_OPTION_BYTES)?
                 .unwrap_or_else(|| "1024x1024".to_string());
@@ -870,10 +1091,25 @@ impl ChatGptWebImageRequest {
                 images.push(value.to_string());
             }
         }
+        let count = match body.get("count") {
+            None => 1,
+            Some(value) => value
+                .as_u64()
+                .filter(|count| (1..=crate::image_generation::MAX_IMAGE_COUNT).contains(count))
+                .ok_or_else(|| {
+                    image_input_error(
+                        "invalid_image_option",
+                        "n",
+                        "ChatGPT-Web image n must be between 1 and 10",
+                    )
+                })?,
+        };
         let partial_images = json_u64(body.get("partial_images")).unwrap_or(0);
         if partial_images > 3 {
-            return Err(ExecutionRuntimeTransportError::UpstreamRequest(
-                "ChatGPT-Web image partial_images must be between 0 and 3".to_string(),
+            return Err(image_input_error(
+                "invalid_image_option",
+                "partial_images",
+                "ChatGPT-Web image partial_images must be between 0 and 3",
             ));
         }
         Ok(Self {
@@ -886,14 +1122,41 @@ impl ChatGptWebImageRequest {
             output_format,
             quality,
             partial_images,
+            count,
             images,
         })
     }
 }
 
+fn bounded_chatgpt_web_prompt_field(
+    body: &Value,
+    key: &'static str,
+    max_chars: u64,
+) -> Result<Option<String>, ExecutionRuntimeTransportError> {
+    let Some(value) = body.get(key).and_then(Value::as_str) else {
+        return Ok(None);
+    };
+    let value = value.trim();
+    if value.is_empty() {
+        return Ok(None);
+    }
+    let char_count = value.chars().count() as u64;
+    if max_chars != 0 && char_count > max_chars {
+        return Err(image_input_error(
+            "image_input_too_large",
+            key,
+            format!(
+                "ChatGPT-Web image request {key} is {char_count} characters ({} UTF-8 bytes); the local limit is {max_chars} characters",
+                value.len(),
+            ),
+        ));
+    }
+    Ok(Some(value.to_string()))
+}
+
 fn bounded_chatgpt_web_text_field(
     body: &Value,
-    key: &str,
+    key: &'static str,
     max_bytes: usize,
 ) -> Result<Option<String>, ExecutionRuntimeTransportError> {
     let Some(value) = body.get(key).and_then(Value::as_str) else {
@@ -904,15 +1167,38 @@ fn bounded_chatgpt_web_text_field(
         return Ok(None);
     }
     if value.len() > max_bytes {
-        return Err(chatgpt_web_image_request_field_too_large(key));
+        return Err(image_input_error("image_input_too_large", key, format!(
+            "ChatGPT-Web image request {key} is {} UTF-8 bytes; the local limit is {max_bytes} bytes", value.len(),
+        )));
     }
     Ok(Some(value.to_string()))
 }
 
-fn chatgpt_web_image_request_field_too_large(field: &str) -> ExecutionRuntimeTransportError {
-    ExecutionRuntimeTransportError::UpstreamRequest(format!(
-        "ChatGPT-Web image request {field} exceeds the supported size"
-    ))
+fn chatgpt_web_image_request_field_too_large(
+    field: &'static str,
+) -> ExecutionRuntimeTransportError {
+    image_input_error(
+        "image_input_too_large",
+        field,
+        format!("ChatGPT-Web image request {field} exceeds the supported size"),
+    )
+}
+
+fn image_input_error(
+    code: &'static str,
+    param: &'static str,
+    message: impl Into<String>,
+) -> ExecutionRuntimeTransportError {
+    ExecutionRuntimeTransportError::ImageInput {
+        status_code: if code == "image_input_too_large" {
+            413
+        } else {
+            400
+        },
+        code,
+        param,
+        message: message.into(),
+    }
 }
 
 impl WebFingerprint {
@@ -1078,8 +1364,42 @@ async fn web_start_conversation(
         Some(conduit),
         "text/event-stream",
     );
+    let body = web_image_conversation_body(request, uploads);
+    let subplan = build_web_image_subrequest_plan(
+        plan,
+        "POST",
+        format!("{base_url}{path}"),
+        headers,
+        Some(RequestBody::from_json(body)),
+        true,
+    );
+    let mut diagnostics = InitialResponseDiagnostics::new(plan);
+    let result = DirectSyncExecutionRuntime::new()
+        .execute_sync_with_body_diagnostics(&subplan, &mut diagnostics.read)
+        .await
+        .and_then(|result| {
+            ensure_success(&result, "ChatGPT-Web conversation")?;
+            execution_result_bytes(&result)
+        });
+    match result {
+        Ok(bytes) => {
+            let summary = parse_web_image_sse(&bytes);
+            diagnostics.finish(Some(&summary), None);
+            Ok(summary)
+        }
+        Err(error) => {
+            diagnostics.finish(None, Some(&error));
+            Err(error)
+        }
+    }
+}
+
+fn web_image_conversation_body(
+    request: &ChatGptWebImageRequest,
+    uploads: &[WebUploadMeta],
+) -> Value {
     let (content, metadata) = web_image_message_content(request.prompt.as_str(), uploads);
-    let body = json!({
+    let mut body = json!({
         "action": "next",
         "fork_from_shared_post": false,
         "parent_message_id": "client-created-root",
@@ -1113,33 +1433,11 @@ async fn web_start_conversation(
             "metadata": metadata
         }]
     });
-    let subplan = build_web_image_subrequest_plan(
-        plan,
-        "POST",
-        format!("{base_url}{path}"),
-        headers,
-        Some(RequestBody::from_json(body)),
-        true,
-    );
-    let mut diagnostics = InitialResponseDiagnostics::new(plan);
-    let result = DirectSyncExecutionRuntime::new()
-        .execute_sync_with_body_diagnostics(&subplan, &mut diagnostics.read)
-        .await
-        .and_then(|result| {
-            ensure_success(&result, "ChatGPT-Web conversation")?;
-            execution_result_bytes(&result)
-        });
-    match result {
-        Ok(bytes) => {
-            let summary = parse_web_image_sse(&bytes);
-            diagnostics.finish(Some(&summary), None);
-            Ok(summary)
-        }
-        Err(error) => {
-            diagnostics.finish(None, Some(&error));
-            Err(error)
-        }
+    // Keep the established single-image payload unchanged. Multi-image support is experimental.
+    if request.count > 1 {
+        body["n"] = json!(request.count);
     }
+    body
 }
 
 async fn web_poll_conversation(
@@ -1181,6 +1479,7 @@ async fn resolve_and_download_images(
     token: &str,
     summary: &mut WebImageSseSummary,
     uploads: &[WebUploadMeta],
+    max_images: u64,
     progress: &mut WebImageAttemptProgress<'_>,
 ) -> Result<Vec<DownloadedImage>, ExecutionRuntimeTransportError> {
     progress.enter("resolve_urls");
@@ -1201,6 +1500,9 @@ async fn resolve_and_download_images(
         "ChatGPT-Web image download addresses resolved"
     );
     let mut downloaded = Vec::new();
+    let mut retained_bytes = 0usize;
+    let output_budget = chatgpt_web_image_sse_envelope_limit_bytes()
+        .saturating_sub(CHATGPT_WEB_IMAGE_SSE_WRAPPER_OVERHEAD_BYTES);
     for (index, url) in urls.into_iter().enumerate() {
         progress.enter("download");
         summary.diagnostics.download_started();
@@ -1216,6 +1518,12 @@ async fn resolve_and_download_images(
         .await
         {
             Ok(image) => {
+                retained_bytes = retained_bytes.saturating_add(image.b64_json.len());
+                if retained_bytes > output_budget {
+                    return Err(ExecutionRuntimeTransportError::BodyTooLarge {
+                        limit_bytes: output_budget,
+                    });
+                }
                 progress.downloaded_count += 1;
                 info!(
                     event_name = "chatgpt_web_image_download_completed",
@@ -1230,7 +1538,9 @@ async fn resolve_and_download_images(
                     "ChatGPT-Web image downloaded and validated"
                 );
                 downloaded.push(image);
-                break;
+                if downloaded.len() >= max_images as usize {
+                    break;
+                }
             }
             Err(err) => {
                 summary.diagnostics.download_failed();
@@ -1364,20 +1674,49 @@ async fn web_download_image(
     raw_url: &str,
     trust: WebImageDownloadTrust,
 ) -> Result<DownloadedImage, ExecutionRuntimeTransportError> {
-    if let Some(data) = parse_data_url(raw_url) {
-        return Ok(data);
+    let untrusted = matches!(trust, WebImageDownloadTrust::UntrustedInput);
+    if raw_url
+        .trim()
+        .get(..5)
+        .is_some_and(|s| s.eq_ignore_ascii_case("data:"))
+    {
+        if untrusted {
+            return parse_input_data_url(raw_url, chatgpt_web_image_raw_payload_limit_bytes())
+                .map_err(|message| image_input_error("invalid_image_data", "image", message));
+        }
+        return parse_data_url(raw_url).ok_or_else(|| {
+            ExecutionRuntimeTransportError::UpstreamRequest(
+                "ChatGPT-Web output image data URL has invalid encoding, MIME or payload".into(),
+            )
+        });
     }
     let payload = match trust {
         WebImageDownloadTrust::UntrustedInput => {
-            let url = parse_absolute_web_image_url(raw_url)?;
-            download_public_web_image(url, plan.timeouts.as_ref(), false).await?
+            let url = parse_absolute_web_image_url(raw_url).map_err(|_| image_input_error(
+                "invalid_image_url", "image", "Image reference must be an absolute public HTTP(S) URL or a supported base64 data URL",
+            ))?;
+            download_public_web_image(url, plan.timeouts.as_ref(), false)
+                .await
+                .map_err(classify_image_reference_error)?
         }
         WebImageDownloadTrust::ProviderOutput => {
             download_provider_web_image(plan, base_url, fp, token, raw_url).await?
         }
     };
     let data = payload.data;
-    let mime = validate_web_image_payload(&data, payload.content_type.as_deref())?.to_string();
+    let mime = if untrusted {
+        detected_web_image_mime(&data)
+            .ok_or_else(|| {
+                image_input_error(
+                    "invalid_image_data",
+                    "image",
+                    "Input image must contain PNG, JPEG or WebP bytes",
+                )
+            })?
+            .to_string()
+    } else {
+        validate_web_image_payload(&data, payload.content_type.as_deref())?.to_string()
+    };
     let (width, height) = image_dimensions(&data);
     Ok(DownloadedImage {
         b64_json: base64::engine::general_purpose::STANDARD.encode(data),
@@ -1385,6 +1724,33 @@ async fn web_download_image(
         width,
         height,
     })
+}
+
+fn classify_image_reference_error(
+    error: ExecutionRuntimeTransportError,
+) -> ExecutionRuntimeTransportError {
+    match error {
+        ExecutionRuntimeTransportError::UpstreamHttpStatus {
+            status_code: 400 | 401 | 403 | 404 | 410,
+            message,
+            ..
+        } => image_input_error("image_reference_unavailable", "image", message),
+        ExecutionRuntimeTransportError::UpstreamRequest(ref message)
+            if message == "ChatGPT-Web image URL resolves to a private or reserved address" =>
+        {
+            image_input_error(
+                "invalid_image_url",
+                "image",
+                "Image reference resolves to a private or reserved address",
+            )
+        }
+        ExecutionRuntimeTransportError::BodyTooLarge { .. } => image_input_error(
+            "image_input_too_large",
+            "image",
+            "Input reference image exceeds the decoded image size limit",
+        ),
+        other => other,
+    }
 }
 
 fn parse_absolute_web_image_url(raw_url: &str) -> Result<url::Url, ExecutionRuntimeTransportError> {
@@ -1684,10 +2050,14 @@ async fn download_public_web_image(
             continue;
         }
         if !response.status().is_success() {
-            return Err(ExecutionRuntimeTransportError::UpstreamRequest(format!(
-                "ChatGPT-Web image download returned {}",
-                response.status().as_u16()
-            )));
+            return Err(ExecutionRuntimeTransportError::UpstreamHttpStatus {
+                status_code: response.status().as_u16(),
+                message: format!(
+                    "ChatGPT-Web image download returned {}",
+                    response.status().as_u16()
+                ),
+                response_body: None,
+            });
         }
         let content_type = response
             .headers()
@@ -1699,10 +2069,15 @@ async fn download_public_web_image(
             chatgpt_web_image_raw_payload_limit_bytes(),
         )
         .await
-        .map_err(|err| {
-            ExecutionRuntimeTransportError::UpstreamRequest(format!(
-                "ChatGPT-Web public image body read failed: {err}"
-            ))
+        .map_err(|err| match err {
+            aether_http::ResponseBodyReadError::TooLarge { max_bytes } => {
+                ExecutionRuntimeTransportError::BodyTooLarge {
+                    limit_bytes: max_bytes,
+                }
+            }
+            other => ExecutionRuntimeTransportError::UpstreamRequest(format!(
+                "ChatGPT-Web public image body read failed: {other}"
+            )),
         })?;
         return Ok(WebImageHttpPayload { data, content_type });
     }
@@ -1913,6 +2288,7 @@ async fn upload_chatgpt_web_blob(
         return Err(ExecutionRuntimeTransportError::UpstreamHttpStatus {
             status_code,
             message: chatgpt_web_stage_http_error_message("ChatGPT-Web upload blob", status_code),
+            response_body: None,
         });
     }
     aether_http::read_response_bytes_with_limit(
@@ -1929,24 +2305,25 @@ async fn upload_chatgpt_web_blob(
 }
 
 async fn web_upload_image(
-    state: &AppState,
+    _state: &AppState,
     plan: &ExecutionPlan,
     base_url: &str,
     fp: &WebFingerprint,
     token: &str,
-    ref_url: &str,
+    image: DownloadedImage,
     file_name: String,
 ) -> Result<WebUploadMeta, ExecutionRuntimeTransportError> {
-    let image = web_download_image(
-        state,
-        plan,
-        base_url,
-        fp,
-        token,
-        ref_url,
-        WebImageDownloadTrust::UntrustedInput,
-    )
-    .await?;
+    let extension = match image.mime.as_str() {
+        "image/jpeg" => "jpg",
+        "image/webp" => "webp",
+        _ => "png",
+    };
+    let file_name = format!(
+        "{}.{extension}",
+        file_name
+            .rsplit_once('.')
+            .map_or(file_name.as_str(), |(stem, _)| stem)
+    );
     let bytes = decode_base64_body_with_limit(
         image.b64_json.as_str(),
         chatgpt_web_image_raw_payload_limit_bytes(),
@@ -2136,6 +2513,93 @@ fn build_web_image_subrequest_plan(
     }
 }
 
+fn image_quota_reset_unix_secs(value: &Value) -> Option<u64> {
+    value.as_u64().or_else(|| {
+        value.as_str().and_then(|text| {
+            text.parse().ok().or_else(|| {
+                chrono::DateTime::parse_from_rfc3339(text)
+                    .ok()
+                    .and_then(|dt| u64::try_from(dt.timestamp()).ok())
+            })
+        })
+    })
+}
+
+fn web_failure_is_image_quota_exhausted(failure: &Value) -> bool {
+    [
+        "/error/code",
+        "/response/error/code",
+        "/error/type",
+        "/response/error/type",
+    ]
+    .iter()
+    .filter_map(|path| failure.pointer(path).and_then(Value::as_str))
+    .any(|code| {
+        matches!(
+            code,
+            "image_generation_limit_reached"
+                | "image_gen_limit_reached"
+                | "image_generation_quota_exceeded"
+                | "insufficient_quota"
+                | "quota_exceeded"
+                | "quota_exhausted"
+        )
+    })
+}
+
+async fn recheck_chatgpt_web_image_account(
+    state: &AppState,
+    plan: &ExecutionPlan,
+) -> Result<(), ExecutionRuntimeTransportError> {
+    let keys = match state
+        .read_provider_catalog_keys_by_ids(&[plan.key_id.clone()])
+        .await
+    {
+        Ok(keys) => keys,
+        Err(_) => {
+            warn!(event_name = "chatgpt_web_image_account_recheck_unavailable", request_id = %plan.request_id,
+                "Account recheck unavailable; retaining scheduler decision");
+            return Ok(());
+        }
+    };
+    let Some(key) = keys
+        .into_iter()
+        .find(|key| key.id == plan.key_id && key.provider_id == plan.provider_id)
+    else {
+        // Some standalone execution deployments do not expose a catalog reader.
+        return Ok(());
+    };
+    if !key.is_active
+        || key.oauth_invalid_at_unix_secs.is_some()
+        || key
+            .expires_at_unix_secs
+            .is_some_and(|expiry| expiry <= current_unix_secs())
+    {
+        return Err(ExecutionRuntimeTransportError::ImageAccountUnavailable);
+    }
+    if !aether_provider_pool::provider_pool_key_account_quota_exhausted(&key, "chatgpt_web") {
+        return Ok(());
+    }
+    let providers = match state
+        .read_provider_catalog_providers_by_ids(&[plan.provider_id.clone()])
+        .await
+    {
+        Ok(providers) => providers,
+        Err(_) => return Ok(()),
+    };
+    let ignore_exhausted = providers
+        .iter()
+        .find(|provider| provider.id == plan.provider_id)
+        .and_then(|provider| provider.config.as_ref())
+        .and_then(|config| config.pointer("/pool_advanced/ignore_exhausted_accounts"))
+        .and_then(Value::as_bool)
+        .unwrap_or(false);
+    if !ignore_exhausted {
+        return Err(ExecutionRuntimeTransportError::ImageAccountUnavailable);
+    }
+    Ok(())
+}
+
 async fn apply_chatgpt_web_image_quota_request_delta_after_conversation_start(
     state: &AppState,
     plan: &ExecutionPlan,
@@ -2226,6 +2690,14 @@ async fn apply_chatgpt_web_image_quota_request_delta(
     state: &AppState,
     plan: &ExecutionPlan,
 ) -> Result<bool, String> {
+    update_chatgpt_web_image_quota(state, plan, false).await
+}
+
+async fn update_chatgpt_web_image_quota(
+    state: &AppState,
+    plan: &ExecutionPlan,
+    exhausted: bool,
+) -> Result<bool, String> {
     let key_id = plan.key_id.trim();
     let provider_id = plan.provider_id.trim();
     if key_id.is_empty() || provider_id.is_empty() {
@@ -2254,7 +2726,30 @@ async fn apply_chatgpt_web_image_quota_request_delta(
             .cloned()
             .unwrap_or_default();
         let now_unix_secs = current_unix_secs();
-        if !apply_chatgpt_web_image_quota_request_delta_to_metadata(
+        if exhausted {
+            metadata.insert("image_quota_blocked".into(), json!(true));
+            metadata.insert("image_quota_remaining".into(), json!(0));
+            if let Some(limit) = metadata
+                .get("image_quota_total")
+                .and_then(Value::as_f64)
+                .filter(|limit| limit.is_finite() && *limit > 0.0)
+            {
+                metadata.insert("image_quota_used".into(), json!(limit));
+            }
+            // Unknown reset is a bounded local backoff, not an invented upstream
+            // daily reset. The normal quota probe can refresh it earlier.
+            if metadata
+                .get("image_quota_reset_at")
+                .and_then(image_quota_reset_unix_secs)
+                .is_none_or(|reset| reset <= now_unix_secs)
+            {
+                metadata.insert(
+                    "image_quota_reset_at".into(),
+                    json!(now_unix_secs.saturating_add(300)),
+                );
+            }
+            metadata.insert("updated_at".into(), json!(now_unix_secs));
+        } else if !apply_chatgpt_web_image_quota_request_delta_to_metadata(
             &mut metadata,
             latest_key.status_snapshot.as_ref(),
             now_unix_secs,
@@ -2577,15 +3072,20 @@ async fn refresh_chatgpt_web_image_quota_after_success(
     let provider_id = plan.provider_id.trim();
     let key_ids = [key_id.to_string()];
     let provider_ids = [provider_id.to_string()];
-    let key_available = state
+    let initial_key = state
         .read_provider_catalog_keys_by_ids(&key_ids)
         .await
         .map_err(|_| "ChatGPT-Web quota key read failed".to_string())?
         .into_iter()
-        .any(|key| key.id == key_id && key.provider_id == provider_id);
-    if !key_available {
+        .find(|key| key.id == key_id && key.provider_id == provider_id);
+    let Some(initial_key) = initial_key else {
         return Ok(false);
-    }
+    };
+    let initial_namespace = initial_key
+        .upstream_metadata
+        .as_ref()
+        .and_then(|value| value.get("chatgpt_web"))
+        .cloned();
     let Some(provider) = state
         .read_provider_catalog_providers_by_ids(&provider_ids)
         .await
@@ -2642,6 +3142,10 @@ async fn refresh_chatgpt_web_image_quota_after_success(
         .and_then(Value::as_object)
         .and_then(|metadata| metadata.get("chatgpt_web"))
         .cloned();
+    if expected_namespace_value != initial_namespace {
+        // A newer local submission or exhaustion is more recent than this probe.
+        return Ok(false);
+    }
     let mut metadata = metadata.clone();
     normalize_chatgpt_web_image_quota_limit(&mut metadata, latest_key.upstream_metadata.as_ref());
     metadata = admin_provider_metadata_bucket_safe_json("chatgpt_web", Some(&metadata));
@@ -3308,11 +3812,15 @@ fn observe_web_image_progress(value: &Value, summary: &mut WebImageSseSummary) {
     if let Some(finished) = summary.diagnostics.observe_progress(value) {
         summary.turn_finished = finished;
     }
-    if let Some(message) = diagnostics::current_message(value) {
+    // Snapshots may contain only the first token; use the bounded patch-assembled
+    // current message instead of retaining a stale one-character snapshot.
+    if let Some(text) = summary.diagnostics.current_assistant_text() {
+        // The full bounded text stays in diagnostics for refusal classification.
+        // Do not clone the entire growing assistant message for each token.
+        summary.last_text = Some(text.chars().take(512).collect());
+    } else if let Some(message) = diagnostics::current_message(value) {
         if message.pointer("/author/role").and_then(Value::as_str) == Some("assistant") {
-            if let Some(text) = extract_web_message_text(message) {
-                summary.last_text = Some(text);
-            }
+            summary.last_text = extract_web_message_text(message);
         }
     }
     if [value, payload]
@@ -3335,6 +3843,8 @@ fn explicit_content_refusal(summary: &WebImageSseSummary) -> Option<&str> {
     let chinese = [
         "非常抱歉，该提示可能违反了",
         "非常抱歉，生成的图片可能违反了",
+        "非常抱歉，生成的图片触及",
+        "抱歉，生成的图片触及",
     ]
     .iter()
     .any(|prefix| text.starts_with(prefix))
@@ -3346,6 +3856,8 @@ fn explicit_content_refusal(summary: &WebImageSseSummary) -> Option<&str> {
         "we're sorry, but the image we created may violate",
         "i can't generate this image because it violates",
         "i cannot generate this image because it violates",
+        "we're sorry, but the image we generated may violate",
+        "we're sorry, but the image we generated violates",
     ]
     .iter()
     .any(|prefix| lower.starts_with(prefix))
@@ -3539,23 +4051,12 @@ fn add_unique_values(values: &mut Vec<String>, incoming: impl IntoIterator<Item 
 
 fn build_success_sse(
     request: &ChatGptWebImageRequest,
-    image: &DownloadedImage,
+    images: &[DownloadedImage],
     report_context: Option<&Value>,
 ) -> String {
     let response_id = format!("resp_{}", Uuid::new_v4().simple());
-    let item_id = format!("ig_{}", Uuid::new_v4().simple());
     let created_at = current_unix_secs() as i64;
-    let output_format = output_format_from_mime(&image.mime, request.output_format.as_str());
-    let usage = chatgpt_web_image_usage(request, image, report_context);
-    let item = json!({
-        "id": item_id,
-        "type": "image_generation_call",
-        "result": image.b64_json,
-        "output_format": output_format,
-        "width": image.width,
-        "height": image.height,
-        "revised_prompt": Value::Null
-    });
+    let usage = chatgpt_web_image_usage(request, images, report_context);
     let created = json!({
         "type": "response.created",
         "response": {
@@ -3566,11 +4067,33 @@ fn build_success_sse(
             "status": "in_progress"
         }
     });
-    let done = json!({
-        "type": "response.output_item.done",
-        "output_index": 0,
-        "item": item
-    });
+    let mut body = format!("event: response.created\ndata: {}\n\n", created);
+    let mut output = Vec::with_capacity(images.len());
+    for (index, image) in images.iter().enumerate() {
+        let output_format = output_format_from_mime(&image.mime, request.output_format.as_str());
+        let item = json!({
+            "id": format!("ig_{}", Uuid::new_v4().simple()),
+            "type": "image_generation_call",
+            "result": image.b64_json,
+            "output_format": output_format,
+            "width": image.width,
+            "height": image.height,
+            "revised_prompt": Value::Null
+        });
+        let done =
+            json!({"type": "response.output_item.done", "output_index": index, "item": item});
+        body.push_str(&format!(
+            "event: response.output_item.done\ndata: {}\n\n",
+            done
+        ));
+        output.push(json!({
+            "type": "image_generation_call",
+            "output_format": output_format,
+            "width": image.width,
+            "height": image.height,
+            "revised_prompt": Value::Null
+        }));
+    }
     let completed = json!({
         "type": "response.completed",
         "response": {
@@ -3579,30 +4102,31 @@ fn build_success_sse(
             "created_at": created_at,
             "model": request.model,
             "status": "completed",
-            "output": [{
-                "type": "image_generation_call",
-                "output_format": output_format,
-                "width": image.width,
-                "height": image.height,
-                "revised_prompt": Value::Null
-            }],
+            "output": output,
             "usage": usage.0,
             "tool_usage": usage.1
         }
     });
-    format!(
-        "event: response.created\ndata: {}\n\nevent: response.output_item.done\ndata: {}\n\nevent: response.completed\ndata: {}\n\ndata: [DONE]\n\n",
-        created, done, completed
-    )
+    body.push_str(&format!(
+        "event: response.completed\ndata: {}\n\ndata: [DONE]\n\n",
+        completed
+    ));
+    body
 }
 
 fn chatgpt_web_image_usage(
     request: &ChatGptWebImageRequest,
-    image: &DownloadedImage,
+    images: &[DownloadedImage],
     report_context: Option<&Value>,
 ) -> (Value, Value) {
     let input_tokens = chatgpt_web_image_input_tokens(request, report_context);
-    let estimated_output_tokens = chatgpt_web_image_output_tokens(request, image, report_context);
+    let estimated_output_tokens = images.iter().fold(0u64, |total, image| {
+        total.saturating_add(chatgpt_web_image_output_tokens(
+            request,
+            image,
+            report_context,
+        ))
+    });
     let usage = json!({
         "input_tokens": input_tokens,
         "output_tokens": estimated_output_tokens,
@@ -3985,24 +4509,85 @@ fn json_execution_result(
     }
 }
 
-fn chatgpt_web_http_error_execution_result(
+fn chatgpt_web_account_unavailable_result(
+    plan: &ExecutionPlan,
+    started_at: Instant,
+) -> ExecutionResult {
+    json_execution_result(
+        plan,
+        409,
+        json!({"error": {
+            "type": "account_unavailable", "code": "chatgpt_web_account_unavailable",
+            "message": "Selected image account became unavailable before submission",
+        }}),
+        started_at,
+    )
+}
+
+pub(crate) fn chatgpt_web_image_response_is_account_unavailable(
+    plan: &ExecutionPlan,
+    context: Option<&Value>,
+    text: Option<&str>,
+) -> bool {
+    is_chatgpt_web_image_plan(plan, context)
+        && text
+            .and_then(|text| serde_json::from_str::<Value>(text).ok())
+            .is_some_and(|body| {
+                body.pointer("/error/code").and_then(Value::as_str)
+                    == Some("chatgpt_web_account_unavailable")
+            })
+}
+
+fn chatgpt_web_input_error_execution_result(
     plan: &ExecutionPlan,
     started_at: Instant,
     status_code: u16,
+    code: &str,
+    param: &str,
     message: &str,
 ) -> ExecutionResult {
     json_execution_result(
         plan,
         status_code,
+        json!({"error": {
+            "type": "invalid_request_error", "code": code, "param": param, "message": message,
+        }}),
+        started_at,
+    )
+}
+
+/// Only locally generated image-input codes bypass provider failover policy.
+pub(crate) fn chatgpt_web_image_response_is_input_error(
+    plan: &ExecutionPlan,
+    report_context: Option<&Value>,
+    response_text: Option<&str>,
+) -> bool {
+    if !is_chatgpt_web_image_plan(plan, report_context) {
+        return false;
+    }
+    let Some(body) = response_text.and_then(|s| serde_json::from_str::<Value>(s).ok()) else {
+        return false;
+    };
+    body.pointer("/error/type").and_then(Value::as_str) == Some("invalid_request_error")
+}
+
+fn chatgpt_web_http_error_execution_result(
+    plan: &ExecutionPlan,
+    started_at: Instant,
+    status_code: u16,
+    message: &str,
+    response_body: Option<Value>,
+) -> ExecutionResult {
+    let body = response_body.unwrap_or_else(|| {
         json!({
             "error": {
                 "type": "upstream_error",
                 "code": "chatgpt_web_image_execution_unavailable",
                 "message": message
             }
-        }),
-        started_at,
-    )
+        })
+    });
+    json_execution_result(plan, status_code, body, started_at)
 }
 
 fn bytes_execution_result(
@@ -4260,7 +4845,56 @@ fn ensure_success(
     Err(ExecutionRuntimeTransportError::UpstreamHttpStatus {
         status_code: result.status_code,
         message: chatgpt_web_stage_http_error_message(stage, result.status_code),
+        response_body: sanitized_chatgpt_web_upstream_error_body(result),
     })
+}
+
+fn sanitized_chatgpt_web_upstream_error_body(result: &ExecutionResult) -> Option<Value> {
+    let body = result.body.as_ref()?;
+    if let Some(json_body) = body.json_body.as_ref() {
+        return sanitized_chatgpt_web_error_summary(json_body);
+    }
+    let encoded = body.body_bytes_b64.as_deref()?;
+    let bytes =
+        decode_base64_body_with_limit(encoded, CHATGPT_WEB_UPSTREAM_ERROR_BODY_LIMIT_BYTES).ok()?;
+    let parsed = serde_json::from_slice::<Value>(&bytes).ok()?;
+    sanitized_chatgpt_web_error_summary(&parsed)
+}
+
+fn sanitized_chatgpt_web_error_summary(body: &Value) -> Option<Value> {
+    let error = body.get("error");
+    let mut summary = Map::new();
+    for field in ["type", "code", "param"] {
+        if let Some(value) = error
+            .and_then(|error| error.get(field))
+            .and_then(Value::as_str)
+            .and_then(sanitize_chatgpt_web_error_field)
+        {
+            summary.insert(field.to_string(), Value::String(value));
+        }
+    }
+    let message = error
+        .and_then(|error| error.get("message"))
+        .and_then(Value::as_str)
+        .or_else(|| error.and_then(Value::as_str))
+        .or_else(|| body.get("message").and_then(Value::as_str))
+        .or_else(|| body.get("detail").and_then(Value::as_str))
+        .and_then(sanitize_chatgpt_web_error_field);
+    if let Some(message) = message {
+        summary.insert("message".to_string(), Value::String(message));
+    }
+    if summary.is_empty() {
+        return None;
+    }
+    let mut output = Map::new();
+    output.insert("error".to_string(), Value::Object(summary));
+    Some(Value::Object(output))
+}
+
+fn sanitize_chatgpt_web_error_field(value: &str) -> Option<String> {
+    let value = crate::request_diagnostics::safe_failure_summary(value);
+    let value = value.trim();
+    (!value.is_empty()).then(|| value.to_string())
 }
 
 fn chatgpt_web_stage_http_error_message(stage: &str, status_code: u16) -> String {
@@ -4510,6 +5144,50 @@ fn keccak_f1600(state: &mut [u64; 25]) {
     }
 }
 
+fn parse_input_data_url(
+    value: &str,
+    decoded_limit: usize,
+) -> Result<DownloadedImage, &'static str> {
+    let (header, data) = value
+        .trim()
+        .split_once(',')
+        .ok_or("Image data URL is missing its payload")?;
+    let metadata = header
+        .get(5..)
+        .filter(|_| {
+            header
+                .get(..5)
+                .is_some_and(|s| s.eq_ignore_ascii_case("data:"))
+        })
+        .ok_or("Image data URL has an invalid scheme")?;
+    let (mime, encoding) = metadata
+        .rsplit_once(';')
+        .ok_or("Image data URL must use base64 encoding")?;
+    if !encoding.eq_ignore_ascii_case("base64")
+        || !matches!(
+            mime.to_ascii_lowercase().as_str(),
+            "image/png"
+                | "image/jpeg"
+                | "image/jpg"
+                | "image/webp"
+                | "application/octet-stream"
+                | "binary/octet-stream"
+        )
+    {
+        return Err("Image data URL must contain base64 PNG, JPEG or WebP; SVG and arbitrary files are not supported");
+    }
+    let bytes = decode_base64_body_with_limit(data, decoded_limit)
+        .map_err(|_| "Image data URL has invalid base64 or exceeds the decoded image size limit")?;
+    let mime = detected_web_image_mime(&bytes).ok_or("Image payload is not PNG, JPEG or WebP")?;
+    let (width, height) = image_dimensions(&bytes);
+    Ok(DownloadedImage {
+        b64_json: data.to_string(),
+        mime: mime.to_string(),
+        width,
+        height,
+    })
+}
+
 fn parse_data_url(value: &str) -> Option<DownloadedImage> {
     parse_data_url_with_limit(value, chatgpt_web_image_raw_payload_limit_bytes())
 }
@@ -4743,6 +5421,249 @@ fn web_download_url_is_same_origin(base: &url::Url, target: &url::Url) -> bool {
 
 #[cfg(test)]
 mod tests {
+
+    #[test]
+    fn audit_input_mime_is_normalized_without_relaxing_output_validation() {
+        let png = png_header_bytes(2, 3);
+        let png64 = base64::engine::general_purpose::STANDARD.encode(&png);
+        for declared in [
+            "application/octet-stream",
+            "binary/octet-stream",
+            "image/jpeg",
+            "image/png",
+        ] {
+            let data = format!("data:{declared};base64,{png64}");
+            let image = parse_input_data_url(&data, png.len()).unwrap();
+            assert_eq!(image.mime, "image/png");
+            assert_eq!(image.b64_json, png64);
+        }
+        let jpeg = base64::engine::general_purpose::STANDARD.encode([0xff, 0xd8, 0xff, 0xd9]);
+        assert_eq!(
+            parse_input_data_url(&format!("data:image/png;base64,{jpeg}"), 64)
+                .unwrap()
+                .mime,
+            "image/jpeg"
+        );
+        assert!(
+            parse_data_url_with_limit(&format!("data:image/jpeg;base64,{png64}"), 64).is_none()
+        );
+        assert!(
+            parse_input_data_url(&format!("data:image/png;base64,{png64}"), png.len() - 1).is_err()
+        );
+        for bad in [
+            "data:image/svg+xml;base64,PHN2Zz4=",
+            "data:text/html;base64,PHN2Zz4=",
+            "data:application/octet-stream;base64,PHN2Zz4=",
+            "data:image/png;base64,!!!!",
+            "data:image/png,not-base64",
+        ] {
+            assert!(parse_input_data_url(bad, 64).is_err());
+        }
+    }
+
+    #[tokio::test]
+    async fn audit_invalid_input_stops_failover_before_any_upstream_call() {
+        let state = AppState::new().unwrap();
+        let context = json!({"chatgpt_web_image":true});
+        for (body, expected_status, expected_code) in [
+            (
+                json!({"images":["data:image/png;base64,!!!!"],"prompt":"test"}),
+                400,
+                "invalid_image_data",
+            ),
+            (
+                json!({"prompt":"图".repeat(crate::image_generation::DEFAULT_MAX_PROMPT_CHARS as usize + 1)}),
+                413,
+                "image_input_too_large",
+            ),
+        ] {
+            // An unreachable upstream proves input validation happens before bootstrap.
+            let plan = sample_plan("http://127.0.0.1:1", body, false);
+            let result = maybe_execute_chatgpt_web_image_sync(&state, &plan, Some(&context))
+                .await
+                .unwrap()
+                .unwrap();
+            assert_eq!(result.status_code, expected_status);
+            let error = execution_result_json(&result).unwrap();
+            assert_eq!(error["error"]["code"], expected_code);
+            let analysis = crate::orchestration::resolve_local_failover_analysis_for_attempt(
+                &state,
+                &plan,
+                Some(&context),
+                result.status_code,
+                Some(&error.to_string()),
+            )
+            .await;
+            assert_eq!(
+                analysis.classification,
+                crate::orchestration::LocalFailoverClassification::StopExecutionError
+            );
+            assert_eq!(
+                analysis.decision,
+                crate::orchestration::LocalFailoverDecision::StopLocalFailover
+            );
+            let stream = maybe_execute_chatgpt_web_image_stream(&state, &plan, Some(&context))
+                .await
+                .unwrap()
+                .unwrap();
+            let frames = stream.frame_stream.collect::<Vec<_>>().await;
+            assert!(!frames.is_empty());
+            assert!(frames.iter().all(Result::is_ok));
+        }
+    }
+
+    #[test]
+    fn audit_reference_404_is_an_input_error_not_an_account_failure() {
+        let error =
+            classify_image_reference_error(ExecutionRuntimeTransportError::UpstreamHttpStatus {
+                status_code: 404,
+                message: "Reference returned HTTP 404".into(),
+                response_body: None,
+            });
+        assert!(matches!(
+            error,
+            ExecutionRuntimeTransportError::ImageInput {
+                status_code: 400,
+                code: "image_reference_unavailable",
+                ..
+            }
+        ));
+        let transient =
+            classify_image_reference_error(ExecutionRuntimeTransportError::UpstreamHttpStatus {
+                status_code: 503,
+                message: "Reference temporarily unavailable".into(),
+                response_body: None,
+            });
+        assert!(matches!(
+            transient,
+            ExecutionRuntimeTransportError::UpstreamHttpStatus {
+                status_code: 503,
+                ..
+            }
+        ));
+    }
+
+    #[tokio::test]
+    async fn audit_explicit_exhaustion_persists_and_recheck_retries_without_fake_401() {
+        let (state, repository) = state_with_chatgpt_web_key(
+            "http://127.0.0.1:1",
+            json!({"chatgpt_web":{
+                "image_quota_remaining":5.0,"image_quota_total":10.0,"image_quota_used":5.0
+            }}),
+        );
+        let plan = sample_plan("http://127.0.0.1:1", json!({"prompt":"test"}), false);
+        assert!(recheck_chatgpt_web_image_account(&state, &plan)
+            .await
+            .is_ok());
+        assert!(update_chatgpt_web_image_quota(&state, &plan, true)
+            .await
+            .unwrap());
+        let metadata = reloaded_chatgpt_web_metadata(repository.as_ref()).await;
+        assert_eq!(metadata["image_quota_blocked"], true);
+        assert_eq!(metadata["image_quota_remaining"], 0.0);
+        assert_eq!(metadata["image_quota_used"], 10.0);
+        assert!(metadata["image_quota_reset_at"].as_u64().unwrap() > current_unix_secs());
+        assert!(matches!(
+            recheck_chatgpt_web_image_account(&state, &plan).await,
+            Err(ExecutionRuntimeTransportError::ImageAccountUnavailable)
+        ));
+        let result = maybe_execute_chatgpt_web_image_sync(&state, &plan, None)
+            .await
+            .unwrap()
+            .unwrap();
+        assert_eq!(result.status_code, 409);
+        let body = execution_result_json(&result).unwrap();
+        let analysis = crate::orchestration::resolve_local_failover_analysis_for_attempt(
+            &state,
+            &plan,
+            None,
+            409,
+            Some(&body.to_string()),
+        )
+        .await;
+        assert_eq!(
+            analysis.classification,
+            crate::orchestration::LocalFailoverClassification::RetryAccountUnavailable
+        );
+        assert_eq!(
+            analysis.decision,
+            crate::orchestration::LocalFailoverDecision::RetryNextCandidate
+        );
+    }
+
+    #[test]
+    fn audit_quota_codes_are_explicit_and_reset_formats_are_preserved() {
+        for code in [
+            "image_generation_limit_reached",
+            "image_gen_limit_reached",
+            "insufficient_quota",
+            "quota_exceeded",
+        ] {
+            assert!(web_failure_is_image_quota_exhausted(
+                &json!({"response":{"error":{"code":code}}})
+            ));
+        }
+        for code in [
+            "rate_limit_exceeded",
+            "server_error",
+            "invalid_request_error",
+        ] {
+            assert!(!web_failure_is_image_quota_exhausted(
+                &json!({"error":{"code":code,"message":"quota mentioned in arbitrary text"}})
+            ));
+        }
+        assert_eq!(
+            image_quota_reset_unix_secs(&json!(1800000000)),
+            Some(1800000000)
+        );
+        assert_eq!(
+            image_quota_reset_unix_secs(&json!("1800000000")),
+            Some(1800000000)
+        );
+        assert_eq!(
+            image_quota_reset_unix_secs(&json!("2030-01-01T00:00:00Z")),
+            Some(1893456000)
+        );
+    }
+
+    #[tokio::test]
+    async fn audit_image_flow_keeps_errors_after_task_local_scope_exits() {
+        use aether_usage_runtime::{
+            build_sync_terminal_usage_payload_seed, build_terminal_usage_context_seed,
+            GatewaySyncReportRequest,
+        };
+        let flow = crate::image_tasks::flow::ImageFlow::default();
+        let plan = sample_plan("http://127.0.0.1:1", json!({"prompt":"test"}), false);
+        let payload:GatewaySyncReportRequest=serde_json::from_value(json!({
+            "trace_id":plan.request_id,"report_kind":"openai_image_sync_error","status_code":400,
+            "headers":{},"body_json":{"error":{"code":"invalid_image_data","message":"Invalid image data"}}
+        })).unwrap();
+        crate::request_diagnostics::scope_request_diagnostics(crate::image_tasks::flow::scope(
+            Some(flow.clone()),
+            async {
+                crate::request_diagnostics::record_request_accepted_at(
+                    Instant::now() - Duration::from_millis(100),
+                );
+                let context = build_terminal_usage_context_seed(&plan, None);
+                assert!(crate::image_tasks::flow::defer(
+                    context,
+                    build_sync_terminal_usage_payload_seed(&payload)
+                ));
+                crate::request_diagnostics::record_candidate_failure(
+                    "candidate-one",
+                    "specific input failure",
+                );
+            },
+        ))
+        .await;
+        let event = flow.terminal_event(false).unwrap().unwrap();
+        assert_eq!(event.data.status_code, Some(400));
+        let metadata = event.data.request_metadata.unwrap();
+        assert_eq!(metadata["last_attempt_error"], "specific input failure");
+        assert!(metadata["end_to_end_time_ms"].as_u64().unwrap() >= 100);
+        assert!(flow.terminal_event(false).unwrap().is_none());
+    }
+
     use super::*;
     use std::sync::{Arc, Mutex};
 
@@ -4974,6 +5895,202 @@ mod tests {
     }
 
     #[test]
+    fn chatgpt_web_http_status_error_keeps_only_sanitized_summary() {
+        let result = ExecutionResult {
+            request_id: "req-chatgpt-web-image-test".to_string(),
+            candidate_id: None,
+            status_code: 400,
+            headers: BTreeMap::new(),
+            response_observation: None,
+            body: Some(ResponseBody {
+                json_body: Some(json!({
+                    "error": {
+                        "type": "invalid_request_error",
+                        "code": "prompt_too_long",
+                        "param": "prompt",
+                        "message": "prompt exceeds limit; Bearer secret-chatgpt-web-token"
+                    },
+                    "access_token": "secret-chatgpt-web-token",
+                    "debug": "private upstream details"
+                })),
+                body_bytes_b64: None,
+            }),
+            telemetry: None,
+            error: None,
+        };
+
+        let error = ensure_success(&result, "ChatGPT-Web bootstrap")
+            .expect_err("non-success result should be rejected");
+        let ExecutionRuntimeTransportError::UpstreamHttpStatus {
+            status_code,
+            response_body: Some(body),
+            ..
+        } = error
+        else {
+            panic!("expected upstream HTTP error with a safe summary");
+        };
+        assert_eq!(status_code, 400);
+        assert_eq!(
+            body,
+            json!({"error": {
+                "type": "invalid_request_error",
+                "code": "prompt_too_long",
+                "param": "prompt",
+                "message": "prompt exceeds limit; Bearer [REDACTED]"
+            }})
+        );
+        let serialized = body.to_string();
+        assert!(!serialized.contains("secret-chatgpt-web-token"));
+        assert!(!serialized.contains("private upstream details"));
+    }
+
+    #[test]
+    fn chatgpt_web_http_status_error_summary_redacts_private_values_and_is_bounded() {
+        let raw = format!(
+            "invalid prompt for alice@example.test at https://images.example.test/private?signature=private-signature Bearer private-bearer-token\r\n{}",
+            "A".repeat(500),
+        );
+        let summary = sanitize_chatgpt_web_error_field(&raw).unwrap();
+        assert!(summary.starts_with("invalid prompt"));
+        assert!(summary.len() <= 259);
+        assert!(!summary.chars().any(char::is_control));
+        for private in [
+            "alice@example.test",
+            "https://",
+            "private-signature",
+            "private-bearer-token",
+            &"A".repeat(40),
+        ] {
+            assert!(!summary.contains(private), "must redact {private}");
+        }
+        let unicode = sanitize_chatgpt_web_error_field(&"图".repeat(200)).unwrap();
+        assert!(unicode.len() <= 259);
+        assert!(unicode.ends_with("..."));
+    }
+
+    #[test]
+    fn chatgpt_web_http_status_error_extracts_summary_from_base64_body() {
+        let raw = serde_json::to_vec(&json!({
+            "error": {
+                "type": "server_error",
+                "code": "upstream_unavailable",
+                "param": "model",
+                "message": "temporary upstream failure"
+            }
+        }))
+        .unwrap();
+        let result = ExecutionResult {
+            request_id: "req-chatgpt-web-image-test".to_string(),
+            candidate_id: None,
+            status_code: 502,
+            headers: BTreeMap::new(),
+            response_observation: None,
+            body: Some(ResponseBody {
+                json_body: None,
+                body_bytes_b64: Some(base64::engine::general_purpose::STANDARD.encode(raw)),
+            }),
+            telemetry: None,
+            error: None,
+        };
+
+        assert_eq!(
+            sanitized_chatgpt_web_upstream_error_body(&result),
+            Some(json!({"error": {
+                "type": "server_error",
+                "code": "upstream_unavailable",
+                "param": "model",
+                "message": "temporary upstream failure"
+            }}))
+        );
+    }
+
+    #[test]
+    fn chatgpt_web_image_count_is_forwarded_without_changing_single_image_payload() {
+        let single = ChatGptWebImageRequest::from_body(&json!({"prompt":"draw a tree"})).unwrap();
+        let single_body = web_image_conversation_body(&single, &[]);
+        assert!(single_body.get("n").is_none());
+        for count in [2, 3, 10] {
+            let request =
+                ChatGptWebImageRequest::from_body(&json!({"prompt":"draw a tree", "count":count}))
+                    .unwrap();
+            let body = web_image_conversation_body(&request, &[]);
+            assert_eq!(body["n"], count);
+            assert_eq!(
+                body["messages"][0]["content"],
+                single_body["messages"][0]["content"]
+            );
+        }
+        for count in [json!(0), json!(11), json!(1.5), json!("2")] {
+            assert!(ChatGptWebImageRequest::from_body(&json!({"count":count})).is_err());
+        }
+    }
+
+    #[test]
+    fn chatgpt_web_multi_image_output_preserves_sync_stream_and_aggregate_usage() {
+        use aether_ai_formats::api::{
+            maybe_build_openai_image_sync_finalize_product, OpenAiImageStreamState,
+            OPENAI_IMAGE_SYNC_FINALIZE_REPORT_KIND,
+        };
+        let request = ChatGptWebImageRequest::from_body(&json!({
+            "prompt":"draw two trees", "count":2, "quality":"low", "size":"1024x1024",
+        }))
+        .unwrap();
+        let images = vec![
+            DownloadedImage {
+                b64_json: "aGVsbG8=".into(),
+                mime: "image/png".into(),
+                width: Some(1024),
+                height: Some(1024),
+            },
+            DownloadedImage {
+                b64_json: "d29ybGQ=".into(),
+                mime: "image/png".into(),
+                width: Some(1024),
+                height: Some(1024),
+            },
+        ];
+        let context = json!({"provider_api_format":"openai:image", "client_api_format":"openai:image",
+            "image_request":{"operation":"generate", "quality":"low", "size":"1024x1024"}});
+        let body = build_success_sse(&request, &images, Some(&context));
+        let completed = completed_response_from_sse(&body);
+        assert_eq!(completed["output"].as_array().unwrap().len(), 2);
+        assert_eq!(completed["usage"]["output_tokens"], 392);
+        assert_eq!(
+            completed["usage"]["input_tokens"],
+            estimate_text_tokens("draw two trees")
+        );
+        let encoded = base64::engine::general_purpose::STANDARD.encode(body.as_bytes());
+        let product = maybe_build_openai_image_sync_finalize_product(
+            OPENAI_IMAGE_SYNC_FINALIZE_REPORT_KIND,
+            200,
+            Some(&context),
+            None,
+            Some(&encoded),
+        )
+        .unwrap()
+        .unwrap();
+        let data = product.client_body_json["data"].as_array().unwrap();
+        assert_eq!(data.len(), 2);
+        assert_eq!(data[0]["b64_json"], "aGVsbG8=");
+        assert_eq!(data[1]["b64_json"], "d29ybGQ=");
+        let mut rewriter = OpenAiImageStreamState::default();
+        let output = rewriter.push_chunk(&context, body.as_bytes()).unwrap();
+        let output = String::from_utf8(output).unwrap();
+        let frames = output
+            .lines()
+            .filter_map(|line| line.strip_prefix("data: "))
+            .map(|line| serde_json::from_str::<Value>(line).unwrap())
+            .collect::<Vec<_>>();
+        assert_eq!(frames.len(), 2);
+        assert_eq!(frames[0]["image_index"], 0);
+        assert_eq!(frames[0]["b64_json"], "aGVsbG8=");
+        assert!(frames[0].get("usage").is_none());
+        assert_eq!(frames[1]["image_index"], 1);
+        assert_eq!(frames[1]["b64_json"], "d29ybGQ=");
+        assert_eq!(frames[1]["usage"]["output_tokens"], 392);
+    }
+
+    #[test]
     fn chatgpt_web_success_sse_includes_estimated_image_usage() {
         let request = ChatGptWebImageRequest {
             operation: "generate".to_string(),
@@ -4985,6 +6102,7 @@ mod tests {
             output_format: "png".to_string(),
             quality: Some("low".to_string()),
             partial_images: 0,
+            count: 1,
             images: Vec::new(),
         };
         let image = DownloadedImage {
@@ -4995,7 +6113,7 @@ mod tests {
         };
         let body = build_success_sse(
             &request,
-            &image,
+            std::slice::from_ref(&image),
             Some(&json!({
                 "image_request": {
                     "size": "1024x1024",
@@ -5039,6 +6157,7 @@ mod tests {
             output_format: "png".to_string(),
             quality: Some("low".to_string()),
             partial_images: 0,
+            count: 1,
             images: Vec::new(),
         };
         let image = DownloadedImage {
@@ -5049,7 +6168,7 @@ mod tests {
         };
         let body = build_success_sse(
             &request,
-            &image,
+            std::slice::from_ref(&image),
             Some(&json!({
                 "image_request": {
                     "size": "1024x1024",
@@ -5429,6 +6548,12 @@ mod tests {
                             json_response(json!({"download_url": "/generated.png"}))
                         }
                     }
+                    (Method::GET, "/backend-api/files/download/file-generated-654321") => {
+                        json_response(json!({"download_url": "/generated-second.png"}))
+                    }
+                    (Method::GET, "/generated-second.png") => {
+                        response(StatusCode::OK, "image/png", png_header_bytes(4, 5))
+                    }
                     (Method::GET, "/generated.png") => {
                         response(StatusCode::OK, "image/png", png_header_bytes(2, 3))
                     }
@@ -5455,6 +6580,31 @@ mod tests {
                 "text/plain",
                 "bootstrap failed",
             )
+        }));
+        let listener = crate::test_support::bind_loopback_listener()
+            .await
+            .expect("listener should bind");
+        let addr = listener.local_addr().expect("local addr should resolve");
+        let handle = tokio::spawn(async move {
+            axum::serve(listener, app)
+                .await
+                .expect("mock server should run");
+        });
+        (format!("http://{addr}"), handle)
+    }
+
+    async fn start_bootstrap_json_failing_chatgpt_web(
+        body: Value,
+    ) -> (String, tokio::task::JoinHandle<()>) {
+        let app = Router::new().fallback(any(move |_request: Request| {
+            let body = body.clone();
+            async move {
+                response(
+                    StatusCode::BAD_GATEWAY,
+                    "application/json",
+                    serde_json::to_vec(&body).expect("error body should encode"),
+                )
+            }
         }));
         let listener = crate::test_support::bind_loopback_listener()
             .await
@@ -5961,6 +7111,42 @@ data: [DONE]
     }
 
     #[tokio::test]
+    async fn chatgpt_web_image_failure_log_includes_sanitized_upstream_error_fields() {
+        let (base_url, handle) = start_bootstrap_json_failing_chatgpt_web(json!({
+            "error": {
+                "type": "invalid_request_error",
+                "code": "prompt_too_long",
+                "param": "prompt",
+                "message": "prompt too long; Bearer secret-chatgpt-web-token"
+            },
+            "debug": "private upstream details"
+        }))
+        .await;
+        let state = AppState::new().unwrap();
+        let plan = sample_plan(&base_url, json!({"images": []}), false);
+        let (_, logs) = execute_with_image_logs(&state, &plan).await;
+        handle.abort();
+
+        let failure = logs
+            .lines()
+            .find(|line| line.contains("chatgpt_web_image_attempt_failed"))
+            .expect("HTTP failure should have a structured attempt log");
+        for expected in [
+            "stage=\"bootstrap\"",
+            "error_kind=\"http_status\"",
+            "upstream_status_code=Some(502)",
+            "upstream_error_type=Some(\"invalid_request_error\")",
+            "upstream_error_code=Some(\"prompt_too_long\")",
+            "upstream_error_param=Some(\"prompt\")",
+            "upstream_error_message=Some(\"prompt too long; Bearer [REDACTED]\")",
+        ] {
+            assert!(failure.contains(expected), "missing {expected}: {failure}");
+        }
+        assert!(!logs.contains("secret-chatgpt-web-token"), "{logs}");
+        assert!(!logs.contains("private upstream details"), "{logs}");
+    }
+
+    #[tokio::test]
     async fn chatgpt_web_image_executor_exits_unrecoverable_output_without_120_second_wait() {
         let cases = [
             ("data: [DONE]\n\n", json!({}), false),
@@ -6284,9 +7470,18 @@ data: [DONE]
     #[test]
     fn chatgpt_web_image_request_fields_are_bounded() {
         let oversized_prompt = json!({
-            "prompt": "x".repeat(CHATGPT_WEB_IMAGE_MAX_PROMPT_BYTES + 1)
+            "prompt": "x".repeat(CHATGPT_WEB_IMAGE_MAX_PROMPT_CHARS as usize + 1)
         });
         assert!(ChatGptWebImageRequest::from_body(&oversized_prompt).is_err());
+
+        let unicode_prompt = json!({"prompt": "图".repeat(20_000)});
+        assert!(
+            ChatGptWebImageRequest::from_body_with_prompt_limit(&unicode_prompt, 20_000).is_ok()
+        );
+        assert!(
+            ChatGptWebImageRequest::from_body_with_prompt_limit(&unicode_prompt, 19_999).is_err()
+        );
+        assert!(ChatGptWebImageRequest::from_body_with_prompt_limit(&unicode_prompt, 0).is_ok());
 
         let oversized_images = json!({
             "images": vec!["data:image/png;base64,AA=="; CHATGPT_WEB_IMAGE_MAX_INPUT_IMAGES + 1]
@@ -6697,6 +7892,44 @@ data: [DONE]
             json!(1756)
         );
 
+        handle.abort();
+    }
+
+    #[tokio::test]
+    async fn chatgpt_web_image_executor_returns_available_images_up_to_requested_count() {
+        let (base_url, handle) = start_mock_chatgpt_web_with_output(concat!(
+            "data: {\"conversation_id\":\"conv-test-1\",\"assets\":[\"file-generated-123456\",\"file-generated-654321\"]}\n\n",
+            "data: [DONE]\n\n"
+        ), json!({})).await;
+        let state = crate::AppState::new().unwrap();
+        for (count, expected) in [(1, 1), (2, 2), (3, 2)] {
+            let plan = sample_plan(
+                &base_url,
+                json!({"prompt":"draw trees", "count":count}),
+                false,
+            );
+            let result = maybe_execute_chatgpt_web_image_sync(
+                &state,
+                &plan,
+                Some(&json!({"chatgpt_web_image":true})),
+            )
+            .await
+            .unwrap()
+            .unwrap();
+            let bytes = execution_result_body_bytes_lossy(&result);
+            let body = std::str::from_utf8(&bytes).unwrap();
+            let completed = completed_response_from_sse(body);
+            assert_eq!(completed["output"].as_array().unwrap().len(), expected);
+            assert_eq!(
+                body.matches("event: response.output_item.done").count(),
+                expected
+            );
+            if expected == 2 {
+                assert!(body.contains(
+                    &base64::engine::general_purpose::STANDARD.encode(png_header_bytes(4, 5))
+                ));
+            }
+        }
         handle.abort();
     }
 
@@ -7119,6 +8352,8 @@ mod content_refusal_tests {
             "非常抱歉，生成的图片可能违反了关于裸露、色情或情色内容的防护限制。如果你认为此判断有误，请重试或修改提示语。",
             "非常抱歉，该提示可能违反了关于裸露、色情或情色内容的防护限制。如果你认为此判断有误，请重试或修改提示语。",
             "We’re sorry, but the prompt may violate our content policies. Please try a different prompt.",
+            "非常抱歉，生成的图片触及内容政策和防护限制。",
+            "We’re sorry, but the image we generated violates our content policies.",
         ] {
             let event = assistant_event(reason);
             assert_eq!(explicit_content_refusal(&summary(&event)), Some(reason));
@@ -7168,7 +8403,7 @@ mod content_refusal_tests {
 
     #[test]
     fn explicit_content_refusal_does_not_use_stale_or_incomplete_text_parts() {
-        let reason = "非常抱歉，该提示可能违反了我们的内容政策。";
+        let reason = "非常抱歉，生成的图片触及我们的内容政策和防护限制。";
         let mut structured = assistant_event(reason);
         structured["message"]["content"]["parts"] = json!([{"type":"refusal","refusal":reason}]);
         let patch =

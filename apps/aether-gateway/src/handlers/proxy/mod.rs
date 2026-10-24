@@ -2826,6 +2826,13 @@ fn local_execution_runtime_miss_candidate_list_empty_detail(
     diagnostic: &LocalExecutionRuntimeMissDiagnostic,
     request_mode: &str,
 ) -> String {
+    if diagnostic.public_path.as_deref() == Some("/v1/responses") {
+        if let Some(model) =
+            diagnostic_requested_model(diagnostic).filter(|model| model.starts_with("gpt-image-"))
+        {
+            return format!("模型 {model} 没有支持 /v1/responses 协议的可用候选；图片端点的账号不会自动获得 Responses 协议能力。请使用 /v1/images/generations 或 /v1/images/edits，或配置支持 Responses 的模型与端点（原因代码: candidate_list_empty）");
+        }
+    }
     if let Some(requested_model) = diagnostic_requested_model(diagnostic) {
         return format!(
             "没有可用提供商支持模型 {requested_model} 的{request_mode}请求。请检查模型映射、端点启用状态和 API Key 权限（原因代码: candidate_list_empty）"

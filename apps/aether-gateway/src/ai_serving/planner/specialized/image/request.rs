@@ -9,8 +9,7 @@ use crate::ai_serving::planner::candidate_preparation::{
 };
 use crate::ai_serving::planner::spec_metadata::local_openai_image_spec_metadata;
 use crate::ai_serving::pure::{
-    build_chatgpt_web_image_request_body_with_resize_target,
-    normalize_openai_image_request_with_options,
+    build_chatgpt_web_image_request_body_with_limits, normalize_openai_image_request_with_options,
 };
 use crate::ai_serving::transport::antigravity::is_antigravity_provider_transport;
 use crate::ai_serving::transport::{
@@ -135,10 +134,21 @@ pub(super) async fn resolve_local_openai_image_candidate_payload_parts(
         parts,
         body_json,
         body_base64,
-        openai_image_normalize_options_for_provider(
-            &transport.provider.provider_type,
-            Some(prepared_candidate.mapped_model.as_str()),
-        ),
+        if transport
+            .provider
+            .provider_type
+            .trim()
+            .eq_ignore_ascii_case("chatgpt_web")
+        {
+            // Parse the request first; the Web adapter returns a precise n/option error.
+            // A provider capability limit is not a missing or malformed request body.
+            crate::ai_serving::OpenAiImageNormalizeOptions::default()
+        } else {
+            openai_image_normalize_options_for_provider(
+                &transport.provider.provider_type,
+                Some(prepared_candidate.mapped_model.as_str()),
+            )
+        },
     );
     let Some(normalized_request) = normalized_request else {
         mark_skipped_local_openai_image_candidate_with_failure_diagnostic(
@@ -197,11 +207,13 @@ pub(super) async fn resolve_local_openai_image_candidate_payload_parts(
             .get::<crate::image_storage::ImageRequestSlot>()
             .and_then(|slot| slot.resize_target());
         Some(
-            match build_chatgpt_web_image_request_body_with_resize_target(
+            match build_chatgpt_web_image_request_body_with_limits(
                 parts,
                 body_json,
                 body_base64,
                 resize_target,
+                crate::image_generation::max_image_count(state).await,
+                crate::image_generation::max_prompt_chars(state).await,
             ) {
                 Ok(body) => body,
                 Err(err) => err.to_error_json(),

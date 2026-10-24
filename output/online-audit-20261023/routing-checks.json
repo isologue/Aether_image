@@ -1,0 +1,892 @@
+[
+  {
+    "request_id": "1465d481-b50c-48c8-96b2-a3ce402d88c3",
+    "api_format": "openai:image",
+    "is_stream": false,
+    "trace_id": "1465d481-b50c-48c8-96b2-a3ce402d88c3",
+    "request_headers": {
+      "accept": "application/json",
+      "content-type": "multipart/form-data; boundary=07061e8c109cefa3939d61dc49519442e06cf65da506196ed153382d4bb4"
+    },
+    "routing": {
+      "key_name": "headman.radios-7j@icloud.com",
+      "created_at": "2026-10-23T09:40:31.864591+08:00",
+      "request_id": "1465d481-b50c-48c8-96b2-a3ce402d88c3",
+      "route_kind": "image",
+      "updated_at": "2026-10-23T09:40:31.864591+08:00",
+      "candidate_id": "ca14bb46-f143-4235-8dce-73e5b7b9d44f",
+      "planner_kind": null,
+      "route_family": "openai",
+      "execution_path": "local_execution_runtime_miss",
+      "candidate_index": 0,
+      "selected_endpoint_id": "6ae7a91f-72a7-4bc0-a655-51cd159721cd",
+      "selected_provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+      "has_format_conversion": null,
+      "local_execution_runtime_miss_reason": null
+    }
+  },
+  {
+    "request_id": "4f8f1af8-f1d7-465b-a9e3-1a38ca950b56",
+    "api_format": "openai:image",
+    "is_stream": false,
+    "trace_id": "4f8f1af8-f1d7-465b-a9e3-1a38ca950b56",
+    "request_headers": {
+      "accept": "application/json",
+      "content-type": "multipart/form-data; boundary=b1f05230704875540a58d82a16c83691baae23ed3234718a361910f26bcc"
+    },
+    "routing": {
+      "key_name": "crystal.gullet91@icloud.com",
+      "created_at": "2026-10-23T10:05:30.045118+08:00",
+      "request_id": "4f8f1af8-f1d7-465b-a9e3-1a38ca950b56",
+      "route_kind": "image",
+      "updated_at": "2026-10-23T10:05:30.045118+08:00",
+      "candidate_id": "4883ecde-f91c-4e80-b692-a2df96ff0281",
+      "planner_kind": null,
+      "route_family": "openai",
+      "execution_path": "local_execution_runtime_miss",
+      "candidate_index": 1,
+      "selected_endpoint_id": "82b0d8f8-66a1-463a-9c05-ed3d6cf8371a",
+      "selected_provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+      "has_format_conversion": null,
+      "local_execution_runtime_miss_reason": null
+    }
+  },
+  {
+    "request_id": "562ce25b-70b1-434c-9740-a8a8bb158db2",
+    "api_format": "openai:responses",
+    "is_stream": false,
+    "trace_id": "562ce25b-70b1-434c-9740-a8a8bb158db2",
+    "request_headers": {
+      "accept": "application/json",
+      "content-length": "440",
+      "content-type": "application/json"
+    },
+    "routing": {
+      "key_name": null,
+      "created_at": "2026-10-23T14:52:43.272553+08:00",
+      "request_id": "562ce25b-70b1-434c-9740-a8a8bb158db2",
+      "route_kind": "responses",
+      "updated_at": "2026-10-23T14:52:43.272553+08:00",
+      "candidate_id": null,
+      "planner_kind": "openai_responses_sync",
+      "route_family": "openai",
+      "execution_path": "local_execution_runtime_miss",
+      "candidate_index": null,
+      "selected_endpoint_id": null,
+      "selected_provider_id": null,
+      "has_format_conversion": null,
+      "local_execution_runtime_miss_reason": "candidate_list_empty"
+    }
+  },
+  {
+    "request_id": "imgtask_13d460eeff66489a92167f7910f847a2",
+    "api_format": "openai:image",
+    "is_stream": false,
+    "trace_id": null,
+    "request_headers": {
+      "content-type": "application/json"
+    },
+    "routing": {
+      "key_name": null,
+      "created_at": "2026-10-23T00:18:09.695889+08:00",
+      "request_id": "imgtask_13d460eeff66489a92167f7910f847a2",
+      "route_kind": null,
+      "updated_at": "2026-10-23T00:19:44.913715+08:00",
+      "candidate_id": "23d38353-68a4-49a2-9555-5880363e4bbd",
+      "planner_kind": null,
+      "route_family": null,
+      "execution_path": null,
+      "candidate_index": null,
+      "selected_endpoint_id": "6ae7a91f-72a7-4bc0-a655-51cd159721cd",
+      "selected_provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+      "has_format_conversion": false,
+      "local_execution_runtime_miss_reason": null
+    }
+  },
+  {
+    "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+    "api_format": "openai:image",
+    "is_stream": false,
+    "trace_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+    "request_headers": {
+      "accept": "*/*",
+      "content-type": "multipart/form-data; boundary=14fd5f69d087bb788796dabe01e85fa53d795f3f3dd90c7d61fa62c422ee"
+    },
+    "routing": {
+      "key_name": null,
+      "created_at": "2026-10-23T10:00:32.643709+08:00",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "route_kind": "image",
+      "updated_at": "2026-10-23T10:00:46.126828+08:00",
+      "candidate_id": "983c926a-b491-4baf-ab05-11a95e9a89f5",
+      "planner_kind": "openai_image_sync",
+      "route_family": "openai",
+      "execution_path": "local_execution_runtime_miss",
+      "candidate_index": 1,
+      "selected_endpoint_id": "82b0d8f8-66a1-463a-9c05-ed3d6cf8371a",
+      "selected_provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+      "has_format_conversion": false,
+      "local_execution_runtime_miss_reason": "execution_runtime_candidates_exhausted"
+    }
+  },
+  {
+    "request_id": "imgtask_af17bb40f8a84ffab16ad2f0ad3063c2",
+    "api_format": "openai:image",
+    "is_stream": false,
+    "trace_id": null,
+    "request_headers": {
+      "content-type": "application/json"
+    },
+    "routing": {
+      "key_name": null,
+      "created_at": "2026-10-23T00:18:09.32146+08:00",
+      "request_id": "imgtask_af17bb40f8a84ffab16ad2f0ad3063c2",
+      "route_kind": null,
+      "updated_at": "2026-10-23T00:20:13.055325+08:00",
+      "candidate_id": "f17cfee0-30ca-470b-89c6-e7a3efd9af20",
+      "planner_kind": null,
+      "route_family": null,
+      "execution_path": null,
+      "candidate_index": null,
+      "selected_endpoint_id": "6ae7a91f-72a7-4bc0-a655-51cd159721cd",
+      "selected_provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+      "has_format_conversion": false,
+      "local_execution_runtime_miss_reason": null
+    }
+  },
+  {
+    "request_id": "e0ae23e3-17be-497a-9566-24412ea60365",
+    "api_format": "openai:image",
+    "is_stream": false,
+    "trace_id": "e0ae23e3-17be-497a-9566-24412ea60365",
+    "request_headers": {
+      "accept": "application/json",
+      "content-type": "multipart/form-data; boundary=3ba0ad3a7f5f6913be4f72110091b6761116dec9696564e0ade193c826b9"
+    },
+    "routing": {
+      "key_name": "don-shiny-4w@icloud.com",
+      "created_at": "2026-10-23T09:40:01.292777+08:00",
+      "request_id": "e0ae23e3-17be-497a-9566-24412ea60365",
+      "route_kind": "image",
+      "updated_at": "2026-10-23T09:40:01.292777+08:00",
+      "candidate_id": "135d9056-8c8c-4952-bdd2-0eea92946af0",
+      "planner_kind": null,
+      "route_family": "openai",
+      "execution_path": "local_execution_runtime_miss",
+      "candidate_index": 0,
+      "selected_endpoint_id": "6ae7a91f-72a7-4bc0-a655-51cd159721cd",
+      "selected_provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+      "has_format_conversion": null,
+      "local_execution_runtime_miss_reason": null
+    }
+  },
+  {
+    "request_id": "97de52c9-4c0a-4250-a1b1-fe355a5289cf",
+    "api_format": "openai:image",
+    "is_stream": false,
+    "trace_id": "97de52c9-4c0a-4250-a1b1-fe355a5289cf",
+    "request_headers": {
+      "accept": "application/json",
+      "content-type": "multipart/form-data; boundary=98283de4f171da38d177bc5f68afd228f726ade85620b9a4f2ccc99d796a"
+    },
+    "routing": {
+      "key_name": "11-airings-neutron@icloud.com",
+      "created_at": "2026-10-23T10:08:27.627035+08:00",
+      "request_id": "97de52c9-4c0a-4250-a1b1-fe355a5289cf",
+      "route_kind": "image",
+      "updated_at": "2026-10-23T10:08:27.627035+08:00",
+      "candidate_id": "672c3b45-de7e-4336-a7ad-79f1505d5544",
+      "planner_kind": null,
+      "route_family": "openai",
+      "execution_path": "local_execution_runtime_miss",
+      "candidate_index": 1,
+      "selected_endpoint_id": "6ae7a91f-72a7-4bc0-a655-51cd159721cd",
+      "selected_provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+      "has_format_conversion": null,
+      "local_execution_runtime_miss_reason": null
+    }
+  },
+  {
+    "request_id": "eac587f1-0492-4fbb-a0d2-60a4284bc55d",
+    "api_format": "openai:image",
+    "is_stream": false,
+    "trace_id": "eac587f1-0492-4fbb-a0d2-60a4284bc55d",
+    "request_headers": {
+      "accept": "application/json",
+      "content-type": "multipart/form-data; boundary=e256efceb5ef00603a4ff39e28e15fc24a2f1efb8e32e6e3c4cce3c24e5c"
+    },
+    "routing": {
+      "key_name": "tendons-duties5s@icloud.com",
+      "created_at": "2026-10-23T10:19:38.900518+08:00",
+      "request_id": "eac587f1-0492-4fbb-a0d2-60a4284bc55d",
+      "route_kind": "image",
+      "updated_at": "2026-10-23T10:19:38.900518+08:00",
+      "candidate_id": "4fbdb0fa-761c-4040-ab52-fe29530eef78",
+      "planner_kind": null,
+      "route_family": "openai",
+      "execution_path": "local_execution_runtime_miss",
+      "candidate_index": 1,
+      "selected_endpoint_id": "82b0d8f8-66a1-463a-9c05-ed3d6cf8371a",
+      "selected_provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+      "has_format_conversion": null,
+      "local_execution_runtime_miss_reason": null
+    }
+  },
+  {
+    "request_id": "897f4162-104e-4098-a768-5c7c1e899d4a",
+    "api_format": "openai:image",
+    "is_stream": false,
+    "trace_id": "897f4162-104e-4098-a768-5c7c1e899d4a",
+    "request_headers": {
+      "accept": "application/json",
+      "content-type": "multipart/form-data; boundary=c0496879c9e8a730ad8596b000283320c72d74c93d8933decc5a2dd4cd13"
+    },
+    "routing": {
+      "key_name": "crystal.gullet91@icloud.com",
+      "created_at": "2026-10-23T10:10:08.828667+08:00",
+      "request_id": "897f4162-104e-4098-a768-5c7c1e899d4a",
+      "route_kind": "image",
+      "updated_at": "2026-10-23T10:10:08.828667+08:00",
+      "candidate_id": "623e6004-1003-40dc-8ad8-ca18c0a574ba",
+      "planner_kind": null,
+      "route_family": "openai",
+      "execution_path": "local_execution_runtime_miss",
+      "candidate_index": 1,
+      "selected_endpoint_id": "82b0d8f8-66a1-463a-9c05-ed3d6cf8371a",
+      "selected_provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+      "has_format_conversion": null,
+      "local_execution_runtime_miss_reason": null
+    }
+  },
+  {
+    "request_id": "8d74ef79-397e-4762-827f-fe3444831c31",
+    "api_format": "openai:image",
+    "is_stream": false,
+    "trace_id": "8d74ef79-397e-4762-827f-fe3444831c31",
+    "request_headers": {
+      "accept": "application/json",
+      "content-type": "multipart/form-data; boundary=5001aa86f152b71346d5619786ca0e2022978557f9fdb8b0b04015a62358"
+    },
+    "routing": {
+      "key_name": "type-69-floors@icloud.com",
+      "created_at": "2026-10-23T10:02:29.318768+08:00",
+      "request_id": "8d74ef79-397e-4762-827f-fe3444831c31",
+      "route_kind": "image",
+      "updated_at": "2026-10-23T10:02:29.318768+08:00",
+      "candidate_id": "68c19b6c-d63d-4700-ac43-5d5aed98890b",
+      "planner_kind": null,
+      "route_family": "openai",
+      "execution_path": "local_execution_runtime_miss",
+      "candidate_index": 1,
+      "selected_endpoint_id": "6ae7a91f-72a7-4bc0-a655-51cd159721cd",
+      "selected_provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+      "has_format_conversion": null,
+      "local_execution_runtime_miss_reason": null
+    }
+  },
+  {
+    "request_id": "6f83c71b-45f5-4753-957c-639efae32c59",
+    "api_format": "openai:image",
+    "is_stream": false,
+    "trace_id": "6f83c71b-45f5-4753-957c-639efae32c59",
+    "request_headers": {
+      "accept": "application/json",
+      "content-type": "multipart/form-data; boundary=40cd64a9b29aacbe38cf37e3036314e25762c8f77daa8094a0d62615bbaa"
+    },
+    "routing": {
+      "key_name": "83-martens-muddy@icloud.com",
+      "created_at": "2026-10-23T10:21:03.117247+08:00",
+      "request_id": "6f83c71b-45f5-4753-957c-639efae32c59",
+      "route_kind": "image",
+      "updated_at": "2026-10-23T10:21:03.117247+08:00",
+      "candidate_id": "783c5679-90f2-4afd-abec-0673ca8eb9fa",
+      "planner_kind": null,
+      "route_family": "openai",
+      "execution_path": "local_execution_runtime_miss",
+      "candidate_index": 1,
+      "selected_endpoint_id": "6ae7a91f-72a7-4bc0-a655-51cd159721cd",
+      "selected_provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+      "has_format_conversion": null,
+      "local_execution_runtime_miss_reason": null
+    }
+  },
+  {
+    "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+    "api_format": "openai:image",
+    "is_stream": false,
+    "trace_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+    "request_headers": {
+      "accept": "*/*",
+      "content-type": "multipart/form-data; boundary=2b84ec0f6e3192b9bbb5bba121d60bd14de1b20db3fa93330cd5a2b8d2bf"
+    },
+    "routing": {
+      "key_name": null,
+      "created_at": "2026-10-23T10:19:52.015167+08:00",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "route_kind": "image",
+      "updated_at": "2026-10-23T10:20:07.390945+08:00",
+      "candidate_id": "3c8d0c96-9140-4815-a49f-2362da088ec5",
+      "planner_kind": "openai_image_sync",
+      "route_family": "openai",
+      "execution_path": "local_execution_runtime_miss",
+      "candidate_index": 1,
+      "selected_endpoint_id": "82b0d8f8-66a1-463a-9c05-ed3d6cf8371a",
+      "selected_provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+      "has_format_conversion": false,
+      "local_execution_runtime_miss_reason": "execution_runtime_candidates_exhausted"
+    }
+  },
+  {
+    "request_id": "f620d2d2-6aae-4604-9a38-665b5db32c15",
+    "api_format": "openai:image",
+    "is_stream": false,
+    "trace_id": "f620d2d2-6aae-4604-9a38-665b5db32c15",
+    "request_headers": {
+      "accept": "application/json",
+      "content-type": "multipart/form-data; boundary=24bd0c6969c7af7af2be255a17bc016e798777baee78d3ce49efdf6c0cde"
+    },
+    "routing": {
+      "key_name": "crystal.gullet91@icloud.com",
+      "created_at": "2026-10-23T10:07:14.668138+08:00",
+      "request_id": "f620d2d2-6aae-4604-9a38-665b5db32c15",
+      "route_kind": "image",
+      "updated_at": "2026-10-23T10:07:14.668138+08:00",
+      "candidate_id": "f5536976-f49d-4afd-a131-a5b6c9b4aea3",
+      "planner_kind": null,
+      "route_family": "openai",
+      "execution_path": "local_execution_runtime_miss",
+      "candidate_index": 1,
+      "selected_endpoint_id": "82b0d8f8-66a1-463a-9c05-ed3d6cf8371a",
+      "selected_provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+      "has_format_conversion": null,
+      "local_execution_runtime_miss_reason": null
+    }
+  },
+  {
+    "request_id": "2a522fcf-dfc4-41fd-89fe-b5b528e7207e",
+    "api_format": "openai:image",
+    "is_stream": false,
+    "trace_id": "2a522fcf-dfc4-41fd-89fe-b5b528e7207e",
+    "request_headers": {
+      "accept": "application/json",
+      "content-type": "multipart/form-data; boundary=acc15615222e68564d670f5e53b6bb3752066210d5620aba7348fe765e0b"
+    },
+    "routing": {
+      "key_name": "crystal.gullet91@icloud.com",
+      "created_at": "2026-10-23T10:07:45.416052+08:00",
+      "request_id": "2a522fcf-dfc4-41fd-89fe-b5b528e7207e",
+      "route_kind": "image",
+      "updated_at": "2026-10-23T10:07:45.416052+08:00",
+      "candidate_id": "1fd8c872-9d08-4deb-a1ec-7ae7765ab226",
+      "planner_kind": null,
+      "route_family": "openai",
+      "execution_path": "local_execution_runtime_miss",
+      "candidate_index": 1,
+      "selected_endpoint_id": "82b0d8f8-66a1-463a-9c05-ed3d6cf8371a",
+      "selected_provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+      "has_format_conversion": null,
+      "local_execution_runtime_miss_reason": null
+    }
+  },
+  {
+    "request_id": "3a39f9cf-6018-4c03-bc57-0211011f7d27",
+    "api_format": "openai:image",
+    "is_stream": false,
+    "trace_id": "3a39f9cf-6018-4c03-bc57-0211011f7d27",
+    "request_headers": {
+      "accept": "application/json",
+      "content-type": "multipart/form-data; boundary=ff731b44c2134fd661e770077fcfe0202c010648c653f2f7b949f2e35ef3"
+    },
+    "routing": {
+      "key_name": "tenable.office.4x@icloud.com",
+      "created_at": "2026-10-23T10:12:21.328559+08:00",
+      "request_id": "3a39f9cf-6018-4c03-bc57-0211011f7d27",
+      "route_kind": "image",
+      "updated_at": "2026-10-23T10:12:21.328559+08:00",
+      "candidate_id": "d99c25e9-73e5-4c11-934c-79d043f5e2ba",
+      "planner_kind": null,
+      "route_family": "openai",
+      "execution_path": "local_execution_runtime_miss",
+      "candidate_index": 1,
+      "selected_endpoint_id": "6ae7a91f-72a7-4bc0-a655-51cd159721cd",
+      "selected_provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+      "has_format_conversion": null,
+      "local_execution_runtime_miss_reason": null
+    }
+  },
+  {
+    "request_id": "93f8c53d-a98f-4b4a-8582-0b7528cd3162",
+    "api_format": "openai:responses",
+    "is_stream": false,
+    "trace_id": "93f8c53d-a98f-4b4a-8582-0b7528cd3162",
+    "request_headers": {
+      "accept": "application/json",
+      "content-length": "448",
+      "content-type": "application/json"
+    },
+    "routing": {
+      "key_name": null,
+      "created_at": "2026-10-23T14:34:57.7243+08:00",
+      "request_id": "93f8c53d-a98f-4b4a-8582-0b7528cd3162",
+      "route_kind": "responses",
+      "updated_at": "2026-10-23T14:34:57.7243+08:00",
+      "candidate_id": null,
+      "planner_kind": "openai_responses_sync",
+      "route_family": "openai",
+      "execution_path": "local_execution_runtime_miss",
+      "candidate_index": null,
+      "selected_endpoint_id": null,
+      "selected_provider_id": null,
+      "has_format_conversion": null,
+      "local_execution_runtime_miss_reason": "candidate_list_empty"
+    }
+  },
+  {
+    "request_id": "722aa949-5651-40cb-addc-97811dbdef96",
+    "api_format": "openai:image",
+    "is_stream": false,
+    "trace_id": "722aa949-5651-40cb-addc-97811dbdef96",
+    "request_headers": {
+      "accept": "application/json",
+      "content-type": "multipart/form-data; boundary=----OpenAiCompatible1792738151971"
+    },
+    "routing": {
+      "key_name": "saltier.scale-9z+3ti40a@icloud.com",
+      "created_at": "2026-10-23T14:49:27.241105+08:00",
+      "request_id": "722aa949-5651-40cb-addc-97811dbdef96",
+      "route_kind": "image",
+      "updated_at": "2026-10-23T14:49:27.241105+08:00",
+      "candidate_id": "5aee8a4f-4bff-4e97-81f6-da34bd26ee77",
+      "planner_kind": null,
+      "route_family": "openai",
+      "execution_path": "local_execution_runtime_miss",
+      "candidate_index": 1,
+      "selected_endpoint_id": "6ae7a91f-72a7-4bc0-a655-51cd159721cd",
+      "selected_provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+      "has_format_conversion": null,
+      "local_execution_runtime_miss_reason": null
+    }
+  },
+  {
+    "request_id": "57eb0fcf-50ba-4a72-bf14-e13191a7ba8c",
+    "api_format": "openai:responses",
+    "is_stream": false,
+    "trace_id": "57eb0fcf-50ba-4a72-bf14-e13191a7ba8c",
+    "request_headers": {
+      "accept": "application/json",
+      "content-length": "440",
+      "content-type": "application/json"
+    },
+    "routing": {
+      "key_name": null,
+      "created_at": "2026-10-23T14:46:09.174486+08:00",
+      "request_id": "57eb0fcf-50ba-4a72-bf14-e13191a7ba8c",
+      "route_kind": "responses",
+      "updated_at": "2026-10-23T14:46:09.174486+08:00",
+      "candidate_id": null,
+      "planner_kind": "openai_responses_sync",
+      "route_family": "openai",
+      "execution_path": "local_execution_runtime_miss",
+      "candidate_index": null,
+      "selected_endpoint_id": null,
+      "selected_provider_id": null,
+      "has_format_conversion": null,
+      "local_execution_runtime_miss_reason": "candidate_list_empty"
+    }
+  },
+  {
+    "request_id": "60c96d01-fb34-4300-8136-9b50d7209b5a",
+    "api_format": "openai:responses",
+    "is_stream": false,
+    "trace_id": "60c96d01-fb34-4300-8136-9b50d7209b5a",
+    "request_headers": {
+      "accept": "application/json",
+      "content-length": "440",
+      "content-type": "application/json"
+    },
+    "routing": {
+      "key_name": null,
+      "created_at": "2026-10-23T14:54:00.801541+08:00",
+      "request_id": "60c96d01-fb34-4300-8136-9b50d7209b5a",
+      "route_kind": "responses",
+      "updated_at": "2026-10-23T14:54:00.801541+08:00",
+      "candidate_id": null,
+      "planner_kind": "openai_responses_sync",
+      "route_family": "openai",
+      "execution_path": "local_execution_runtime_miss",
+      "candidate_index": null,
+      "selected_endpoint_id": null,
+      "selected_provider_id": null,
+      "has_format_conversion": null,
+      "local_execution_runtime_miss_reason": "candidate_list_empty"
+    }
+  },
+  {
+    "request_id": "221b26d0-6782-4f2a-a1be-64882079bc7f",
+    "api_format": "openai:responses",
+    "is_stream": false,
+    "trace_id": "221b26d0-6782-4f2a-a1be-64882079bc7f",
+    "request_headers": {
+      "accept": "application/json",
+      "content-length": "440",
+      "content-type": "application/json"
+    },
+    "routing": {
+      "key_name": null,
+      "created_at": "2026-10-23T14:35:31.418+08:00",
+      "request_id": "221b26d0-6782-4f2a-a1be-64882079bc7f",
+      "route_kind": "responses",
+      "updated_at": "2026-10-23T14:35:31.418+08:00",
+      "candidate_id": null,
+      "planner_kind": "openai_responses_sync",
+      "route_family": "openai",
+      "execution_path": "local_execution_runtime_miss",
+      "candidate_index": null,
+      "selected_endpoint_id": null,
+      "selected_provider_id": null,
+      "has_format_conversion": null,
+      "local_execution_runtime_miss_reason": "candidate_list_empty"
+    }
+  },
+  {
+    "request_id": "5074f517-2309-467a-a360-6915f1799520",
+    "api_format": "openai:responses",
+    "is_stream": false,
+    "trace_id": "5074f517-2309-467a-a360-6915f1799520",
+    "request_headers": {
+      "accept": "application/json",
+      "content-length": "440",
+      "content-type": "application/json"
+    },
+    "routing": {
+      "key_name": null,
+      "created_at": "2026-10-23T14:47:53.334815+08:00",
+      "request_id": "5074f517-2309-467a-a360-6915f1799520",
+      "route_kind": "responses",
+      "updated_at": "2026-10-23T14:47:53.334815+08:00",
+      "candidate_id": null,
+      "planner_kind": "openai_responses_sync",
+      "route_family": "openai",
+      "execution_path": "local_execution_runtime_miss",
+      "candidate_index": null,
+      "selected_endpoint_id": null,
+      "selected_provider_id": null,
+      "has_format_conversion": null,
+      "local_execution_runtime_miss_reason": "candidate_list_empty"
+    }
+  },
+  {
+    "request_id": "5ef50029-06bf-4fc5-b02a-0acb4d50e6a7",
+    "api_format": "openai:responses",
+    "is_stream": false,
+    "trace_id": "5ef50029-06bf-4fc5-b02a-0acb4d50e6a7",
+    "request_headers": {
+      "accept": "application/json",
+      "content-length": "440",
+      "content-type": "application/json"
+    },
+    "routing": {
+      "key_name": null,
+      "created_at": "2026-10-23T14:48:14.685072+08:00",
+      "request_id": "5ef50029-06bf-4fc5-b02a-0acb4d50e6a7",
+      "route_kind": "responses",
+      "updated_at": "2026-10-23T14:48:14.685072+08:00",
+      "candidate_id": null,
+      "planner_kind": "openai_responses_sync",
+      "route_family": "openai",
+      "execution_path": "local_execution_runtime_miss",
+      "candidate_index": null,
+      "selected_endpoint_id": null,
+      "selected_provider_id": null,
+      "has_format_conversion": null,
+      "local_execution_runtime_miss_reason": "candidate_list_empty"
+    }
+  },
+  {
+    "request_id": "5540bd89-009a-44eb-bec9-d1e6c585c0b0",
+    "api_format": "openai:image",
+    "is_stream": false,
+    "trace_id": "5540bd89-009a-44eb-bec9-d1e6c585c0b0",
+    "request_headers": {
+      "accept": "application/json",
+      "content-type": "application/json; charset=utf-8"
+    },
+    "routing": {
+      "key_name": null,
+      "created_at": "2026-10-23T15:07:31.895888+08:00",
+      "request_id": "5540bd89-009a-44eb-bec9-d1e6c585c0b0",
+      "route_kind": "image",
+      "updated_at": "2026-10-23T15:07:31.895888+08:00",
+      "candidate_id": null,
+      "planner_kind": null,
+      "route_family": "openai",
+      "execution_path": "local_execution_runtime_miss",
+      "candidate_index": null,
+      "selected_endpoint_id": null,
+      "selected_provider_id": null,
+      "has_format_conversion": null,
+      "local_execution_runtime_miss_reason": null
+    }
+  },
+  {
+    "request_id": "1db6e452-c685-47f7-9989-9ecc13562cdc",
+    "api_format": "openai:image",
+    "is_stream": false,
+    "trace_id": "1db6e452-c685-47f7-9989-9ecc13562cdc",
+    "request_headers": {
+      "accept": "application/json",
+      "content-type": "application/json; charset=utf-8"
+    },
+    "routing": {
+      "key_name": null,
+      "created_at": "2026-10-23T15:07:44.448922+08:00",
+      "request_id": "1db6e452-c685-47f7-9989-9ecc13562cdc",
+      "route_kind": "image",
+      "updated_at": "2026-10-23T15:07:44.448922+08:00",
+      "candidate_id": null,
+      "planner_kind": null,
+      "route_family": "openai",
+      "execution_path": "local_execution_runtime_miss",
+      "candidate_index": null,
+      "selected_endpoint_id": null,
+      "selected_provider_id": null,
+      "has_format_conversion": null,
+      "local_execution_runtime_miss_reason": null
+    }
+  },
+  {
+    "request_id": "ed92f8ca-cc8d-43e2-9682-18dbb4adcc0d",
+    "api_format": "openai:image",
+    "is_stream": false,
+    "trace_id": "ed92f8ca-cc8d-43e2-9682-18dbb4adcc0d",
+    "request_headers": {
+      "accept": "application/json",
+      "content-type": "application/json; charset=utf-8"
+    },
+    "routing": {
+      "key_name": null,
+      "created_at": "2026-10-23T15:07:58.484013+08:00",
+      "request_id": "ed92f8ca-cc8d-43e2-9682-18dbb4adcc0d",
+      "route_kind": "image",
+      "updated_at": "2026-10-23T15:07:58.484013+08:00",
+      "candidate_id": null,
+      "planner_kind": null,
+      "route_family": "openai",
+      "execution_path": "local_execution_runtime_miss",
+      "candidate_index": null,
+      "selected_endpoint_id": null,
+      "selected_provider_id": null,
+      "has_format_conversion": null,
+      "local_execution_runtime_miss_reason": null
+    }
+  },
+  {
+    "request_id": "9d009778-8110-4c42-90a2-e20d8401b9b2",
+    "api_format": "openai:image",
+    "is_stream": false,
+    "trace_id": "9d009778-8110-4c42-90a2-e20d8401b9b2",
+    "request_headers": {
+      "accept": "application/json",
+      "content-type": "multipart/form-data; boundary=----OpenAiCompatible1792737671864"
+    },
+    "routing": {
+      "key_name": "porgies.along.2p@icloud.com",
+      "created_at": "2026-10-23T14:41:20.835421+08:00",
+      "request_id": "9d009778-8110-4c42-90a2-e20d8401b9b2",
+      "route_kind": "image",
+      "updated_at": "2026-10-23T14:41:20.835421+08:00",
+      "candidate_id": "0a3a29fb-72ee-41e2-9899-ae2185cd0bd3",
+      "planner_kind": null,
+      "route_family": "openai",
+      "execution_path": "local_execution_runtime_miss",
+      "candidate_index": 1,
+      "selected_endpoint_id": "6ae7a91f-72a7-4bc0-a655-51cd159721cd",
+      "selected_provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+      "has_format_conversion": null,
+      "local_execution_runtime_miss_reason": null
+    }
+  },
+  {
+    "request_id": "e2706b9c-aa01-4b20-a358-beecbb2ac752",
+    "api_format": "openai:image",
+    "is_stream": false,
+    "trace_id": "e2706b9c-aa01-4b20-a358-beecbb2ac752",
+    "request_headers": {
+      "accept": "application/json",
+      "content-type": "multipart/form-data; boundary=----OpenAiCompatible1792737456801"
+    },
+    "routing": {
+      "key_name": "hombre-tweed8y+sybaan@icloud.com",
+      "created_at": "2026-10-23T14:37:52.204995+08:00",
+      "request_id": "e2706b9c-aa01-4b20-a358-beecbb2ac752",
+      "route_kind": "image",
+      "updated_at": "2026-10-23T14:37:52.204995+08:00",
+      "candidate_id": "664c8939-1447-46b4-a198-a4a974b63c23",
+      "planner_kind": null,
+      "route_family": "openai",
+      "execution_path": "local_execution_runtime_miss",
+      "candidate_index": 1,
+      "selected_endpoint_id": "82b0d8f8-66a1-463a-9c05-ed3d6cf8371a",
+      "selected_provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+      "has_format_conversion": null,
+      "local_execution_runtime_miss_reason": null
+    }
+  },
+  {
+    "request_id": "ebdfcd6f-d3c4-4b4d-a207-c282e987626a",
+    "api_format": "openai:image",
+    "is_stream": false,
+    "trace_id": "ebdfcd6f-d3c4-4b4d-a207-c282e987626a",
+    "request_headers": {
+      "accept": "application/json",
+      "content-type": "multipart/form-data; boundary=----OpenAiCompatible1792737466803"
+    },
+    "routing": {
+      "key_name": "trailer.hued4m@icloud.com",
+      "created_at": "2026-10-23T14:37:58.435737+08:00",
+      "request_id": "ebdfcd6f-d3c4-4b4d-a207-c282e987626a",
+      "route_kind": "image",
+      "updated_at": "2026-10-23T14:37:58.435737+08:00",
+      "candidate_id": "73a5c4ae-01dd-41b5-8290-e07692956cca",
+      "planner_kind": null,
+      "route_family": "openai",
+      "execution_path": "local_execution_runtime_miss",
+      "candidate_index": 1,
+      "selected_endpoint_id": "82b0d8f8-66a1-463a-9c05-ed3d6cf8371a",
+      "selected_provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+      "has_format_conversion": null,
+      "local_execution_runtime_miss_reason": null
+    }
+  },
+  {
+    "request_id": "df70b8c3-07fa-4f21-b1f2-ae5072ca9a2f",
+    "api_format": "openai:responses",
+    "is_stream": false,
+    "trace_id": "df70b8c3-07fa-4f21-b1f2-ae5072ca9a2f",
+    "request_headers": {
+      "accept": "application/json",
+      "content-length": "448",
+      "content-type": "application/json"
+    },
+    "routing": {
+      "key_name": null,
+      "created_at": "2026-10-23T14:25:27.431877+08:00",
+      "request_id": "df70b8c3-07fa-4f21-b1f2-ae5072ca9a2f",
+      "route_kind": "responses",
+      "updated_at": "2026-10-23T14:25:27.431877+08:00",
+      "candidate_id": null,
+      "planner_kind": "openai_responses_sync",
+      "route_family": "openai",
+      "execution_path": "local_execution_runtime_miss",
+      "candidate_index": null,
+      "selected_endpoint_id": null,
+      "selected_provider_id": null,
+      "has_format_conversion": null,
+      "local_execution_runtime_miss_reason": "candidate_list_empty"
+    }
+  },
+  {
+    "request_id": "84ecd70e-1556-4182-860c-fe1a2dc3a033",
+    "api_format": "openai:responses",
+    "is_stream": false,
+    "trace_id": "84ecd70e-1556-4182-860c-fe1a2dc3a033",
+    "request_headers": {
+      "accept": "application/json",
+      "content-length": "448",
+      "content-type": "application/json"
+    },
+    "routing": {
+      "key_name": null,
+      "created_at": "2026-10-23T14:27:29.73496+08:00",
+      "request_id": "84ecd70e-1556-4182-860c-fe1a2dc3a033",
+      "route_kind": "responses",
+      "updated_at": "2026-10-23T14:27:29.73496+08:00",
+      "candidate_id": null,
+      "planner_kind": "openai_responses_sync",
+      "route_family": "openai",
+      "execution_path": "local_execution_runtime_miss",
+      "candidate_index": null,
+      "selected_endpoint_id": null,
+      "selected_provider_id": null,
+      "has_format_conversion": null,
+      "local_execution_runtime_miss_reason": "candidate_list_empty"
+    }
+  },
+  {
+    "request_id": "3731efdb-d230-489e-a353-e879ce4a37d7",
+    "api_format": "openai:image",
+    "is_stream": false,
+    "trace_id": "3731efdb-d230-489e-a353-e879ce4a37d7",
+    "request_headers": {
+      "accept": "application/json",
+      "content-type": "application/json; charset=utf-8"
+    },
+    "routing": {
+      "key_name": null,
+      "created_at": "2026-10-23T14:42:39.099685+08:00",
+      "request_id": "3731efdb-d230-489e-a353-e879ce4a37d7",
+      "route_kind": "image",
+      "updated_at": "2026-10-23T14:42:39.099685+08:00",
+      "candidate_id": null,
+      "planner_kind": null,
+      "route_family": "openai",
+      "execution_path": "local_execution_runtime_miss",
+      "candidate_index": null,
+      "selected_endpoint_id": null,
+      "selected_provider_id": null,
+      "has_format_conversion": null,
+      "local_execution_runtime_miss_reason": null
+    }
+  },
+  {
+    "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+    "api_format": "openai:image",
+    "is_stream": false,
+    "trace_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+    "request_headers": {
+      "content-type": "application/json"
+    },
+    "routing": {
+      "key_name": null,
+      "created_at": "2026-10-23T14:29:39.625367+08:00",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "route_kind": "image",
+      "updated_at": "2026-10-23T14:30:53.690711+08:00",
+      "candidate_id": "c2f7ab38-00a3-4a66-97fa-afd51d4c3109",
+      "planner_kind": "openai_image_sync",
+      "route_family": "openai",
+      "execution_path": "local_execution_runtime_miss",
+      "candidate_index": 1,
+      "selected_endpoint_id": "82b0d8f8-66a1-463a-9c05-ed3d6cf8371a",
+      "selected_provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+      "has_format_conversion": false,
+      "local_execution_runtime_miss_reason": "execution_runtime_candidates_exhausted"
+    }
+  },
+  {
+    "request_id": "64b024a8-8f0c-44df-829e-ae08066be815",
+    "api_format": "openai:image",
+    "is_stream": false,
+    "trace_id": "64b024a8-8f0c-44df-829e-ae08066be815",
+    "request_headers": {
+      "accept": "application/json",
+      "content-type": "application/json; charset=utf-8"
+    },
+    "routing": {
+      "key_name": null,
+      "created_at": "2026-10-23T14:42:52.67724+08:00",
+      "request_id": "64b024a8-8f0c-44df-829e-ae08066be815",
+      "route_kind": "image",
+      "updated_at": "2026-10-23T14:42:52.67724+08:00",
+      "candidate_id": null,
+      "planner_kind": null,
+      "route_family": "openai",
+      "execution_path": "local_execution_runtime_miss",
+      "candidate_index": null,
+      "selected_endpoint_id": null,
+      "selected_provider_id": null,
+      "has_format_conversion": null,
+      "local_execution_runtime_miss_reason": null
+    }
+  }
+]

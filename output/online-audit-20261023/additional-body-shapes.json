@@ -1,0 +1,988 @@
+[
+  {
+    "request_id": "1465d481-b50c-48c8-96b2-a3ce402d88c3",
+    "field": "request_body",
+    "keys": [
+      "body_bytes_b64"
+    ],
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "mime": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "n",
+        "mime": "text/plain",
+        "bytes": 1,
+        "file": false,
+        "value": "2"
+      },
+      {
+        "name": "prompt",
+        "mime": "text/plain",
+        "bytes": 1413,
+        "file": false
+      },
+      {
+        "name": "size",
+        "mime": "text/plain",
+        "bytes": 9,
+        "file": false,
+        "value": "1024x1024"
+      },
+      {
+        "name": "quality",
+        "mime": "text/plain",
+        "bytes": 4,
+        "file": false,
+        "value": "high"
+      },
+      {
+        "name": "image",
+        "mime": "image/png",
+        "bytes": 619448,
+        "file": true,
+        "magic": "ffd8ffe000104a4649460001"
+      }
+    ]
+  },
+  {
+    "request_id": "f620d2d2-6aae-4604-9a38-665b5db32c15",
+    "field": "request_body",
+    "keys": [
+      "body_bytes_b64"
+    ],
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "mime": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "n",
+        "mime": "text/plain",
+        "bytes": 1,
+        "file": false,
+        "value": "2"
+      },
+      {
+        "name": "prompt",
+        "mime": "text/plain",
+        "bytes": 705,
+        "file": false
+      },
+      {
+        "name": "size",
+        "mime": "text/plain",
+        "bytes": 9,
+        "file": false,
+        "value": "1024x1024"
+      },
+      {
+        "name": "quality",
+        "mime": "text/plain",
+        "bytes": 4,
+        "file": false,
+        "value": "high"
+      },
+      {
+        "name": "image",
+        "mime": "image/png",
+        "bytes": 303392,
+        "file": true,
+        "magic": "ffd8ffe000104a4649460001"
+      }
+    ]
+  },
+  {
+    "request_id": "e0ae23e3-17be-497a-9566-24412ea60365",
+    "field": "request_body",
+    "keys": [
+      "body_bytes_b64"
+    ],
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "mime": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "n",
+        "mime": "text/plain",
+        "bytes": 1,
+        "file": false,
+        "value": "2"
+      },
+      {
+        "name": "prompt",
+        "mime": "text/plain",
+        "bytes": 1413,
+        "file": false
+      },
+      {
+        "name": "size",
+        "mime": "text/plain",
+        "bytes": 9,
+        "file": false,
+        "value": "1024x1024"
+      },
+      {
+        "name": "quality",
+        "mime": "text/plain",
+        "bytes": 4,
+        "file": false,
+        "value": "high"
+      },
+      {
+        "name": "image",
+        "mime": "image/png",
+        "bytes": 177892,
+        "file": true,
+        "magic": "ffd8ffe000104a4649460001"
+      }
+    ]
+  },
+  {
+    "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+    "field": "request_body",
+    "keys": [
+      "body_bytes_b64"
+    ],
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "mime": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "size",
+        "mime": "text/plain",
+        "bytes": 9,
+        "file": false,
+        "value": "1024x1536"
+      },
+      {
+        "name": "prompt",
+        "mime": "text/plain",
+        "bytes": 8280,
+        "file": false
+      },
+      {
+        "name": "image",
+        "mime": "image/jpeg",
+        "bytes": 148665,
+        "file": true,
+        "magic": "89504e470d0a1a0a0000000d"
+      }
+    ]
+  },
+  {
+    "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+    "field": "provider_request_body",
+    "keys": [
+      "operation",
+      "model",
+      "web_model",
+      "prompt",
+      "size",
+      "ratio",
+      "size_best_effort",
+      "images",
+      "count"
+    ],
+    "values": {
+      "model": "gpt-image-2",
+      "size": "832x1216",
+      "count": 1,
+      "operation": "edit",
+      "web_model": "gpt-5-5-thinking"
+    },
+    "input_type": "NoneType",
+    "image_shapes": [
+      {
+        "type": "str",
+        "keys": null,
+        "data_header": "data:image/jpeg;base64",
+        "chars": 198243
+      }
+    ]
+  },
+  {
+    "request_id": "4f8f1af8-f1d7-465b-a9e3-1a38ca950b56",
+    "field": "request_body",
+    "keys": [
+      "body_bytes_b64"
+    ],
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "mime": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "size",
+        "mime": "text/plain",
+        "bytes": 9,
+        "file": false,
+        "value": "1024x1024"
+      },
+      {
+        "name": "quality",
+        "mime": "text/plain",
+        "bytes": 4,
+        "file": false,
+        "value": "high"
+      },
+      {
+        "name": "n",
+        "mime": "text/plain",
+        "bytes": 1,
+        "file": false,
+        "value": "2"
+      },
+      {
+        "name": "prompt",
+        "mime": "text/plain",
+        "bytes": 705,
+        "file": false
+      },
+      {
+        "name": "image",
+        "mime": "image/png",
+        "bytes": 303392,
+        "file": true,
+        "magic": "ffd8ffe000104a4649460001"
+      }
+    ]
+  },
+  {
+    "request_id": "8d74ef79-397e-4762-827f-fe3444831c31",
+    "field": "request_body",
+    "keys": [
+      "body_bytes_b64"
+    ],
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "mime": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "n",
+        "mime": "text/plain",
+        "bytes": 1,
+        "file": false,
+        "value": "2"
+      },
+      {
+        "name": "prompt",
+        "mime": "text/plain",
+        "bytes": 705,
+        "file": false
+      },
+      {
+        "name": "size",
+        "mime": "text/plain",
+        "bytes": 9,
+        "file": false,
+        "value": "1024x1024"
+      },
+      {
+        "name": "quality",
+        "mime": "text/plain",
+        "bytes": 4,
+        "file": false,
+        "value": "high"
+      },
+      {
+        "name": "image",
+        "mime": "image/png",
+        "bytes": 303392,
+        "file": true,
+        "magic": "ffd8ffe000104a4649460001"
+      }
+    ]
+  },
+  {
+    "request_id": "2a522fcf-dfc4-41fd-89fe-b5b528e7207e",
+    "field": "request_body",
+    "keys": [
+      "body_bytes_b64"
+    ],
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "mime": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "size",
+        "mime": "text/plain",
+        "bytes": 9,
+        "file": false,
+        "value": "1024x1024"
+      },
+      {
+        "name": "quality",
+        "mime": "text/plain",
+        "bytes": 4,
+        "file": false,
+        "value": "high"
+      },
+      {
+        "name": "n",
+        "mime": "text/plain",
+        "bytes": 1,
+        "file": false,
+        "value": "2"
+      },
+      {
+        "name": "prompt",
+        "mime": "text/plain",
+        "bytes": 705,
+        "file": false
+      },
+      {
+        "name": "image",
+        "mime": "image/png",
+        "bytes": 303392,
+        "file": true,
+        "magic": "ffd8ffe000104a4649460001"
+      }
+    ]
+  },
+  {
+    "request_id": "97de52c9-4c0a-4250-a1b1-fe355a5289cf",
+    "field": "request_body",
+    "keys": [
+      "body_bytes_b64"
+    ],
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "mime": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "n",
+        "mime": "text/plain",
+        "bytes": 1,
+        "file": false,
+        "value": "2"
+      },
+      {
+        "name": "prompt",
+        "mime": "text/plain",
+        "bytes": 705,
+        "file": false
+      },
+      {
+        "name": "size",
+        "mime": "text/plain",
+        "bytes": 9,
+        "file": false,
+        "value": "1024x1024"
+      },
+      {
+        "name": "quality",
+        "mime": "text/plain",
+        "bytes": 4,
+        "file": false,
+        "value": "high"
+      },
+      {
+        "name": "image",
+        "mime": "image/png",
+        "bytes": 303392,
+        "file": true,
+        "magic": "ffd8ffe000104a4649460001"
+      }
+    ]
+  },
+  {
+    "request_id": "897f4162-104e-4098-a768-5c7c1e899d4a",
+    "field": "request_body",
+    "keys": [
+      "body_bytes_b64"
+    ],
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "mime": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "prompt",
+        "mime": "text/plain",
+        "bytes": 705,
+        "file": false
+      },
+      {
+        "name": "size",
+        "mime": "text/plain",
+        "bytes": 9,
+        "file": false,
+        "value": "1024x1024"
+      },
+      {
+        "name": "quality",
+        "mime": "text/plain",
+        "bytes": 4,
+        "file": false,
+        "value": "high"
+      },
+      {
+        "name": "n",
+        "mime": "text/plain",
+        "bytes": 1,
+        "file": false,
+        "value": "2"
+      },
+      {
+        "name": "image",
+        "mime": "image/png",
+        "bytes": 303392,
+        "file": true,
+        "magic": "ffd8ffe000104a4649460001"
+      }
+    ]
+  },
+  {
+    "request_id": "3a39f9cf-6018-4c03-bc57-0211011f7d27",
+    "field": "request_body",
+    "keys": [
+      "body_bytes_b64"
+    ],
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "mime": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "size",
+        "mime": "text/plain",
+        "bytes": 9,
+        "file": false,
+        "value": "1024x1024"
+      },
+      {
+        "name": "quality",
+        "mime": "text/plain",
+        "bytes": 4,
+        "file": false,
+        "value": "high"
+      },
+      {
+        "name": "n",
+        "mime": "text/plain",
+        "bytes": 1,
+        "file": false,
+        "value": "2"
+      },
+      {
+        "name": "prompt",
+        "mime": "text/plain",
+        "bytes": 705,
+        "file": false
+      },
+      {
+        "name": "image",
+        "mime": "image/png",
+        "bytes": 303392,
+        "file": true,
+        "magic": "ffd8ffe000104a4649460001"
+      }
+    ]
+  },
+  {
+    "request_id": "6f83c71b-45f5-4753-957c-639efae32c59",
+    "field": "request_body",
+    "keys": [
+      "body_bytes_b64"
+    ],
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "mime": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "quality",
+        "mime": "text/plain",
+        "bytes": 4,
+        "file": false,
+        "value": "high"
+      },
+      {
+        "name": "n",
+        "mime": "text/plain",
+        "bytes": 1,
+        "file": false,
+        "value": "2"
+      },
+      {
+        "name": "prompt",
+        "mime": "text/plain",
+        "bytes": 705,
+        "file": false
+      },
+      {
+        "name": "size",
+        "mime": "text/plain",
+        "bytes": 9,
+        "file": false,
+        "value": "1024x1024"
+      },
+      {
+        "name": "image",
+        "mime": "image/png",
+        "bytes": 303392,
+        "file": true,
+        "magic": "ffd8ffe000104a4649460001"
+      }
+    ]
+  },
+  {
+    "request_id": "eac587f1-0492-4fbb-a0d2-60a4284bc55d",
+    "field": "request_body",
+    "keys": [
+      "body_bytes_b64"
+    ],
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "mime": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "n",
+        "mime": "text/plain",
+        "bytes": 1,
+        "file": false,
+        "value": "2"
+      },
+      {
+        "name": "prompt",
+        "mime": "text/plain",
+        "bytes": 705,
+        "file": false
+      },
+      {
+        "name": "size",
+        "mime": "text/plain",
+        "bytes": 9,
+        "file": false,
+        "value": "1024x1024"
+      },
+      {
+        "name": "quality",
+        "mime": "text/plain",
+        "bytes": 4,
+        "file": false,
+        "value": "high"
+      },
+      {
+        "name": "image",
+        "mime": "image/png",
+        "bytes": 303392,
+        "file": true,
+        "magic": "ffd8ffe000104a4649460001"
+      }
+    ]
+  },
+  {
+    "request_id": "df70b8c3-07fa-4f21-b1f2-ae5072ca9a2f",
+    "field": "request_body",
+    "keys": [
+      "input",
+      "max_output_tokens",
+      "model",
+      "stream",
+      "tool_choice",
+      "tools"
+    ],
+    "values": {
+      "model": "gpt-image-2.5-flare",
+      "stream": false
+    },
+    "input_type": "list"
+  },
+  {
+    "request_id": "84ecd70e-1556-4182-860c-fe1a2dc3a033",
+    "field": "request_body",
+    "keys": [
+      "input",
+      "max_output_tokens",
+      "model",
+      "stream",
+      "tool_choice",
+      "tools"
+    ],
+    "values": {
+      "model": "gpt-image-2.5-flare",
+      "stream": false
+    },
+    "input_type": "list"
+  },
+  {
+    "request_id": "93f8c53d-a98f-4b4a-8582-0b7528cd3162",
+    "field": "request_body",
+    "keys": [
+      "input",
+      "max_output_tokens",
+      "model",
+      "stream",
+      "tool_choice",
+      "tools"
+    ],
+    "values": {
+      "model": "gpt-image-2.5-flare",
+      "stream": false
+    },
+    "input_type": "list"
+  },
+  {
+    "request_id": "221b26d0-6782-4f2a-a1be-64882079bc7f",
+    "field": "request_body",
+    "keys": [
+      "input",
+      "max_output_tokens",
+      "model",
+      "stream",
+      "tool_choice",
+      "tools"
+    ],
+    "values": {
+      "model": "gpt-image-2",
+      "stream": false
+    },
+    "input_type": "list"
+  },
+  {
+    "request_id": "e2706b9c-aa01-4b20-a358-beecbb2ac752",
+    "field": "request_body",
+    "keys": [
+      "body_bytes_b64"
+    ],
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "mime": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "n",
+        "mime": "text/plain",
+        "bytes": 1,
+        "file": false,
+        "value": "2"
+      },
+      {
+        "name": "prompt",
+        "mime": "text/plain",
+        "bytes": 9,
+        "file": false
+      },
+      {
+        "name": "size",
+        "mime": "text/plain",
+        "bytes": 9,
+        "file": false,
+        "value": "1024x1024"
+      },
+      {
+        "name": "quality",
+        "mime": "text/plain",
+        "bytes": 4,
+        "file": false,
+        "value": "high"
+      },
+      {
+        "name": "image",
+        "mime": "image/jpeg",
+        "bytes": 28314,
+        "file": true,
+        "magic": "ffd8ffe000104a4649460001"
+      }
+    ]
+  },
+  {
+    "request_id": "ebdfcd6f-d3c4-4b4d-a207-c282e987626a",
+    "field": "request_body",
+    "keys": [
+      "body_bytes_b64"
+    ],
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "mime": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "n",
+        "mime": "text/plain",
+        "bytes": 1,
+        "file": false,
+        "value": "2"
+      },
+      {
+        "name": "prompt",
+        "mime": "text/plain",
+        "bytes": 9,
+        "file": false
+      },
+      {
+        "name": "size",
+        "mime": "text/plain",
+        "bytes": 9,
+        "file": false,
+        "value": "1024x1024"
+      },
+      {
+        "name": "quality",
+        "mime": "text/plain",
+        "bytes": 4,
+        "file": false,
+        "value": "high"
+      },
+      {
+        "name": "image",
+        "mime": "image/jpeg",
+        "bytes": 28314,
+        "file": true,
+        "magic": "ffd8ffe000104a4649460001"
+      }
+    ]
+  },
+  {
+    "request_id": "9d009778-8110-4c42-90a2-e20d8401b9b2",
+    "field": "request_body",
+    "keys": [
+      "body_bytes_b64"
+    ],
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "mime": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "n",
+        "mime": "text/plain",
+        "bytes": 1,
+        "file": false,
+        "value": "2"
+      },
+      {
+        "name": "prompt",
+        "mime": "text/plain",
+        "bytes": 9,
+        "file": false
+      },
+      {
+        "name": "size",
+        "mime": "text/plain",
+        "bytes": 9,
+        "file": false,
+        "value": "1024x1024"
+      },
+      {
+        "name": "quality",
+        "mime": "text/plain",
+        "bytes": 4,
+        "file": false,
+        "value": "high"
+      },
+      {
+        "name": "image",
+        "mime": "image/jpeg",
+        "bytes": 28314,
+        "file": true,
+        "magic": "ffd8ffe000104a4649460001"
+      }
+    ]
+  },
+  {
+    "request_id": "57eb0fcf-50ba-4a72-bf14-e13191a7ba8c",
+    "field": "request_body",
+    "keys": [
+      "input",
+      "max_output_tokens",
+      "model",
+      "stream",
+      "tool_choice",
+      "tools"
+    ],
+    "values": {
+      "model": "gpt-image-2",
+      "stream": false
+    },
+    "input_type": "list"
+  },
+  {
+    "request_id": "5074f517-2309-467a-a360-6915f1799520",
+    "field": "request_body",
+    "keys": [
+      "input",
+      "max_output_tokens",
+      "model",
+      "stream",
+      "tool_choice",
+      "tools"
+    ],
+    "values": {
+      "model": "gpt-image-2",
+      "stream": false
+    },
+    "input_type": "list"
+  },
+  {
+    "request_id": "5ef50029-06bf-4fc5-b02a-0acb4d50e6a7",
+    "field": "request_body",
+    "keys": [
+      "input",
+      "max_output_tokens",
+      "model",
+      "stream",
+      "tool_choice",
+      "tools"
+    ],
+    "values": {
+      "model": "gpt-image-2",
+      "stream": false
+    },
+    "input_type": "list"
+  },
+  {
+    "request_id": "60c96d01-fb34-4300-8136-9b50d7209b5a",
+    "field": "request_body",
+    "keys": [
+      "input",
+      "max_output_tokens",
+      "model",
+      "stream",
+      "tool_choice",
+      "tools"
+    ],
+    "values": {
+      "model": "gpt-image-2",
+      "stream": false
+    },
+    "input_type": "list"
+  },
+  {
+    "request_id": "722aa949-5651-40cb-addc-97811dbdef96",
+    "field": "request_body",
+    "keys": [
+      "body_bytes_b64"
+    ],
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "mime": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "n",
+        "mime": "text/plain",
+        "bytes": 1,
+        "file": false,
+        "value": "2"
+      },
+      {
+        "name": "prompt",
+        "mime": "text/plain",
+        "bytes": 9,
+        "file": false
+      },
+      {
+        "name": "size",
+        "mime": "text/plain",
+        "bytes": 9,
+        "file": false,
+        "value": "1024x1024"
+      },
+      {
+        "name": "quality",
+        "mime": "text/plain",
+        "bytes": 4,
+        "file": false,
+        "value": "high"
+      },
+      {
+        "name": "image",
+        "mime": "image/jpeg",
+        "bytes": 28314,
+        "file": true,
+        "magic": "ffd8ffe000104a4649460001"
+      }
+    ]
+  },
+  {
+    "request_id": "562ce25b-70b1-434c-9740-a8a8bb158db2",
+    "field": "request_body",
+    "keys": [
+      "input",
+      "max_output_tokens",
+      "model",
+      "stream",
+      "tool_choice",
+      "tools"
+    ],
+    "values": {
+      "model": "gpt-image-2",
+      "stream": false
+    },
+    "input_type": "list"
+  }
+]

@@ -138,11 +138,67 @@ pub fn build_chatgpt_web_image_request_body_with_resize_target(
     body_base64: Option<&str>,
     resize_target: Option<(u32, u32)>,
 ) -> Result<Value, ChatGptWebImageRequestError> {
+    build_chatgpt_web_image_request_body_with_options(
+        parts,
+        body_json,
+        body_base64,
+        resize_target,
+        1,
+    )
+}
+
+/// The count limit is supplied by trusted gateway configuration, never by the request body.
+pub fn build_chatgpt_web_image_request_body_with_options(
+    parts: &http::request::Parts,
+    body_json: &Value,
+    body_base64: Option<&str>,
+    resize_target: Option<(u32, u32)>,
+    max_image_count: u64,
+) -> Result<Value, ChatGptWebImageRequestError> {
+    build_chatgpt_web_image_request_body_with_limits(
+        parts,
+        body_json,
+        body_base64,
+        resize_target,
+        max_image_count,
+        32 * 1024,
+    )
+}
+
+/// Builds a ChatGPT Web request with trusted local limits supplied by the gateway.
+/// A prompt limit of zero disables the local prompt-length check.
+pub fn build_chatgpt_web_image_request_body_with_limits(
+    parts: &http::request::Parts,
+    body_json: &Value,
+    body_base64: Option<&str>,
+    resize_target: Option<(u32, u32)>,
+    max_image_count: u64,
+    max_prompt_chars: u64,
+) -> Result<Value, ChatGptWebImageRequestError> {
+    let max_image_count = max_image_count.clamp(1, OPENAI_IMAGE_MAX_GENERATION_COUNT);
     let request = normalize_openai_image_request(parts, body_json, body_base64).ok_or_else(|| {
         ChatGptWebImageRequestError::invalid_request(
-            "ChatGPT-Web image proxy only supports OpenAI image requests with prompt, n=1, supported image inputs, and supported output options",
+            "ChatGPT-Web image proxy requires a supported OpenAI image request with n between 1 and 10, supported image inputs, and supported output options",
         )
     })?;
+    let image_count = request.image_count.unwrap_or(1);
+    if image_count > max_image_count {
+        return Err(ChatGptWebImageRequestError::invalid_request(format!(
+            "ChatGPT-Web is configured to allow at most n={max_image_count} per request; requested n={image_count}. Adjust the limit in System Settings > Image Generation to test upstream support",
+        )));
+    }
+    if let Some(prompt) = request
+        .prompt
+        .as_ref()
+        .filter(|prompt| max_prompt_chars != 0 && prompt.chars().count() as u64 > max_prompt_chars)
+    {
+        return Err(ChatGptWebImageRequestError::invalid_request(format!(
+            "ChatGPT-Web prompt is {} characters ({} UTF-8 bytes); the local limit is {} characters",
+            prompt.chars().count(),
+            prompt.len(),
+            max_prompt_chars,
+        )));
+    }
     let mut raw_fields = resolve_chatgpt_web_raw_image_fields(parts, body_json, body_base64)?;
     if let Some((width, height)) = resize_target {
         if width == 0 || height == 0 {
@@ -252,7 +308,10 @@ pub fn build_chatgpt_web_image_request_body_with_resize_target(
         Value::Bool(resolved_size.best_effort),
     );
     body.insert("images".to_string(), Value::Array(image_urls));
-    body.insert("count".to_string(), Value::Number(Number::from(1)));
+    body.insert(
+        "count".to_string(),
+        Value::Number(Number::from(image_count)),
+    );
     if let Some(user) = request.user.as_ref() {
         body.insert("user".to_string(), Value::String(user.clone()));
     }
@@ -2116,12 +2175,153 @@ fn find_subslice(haystack: &[u8], needle: &[u8]) -> Option<usize> {
 
 #[cfg(test)]
 mod tests {
+
+    #[test]
+    fn audit_chatgpt_web_n_two_is_explicit_while_standard_provider_support_is_preserved() {
+        let parts = request_parts("/v1/images/generations", Some("application/json"));
+        let body = json!({"model":"gpt-image-2","prompt":"draw","n":2,"quality":"high"});
+        let normalized = normalize_openai_image_request(&parts, &body, None).unwrap();
+        assert!(build_openai_image_api_provider_request_body(&normalized, None, false).is_some());
+        let error = build_chatgpt_web_image_request_body(&parts, &body, None).unwrap_err();
+        assert_eq!(error.status_code, 400);
+        assert!(error.message.contains("at most n=1 per request"));
+        let parts = request_parts(
+            "/v1/images/edits",
+            Some("multipart/form-data; boundary=audit"),
+        );
+        let multipart=b"--audit\r\nContent-Disposition: form-data; name=\"prompt\"\r\n\r\nedit\r\n--audit\r\nContent-Disposition: form-data; name=\"n\"\r\n\r\n2\r\n--audit\r\nContent-Disposition: form-data; name=\"quality\"\r\n\r\nhigh\r\n--audit\r\nContent-Disposition: form-data; name=\"image\"; filename=\"x.jpg\"\r\nContent-Type: application/octet-stream\r\n\r\n\xff\xd8\xff\xd9\r\n--audit--\r\n";
+        let b64 = base64::engine::general_purpose::STANDARD.encode(multipart);
+        let error =
+            build_chatgpt_web_image_request_body(&parts, &json!({}), Some(&b64)).unwrap_err();
+        assert!(error.message.contains("at most n=1 per request"));
+    }
+
+    #[test]
+    fn chatgpt_web_prompt_limit_uses_configured_character_count() {
+        let parts = request_parts("/v1/images/generations", Some("application/json"));
+        let prompt = "图".repeat(20_000);
+        let body = json!({"prompt": prompt});
+
+        let upstream =
+            build_chatgpt_web_image_request_body_with_limits(&parts, &body, None, None, 1, 0)
+                .unwrap();
+        assert_eq!(upstream["prompt"], body["prompt"]);
+
+        let error =
+            build_chatgpt_web_image_request_body_with_limits(&parts, &body, None, None, 1, 100)
+                .unwrap_err();
+        assert_eq!(error.status_code, 400);
+        assert!(error.message.contains("20000 characters"));
+        assert!(error.message.contains("100 characters"));
+    }
+
+    #[test]
+    fn chatgpt_web_image_configured_count_passes_through_without_overriding_request() {
+        let parts = request_parts("/v1/images/generations", Some("application/json"));
+        for count in [2, 3, 10] {
+            let body = json!({"prompt":"draw", "n":count, "size":"3840x2160"});
+            let upstream = build_chatgpt_web_image_request_body_with_options(
+                &parts,
+                &body,
+                None,
+                Some((3840, 2160)),
+                count,
+            )
+            .unwrap();
+            assert_eq!(upstream["count"], count);
+            assert_eq!(upstream["prompt"], "draw");
+            assert_eq!(upstream["ratio"], "16:9");
+        }
+        let body = json!({"prompt":"draw", "max_image_count":10});
+        let upstream =
+            build_chatgpt_web_image_request_body_with_options(&parts, &body, None, None, 10)
+                .unwrap();
+        assert_eq!(upstream["count"], 1);
+        let body = json!({"prompt":"draw", "n":3, "max_image_count":10});
+        let error = build_chatgpt_web_image_request_body_with_options(&parts, &body, None, None, 2)
+            .unwrap_err();
+        assert_eq!(error.status_code, 400);
+        assert!(error.message.contains("requested n=3"));
+        for n in [json!(0), json!(11)] {
+            assert!(build_chatgpt_web_image_request_body_with_options(
+                &parts,
+                &json!({"prompt":"draw", "n":n}),
+                None,
+                None,
+                10,
+            )
+            .is_err());
+        }
+    }
+
+    #[test]
+    fn chatgpt_web_image_configured_count_supports_json_and_multipart_edits() {
+        let parts = request_parts("/v1/images/edits", Some("application/json"));
+        let body = json!({"prompt":"edit", "n":3, "image":"data:image/png;base64,aW1hZ2U="});
+        let upstream =
+            build_chatgpt_web_image_request_body_with_options(&parts, &body, None, None, 3)
+                .unwrap();
+        assert_eq!(upstream["count"], 3);
+        assert_eq!(upstream["images"][0], "data:image/png;base64,aW1hZ2U=");
+        let parts = request_parts(
+            "/v1/images/edits",
+            Some("multipart/form-data; boundary=count"),
+        );
+        let multipart = b"--count\r\nContent-Disposition: form-data; name=\"prompt\"\r\n\r\nedit\r\n--count\r\nContent-Disposition: form-data; name=\"n\"\r\n\r\n3\r\n--count\r\nContent-Disposition: form-data; name=\"image\"; filename=\"x.jpg\"\r\nContent-Type: image/jpeg\r\n\r\n\xff\xd8\xff\xd9\r\n--count--\r\n";
+        let encoded = base64::engine::general_purpose::STANDARD.encode(multipart);
+        let upstream = build_chatgpt_web_image_request_body_with_options(
+            &parts,
+            &json!({}),
+            Some(&encoded),
+            None,
+            3,
+        )
+        .unwrap();
+        assert_eq!(upstream["count"], 3);
+        assert_eq!(upstream["images"].as_array().unwrap().len(), 1);
+    }
+
+    #[test]
+    fn audit_prompt_limit_reports_utf8_bytes_without_truncating() {
+        let parts = request_parts("/v1/images/generations", Some("application/json"));
+        let body = json!({"model":"gpt-image-2","prompt":"图".repeat(10923)});
+        let error = build_chatgpt_web_image_request_body(&parts, &body, None).unwrap_err();
+        assert!(error.message.contains("32769 UTF-8 bytes"));
+        assert!(error.message.contains("32768"));
+        let body = json!({"prompt":"图".repeat(10922)});
+        assert!(build_chatgpt_web_image_request_body(&parts, &body, None).is_ok());
+    }
+
+    #[test]
+    fn audit_large_json_edit_shape_normalizes_and_preserves_reference_with_resize() {
+        let parts = request_parts("/v1/images/edits", Some("application/json"));
+        let data = format!("data:image/jpeg;base64,{}", "A".repeat(26_709_100));
+        let body = json!({"model":"gpt-image-2.5","prompt":"edit synthetic input","n":1,"size":"3840x2160","images":[{"image_url":data}]});
+        let bytes = serde_json::to_vec(&body).unwrap();
+        assert!(bytes.len() > 26_700_000);
+        let (parsed, b64) = crate::api::parse_direct_request_body(true, &bytes).unwrap();
+        assert!(b64.is_none());
+        let normalized = normalize_openai_image_request(&parts, &parsed, None).unwrap();
+        assert_eq!(normalized.images.len(), 1);
+        let result = build_chatgpt_web_image_request_body_with_resize_target(
+            &parts,
+            &parsed,
+            None,
+            Some((3840, 2160)),
+        )
+        .unwrap();
+        assert_eq!(result["images"][0].as_str().unwrap().len(), data.len());
+        assert_eq!(result["model"], "gpt-image-2.5");
+        assert_eq!(result["ratio"], "16:9");
+    }
+
     use base64::Engine as _;
     use http::{Method, Request};
     use serde_json::json;
 
     use super::{
-        build_chatgpt_web_image_request_body,
+        build_chatgpt_web_image_request_body, build_chatgpt_web_image_request_body_with_limits,
+        build_chatgpt_web_image_request_body_with_options,
         build_chatgpt_web_image_request_body_with_resize_target,
         build_codex_openai_image_api_provider_request_body,
         build_openai_image_api_provider_request_body, build_openai_image_provider_request_body,

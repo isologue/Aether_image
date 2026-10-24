@@ -12,7 +12,8 @@ async fn live_task_id_search_filters_image_items_total_and_stats() {
     let pool = sqlx::postgres::PgPoolOptions::new()
         .max_connections(1)
         .connect(&std::env::var("AETHER_TEST_DATABASE_URL").unwrap())
-        .await.unwrap();
+        .await
+        .unwrap();
     // An isolated table exercises the real list SQL without touching persisted tasks.
     sqlx::query("CREATE TEMP TABLE image_tasks (id text PRIMARY KEY, status text, payload jsonb, created_at bigint, started_at bigint, completed_at bigint)")
         .execute(&pool).await.unwrap();
@@ -22,8 +23,12 @@ async fn live_task_id_search_filters_image_items_total_and_stats() {
         ("img_Beta-1", "failed", "other-model"),
     ] {
         sqlx::query("INSERT INTO image_tasks(id,status,payload,created_at) VALUES ($1,$2,$3,100)")
-            .bind(id).bind(status).bind(json!({"task_id":id,"model":model}))
-            .execute(&pool).await.unwrap();
+            .bind(id)
+            .bind(status)
+            .bind(json!({"task_id":id,"model":model}))
+            .execute(&pool)
+            .await
+            .unwrap();
     }
     let repo = SqlxImageTaskRepository::new(pool);
     let page = repo.list(None, None, Some("ALPHA"), 2, 1).await.unwrap();
@@ -31,7 +36,10 @@ async fn live_task_id_search_filters_image_items_total_and_stats() {
     assert_eq!(page["items"].as_array().unwrap().len(), 1);
     assert_eq!(page["items"][0]["task_id"], "img_Alpha-2");
     assert_eq!(page["stats"], json!({"running":1,"succeeded":1}));
-    let page = repo.list(Some("running"), Some("gpt-image"), Some("alpha"), 1, 20).await.unwrap();
+    let page = repo
+        .list(Some("running"), Some("gpt-image"), Some("alpha"), 1, 20)
+        .await
+        .unwrap();
     assert_eq!(page["total"], 1);
     assert_eq!(page["items"][0]["task_id"], "img_Alpha-1");
     for needle in ["missing", "%", "'"] {

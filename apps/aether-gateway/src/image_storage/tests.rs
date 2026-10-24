@@ -633,6 +633,10 @@ async fn cleanup_preserves_pending_busy_new_images_and_remote_files() {
 struct DavFixture {
     files: Arc<Mutex<HashMap<String, Vec<u8>>>>,
     public_auth: Arc<Mutex<bool>>,
+    public_count: Arc<Mutex<u32>>,
+    put_count: Arc<Mutex<u32>>,
+    put_gate: Arc<Mutex<Option<Arc<tokio::sync::Semaphore>>>>,
+    put_status: Arc<Mutex<Option<u16>>>,
     delete_count: Arc<Mutex<u32>>,
     bad_public: bool,
     expected_auth: Arc<Mutex<String>>,
@@ -646,6 +650,7 @@ async fn dav_handler(
     let path = request.uri().path().to_string();
     let method = request.method().as_str().to_string();
     if path.starts_with("/public/") {
+        *state.public_count.lock().unwrap() += 1;
         if let Some(status) = *state.public_status.lock().unwrap() {
             return Response::builder()
                 .status(status)
@@ -683,6 +688,19 @@ async fn dav_handler(
         != Some(state.expected_auth.lock().unwrap().as_str())
     {
         return Response::builder().status(401).body(Body::empty()).unwrap();
+    }
+    if method == "PUT" {
+        *state.put_count.lock().unwrap() += 1;
+        if let Some(status) = *state.put_status.lock().unwrap() {
+            return Response::builder()
+                .status(status)
+                .body(Body::empty())
+                .unwrap();
+        }
+        let gate = state.put_gate.lock().unwrap().clone();
+        if let Some(gate) = &gate {
+            let _permit = gate.acquire().await.unwrap();
+        }
     }
     let status = match method.as_str() {
         "MKCOL" => 201,
@@ -728,13 +746,14 @@ async fn dav_server(bad_public: bool) -> (ImageConfig, DavFixture, tokio::task::
 }
 
 #[tokio::test]
-async fn webdav_upload_verifies_anonymous_public_content_and_cleans_test_file() {
+async fn webdav_upload_skips_readback_and_manual_test_checks_anonymous_content() {
     let temp = TempDir::new();
     let storage = ImageStorage::new(temp.0.clone()).unwrap();
     let (config, fixture, server) = dav_server(false).await;
     let record = storage.save(&png()).await.unwrap();
     let public = storage.upload(&config, "pass", &record).await.unwrap();
     assert!(public.starts_with(&config.webdav_public_url));
+    assert_eq!(*fixture.public_count.lock().unwrap(), 0);
     assert_eq!(storage.download(&public).await.unwrap(), png());
     assert!(!*fixture.public_auth.lock().unwrap());
     assert_eq!(storage.stats(&config).await.unwrap()["synced"], 1);
@@ -759,7 +778,7 @@ async fn webdav_upload_verifies_anonymous_public_content_and_cleans_test_file() 
 }
 
 #[tokio::test]
-async fn webdav_mapping_failure_is_recorded_and_url_falls_back_to_local() {
+async fn webdav_upload_failure_is_recorded_and_url_falls_back_to_local() {
     let temp = TempDir::new();
     let (config, fixture, server) = dav_server(true).await;
     let state = app(&temp.0, &config);
@@ -779,10 +798,11 @@ async fn webdav_mapping_failure_is_recorded_and_url_falls_back_to_local() {
     let record = state.image_storage.save(&png()).await.unwrap();
     let failure = state
         .image_storage
-        .upload(&config, "pass", &record)
+        .upload(&config, "wrong", &record)
         .await
         .unwrap_err();
-    assert!(failure.contains("同一图片"));
+    assert!(failure.contains("HTTP 401"));
+    assert_eq!(*fixture.public_count.lock().unwrap(), 0);
     assert!(
         state
             .image_storage
@@ -961,13 +981,14 @@ fn storage_modes_migrate_legacy_settings_and_validate_only_active_destinations()
 }
 
 #[tokio::test]
-async fn webdav_only_url_waits_for_validation_and_never_creates_local_images() {
+async fn webdav_only_url_waits_for_put_but_not_public_access_without_local_images() {
     let temp = TempDir::new();
     let (mut config, fixture, server) = dav_server(false).await;
     config.storage_mode = "webdav".into();
     *fixture.expected_auth.lock().unwrap() = "Basic YWRtaW46".into();
     let gate = Arc::new(tokio::sync::Semaphore::new(0));
-    *fixture.public_gate.lock().unwrap() = Some(gate.clone());
+    *fixture.put_gate.lock().unwrap() = Some(gate.clone());
+    *fixture.public_gate.lock().unwrap() = Some(Arc::new(tokio::sync::Semaphore::new(0)));
     let state = app(&temp.0, &config);
     let task_state = state.clone();
     let task_config = config.clone();
@@ -979,46 +1000,108 @@ async fn webdav_only_url_waits_for_validation_and_never_creates_local_images() {
         value
     });
     tokio::time::timeout(std::time::Duration::from_secs(2), async {
-        while fixture.files.lock().unwrap().is_empty() {
+        while *fixture.put_count.lock().unwrap() == 0 {
             tokio::task::yield_now().await;
         }
     })
     .await
     .unwrap();
-    assert!(
-        !request.is_finished(),
-        "URL must wait for public download verification"
-    );
+    assert!(!request.is_finished(), "URL must wait for PUT success");
+    assert!(fixture.files.lock().unwrap().is_empty());
     assert!(
         !temp.0.exists(),
         "WebDAV-only must not write image or metadata files"
     );
     gate.add_permits(1);
-    let value = request.await.unwrap();
+    let value = tokio::time::timeout(std::time::Duration::from_secs(2), request)
+        .await
+        .expect("a blocked public URL must not delay delivery")
+        .unwrap();
     let url = value["data"][0]["url"].as_str().unwrap();
     assert!(url.starts_with(&config.webdav_public_url));
     assert!(value["data"][0].get("b64_json").is_none());
-    assert_eq!(state.image_storage.download(url).await.unwrap(), png());
+    assert_eq!(*fixture.public_count.lock().unwrap(), 0);
     assert_eq!(fixture.files.lock().unwrap().len(), 1);
     assert!(!temp.0.exists());
+    *fixture.public_gate.lock().unwrap() = None;
+    assert_eq!(state.image_storage.download(url).await.unwrap(), png());
     server.abort();
 }
 
 #[tokio::test]
-async fn webdav_only_failure_returns_storage_error_without_local_fallback() {
-    let temp = TempDir::new();
-    let (mut config, fixture, server) = dav_server(true).await;
-    config.storage_mode = "webdav".into();
-    *fixture.expected_auth.lock().unwrap() = "Basic YWRtaW46".into();
-    let state = app(&temp.0, &config);
-    let mut value = json!({"data":[{"b64_json":PNG}]});
-    let error = transform_json(&state, &request_config(config, true), &mut value)
-        .await
-        .unwrap_err();
-    assert!(error.contains("同一图片"));
-    assert!(value["data"][0].get("url").is_none());
-    assert!(!temp.0.exists());
-    server.abort();
+async fn webdav_put_failures_keep_storage_error_or_local_fallback() {
+    for mode in ["webdav", "local_webdav"] {
+        for status in [401, 413, 500] {
+            let temp = TempDir::new();
+            let (mut config, fixture, server) = dav_server(false).await;
+            config.storage_mode = mode.into();
+            *fixture.expected_auth.lock().unwrap() = "Basic YWRtaW46".into();
+            *fixture.put_status.lock().unwrap() = Some(status);
+            let state = app(&temp.0, &config);
+            let mut value = json!({"data":[{"b64_json":PNG}]});
+            let result =
+                transform_json(&state, &request_config(config.clone(), true), &mut value).await;
+            if mode == "webdav" {
+                assert!(result.unwrap_err().contains(&format!("HTTP {status}")));
+                assert!(value["data"][0].get("url").is_none());
+                assert!(!temp.0.exists());
+            } else {
+                result.unwrap();
+                assert!(value["data"][0]["url"]
+                    .as_str()
+                    .unwrap()
+                    .starts_with("https://images.example.test/media/images/"));
+                assert_eq!(
+                    state.image_storage.stats(&config).await.unwrap()["failed"],
+                    1
+                );
+            }
+            assert_eq!(*fixture.public_count.lock().unwrap(), 0);
+            assert!(fixture.files.lock().unwrap().is_empty());
+            server.abort();
+        }
+    }
+}
+
+#[tokio::test]
+async fn webdav_upload_success_ignores_bad_or_unavailable_public_urls() {
+    for mode in ["webdav", "local_webdav"] {
+        for status in [None, Some(401), Some(404), Some(503)] {
+            let temp = TempDir::new();
+            // Without an HTTP error, the public mapping intentionally serves mismatched content.
+            let (mut config, fixture, server) = dav_server(true).await;
+            config.storage_mode = mode.into();
+            *fixture.expected_auth.lock().unwrap() = "Basic YWRtaW46".into();
+            *fixture.public_status.lock().unwrap() = status;
+            let state = app(&temp.0, &config);
+            let mut value = json!({"data":[{"b64_json":PNG}]});
+            tokio::time::timeout(
+                std::time::Duration::from_secs(2),
+                transform_json(&state, &request_config(config.clone(), true), &mut value),
+            )
+            .await
+            .unwrap()
+            .unwrap();
+            assert!(value["data"][0]["url"]
+                .as_str()
+                .unwrap()
+                .starts_with(&config.webdav_public_url));
+            assert_eq!(*fixture.public_count.lock().unwrap(), 0);
+            assert_eq!(fixture.files.lock().unwrap().len(), 1);
+            assert_eq!(
+                fixture.files.lock().unwrap().values().next().unwrap(),
+                &png()
+            );
+            if mode == "webdav" {
+                assert!(!temp.0.exists());
+            } else {
+                let stats = state.image_storage.stats(&config).await.unwrap();
+                assert_eq!(stats["synced"], 1);
+                assert_eq!(stats["failed"], 0);
+            }
+            server.abort();
+        }
+    }
 }
 
 #[tokio::test]
@@ -1028,7 +1111,7 @@ async fn webdav_only_base64_waits_until_durable_without_local_copy() {
     config.storage_mode = "webdav".into();
     *fixture.expected_auth.lock().unwrap() = "Basic YWRtaW46".into();
     let gate = Arc::new(tokio::sync::Semaphore::new(0));
-    *fixture.public_gate.lock().unwrap() = Some(gate.clone());
+    *fixture.put_gate.lock().unwrap() = Some(gate.clone());
     let state = app(&temp.0, &config);
     let request = tokio::spawn(async move {
         let mut value = json!({"data":[{"b64_json":PNG}]});
@@ -1038,7 +1121,7 @@ async fn webdav_only_base64_waits_until_durable_without_local_copy() {
         value
     });
     tokio::time::timeout(std::time::Duration::from_secs(2), async {
-        while fixture.files.lock().unwrap().is_empty() {
+        while *fixture.put_count.lock().unwrap() == 0 {
             tokio::task::yield_now().await;
         }
     })
@@ -1050,7 +1133,11 @@ async fn webdav_only_base64_waits_until_durable_without_local_copy() {
     );
     assert!(!temp.0.exists());
     gate.add_permits(1);
-    let value = request.await.unwrap();
+    let value = tokio::time::timeout(std::time::Duration::from_secs(2), request)
+        .await
+        .unwrap()
+        .unwrap();
+    assert_eq!(*fixture.public_count.lock().unwrap(), 0);
     assert_eq!(value["data"][0]["b64_json"], PNG);
     assert!(value["data"][0].get("url").is_none());
     assert_eq!(fixture.files.lock().unwrap().len(), 1);

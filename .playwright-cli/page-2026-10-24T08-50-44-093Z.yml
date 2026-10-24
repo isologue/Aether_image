@@ -1,0 +1,13 @@
+- generic [ref=f1e4]:
+  - generic [ref=f1e5]: "[plugin:vite:css] [postcss] G:/Demo/Aether/frontend/src/style.css:1:1: The `bg-background` class does not exist. If `bg-background` is a custom class, make sure it is defined within a `@layer` directive."
+  - generic [ref=f1e6]: G:/Demo/Aether/frontend/src/style.css:1:0
+  - generic [ref=f1e7]: 1 | @tailwind base; | ^ 2 | @tailwind components; 3 | @tailwind utilities;
+  - generic [ref=f1e8]: at Input.error (G:\Demo\Aether\frontend\node_modules\postcss\lib\input.js:135:16) at AtRule.error (G:\Demo\Aether\frontend\node_modules\postcss\lib\node.js:166:32) at processApply (G:\Demo\Aether\frontend\node_modules\tailwindcss\lib\lib\expandApplyAtRules.js:380:29) at G:\Demo\Aether\frontend\node_modules\tailwindcss\lib\lib\expandApplyAtRules.js:551:9 at G:\Demo\Aether\frontend\node_modules\tailwindcss\lib\processTailwindFeatures.js:55:50 at async plugins (G:\Demo\Aether\frontend\node_modules\tailwindcss\lib\plugin.js:38:17) at async LazyResult.runAsync (G:\Demo\Aether\frontend\node_modules\postcss\lib\lazy-result.js:299:11) at async runPostCSS (file:///G:/Demo/Aether/frontend/node_modules/vite/dist/node/chunks/config.js:30225:19) at async compilePostCSS (file:///G:/Demo/Aether/frontend/node_modules/vite/dist/node/chunks/config.js:30209:6) at async compileCSS (file:///G:/Demo/Aether/frontend/node_modules/vite/dist/node/chunks/config.js:30139:26)
+  - generic [ref=f1e9]:
+    - text: Click outside, press Esc key, or fix the code to dismiss.You can also disable this overlay by setting
+    - code [ref=f1e10]: server.hmr.overlay
+    - text: to
+    - code [ref=f1e11]: "false"
+    - text: in
+    - code [ref=f1e12]: vite.config.ts
+    - text: .

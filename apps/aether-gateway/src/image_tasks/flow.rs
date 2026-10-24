@@ -16,6 +16,7 @@ pub(crate) struct FlowState {
         String,
     )>,
     pub terminal: Option<DeferredTerminal>,
+    pub diagnostics: Option<Arc<crate::request_diagnostics::RequestDiagnostics>>,
     pub completion: Option<bool>,
     pub emitted: bool,
     pub attempts: u64,
@@ -54,6 +55,7 @@ pub(crate) fn defer(
         return false;
     };
     let mut state = flow.0.lock().unwrap_or_else(|e| e.into_inner());
+    state.diagnostics = crate::request_diagnostics::current_request_diagnostics();
     state.request_id = Some(context.request_id.clone());
     if !state.emitted {
         state.terminal = Some(DeferredTerminal::Sync(context, payload));
@@ -129,7 +131,11 @@ where
     F::Output: Send + 'static,
 {
     let flow = current();
-    tokio::spawn(async move { scope(flow, future).await })
+    let diagnostics = crate::request_diagnostics::current_request_diagnostics();
+    tokio::spawn(async move {
+        crate::request_diagnostics::scope_request_diagnostics_with(diagnostics, scope(flow, future))
+            .await
+    })
 }
 pub(crate) async fn defer_stream_for(
     flow: Option<ImageFlow>,
@@ -146,6 +152,7 @@ pub(crate) async fn defer_stream_for(
         if s.emitted {
             return true;
         }
+        s.diagnostics = crate::request_diagnostics::current_request_diagnostics();
         s.request_id = Some(context.request_id.clone());
         s.terminal = Some(DeferredTerminal::Stream(context, payload, void));
         s.completion
@@ -160,7 +167,7 @@ impl ImageFlow {
         &self,
         succeeded: bool,
     ) -> Result<Option<aether_usage_runtime::UsageEvent>, String> {
-        let (terminal, task, refusal) = {
+        let (terminal, task, refusal, diagnostics) = {
             let mut s = self.0.lock().unwrap_or_else(|e| e.into_inner());
             if s.emitted {
                 return Ok(None);
@@ -169,7 +176,12 @@ impl ImageFlow {
             if terminal.is_some() {
                 s.emitted = true;
             }
-            (terminal, s.task.clone(), s.refusal.clone())
+            (
+                terminal,
+                s.task.clone(),
+                s.refusal.clone(),
+                s.diagnostics.clone(),
+            )
         };
         let Some(mut terminal) = terminal else {
             return Ok(None);
@@ -177,6 +189,13 @@ impl ImageFlow {
         let context = match &mut terminal {
             DeferredTerminal::Sync(c, _) | DeferredTerminal::Stream(c, _, _) => c,
         };
+        let diagnostics =
+            diagnostics.or_else(crate::request_diagnostics::current_request_diagnostics);
+        context.request_metadata =
+            crate::request_diagnostics::attach_request_diagnostics_to_report_context(
+                context.request_metadata.take(),
+                diagnostics.as_ref(),
+            );
         if let Some((_, id, _)) = task {
             context.request_metadata.get_or_insert_with(|| json!({}))["image_task_id"] = json!(id);
         }
@@ -191,7 +210,7 @@ impl ImageFlow {
         }
         let seed = match terminal {
             DeferredTerminal::Sync(context, mut payload) => {
-                if !succeeded {
+                if !succeeded && payload.status_code < 400 {
                     payload.status_code = 502;
                     payload.report_kind = payload.report_kind.replace("success", "error");
                     payload.client_response = Some(
@@ -202,9 +221,12 @@ impl ImageFlow {
             }
             DeferredTerminal::Stream(context, mut payload, void) => {
                 if !succeeded {
-                    payload.status_code = 502;
-                    payload.terminal_error_message =
-                        Some("Final image preparation failed or delivery was interrupted".into());
+                    if payload.status_code < 400 {
+                        payload.status_code = 502;
+                    }
+                    payload.terminal_error_message.get_or_insert_with(|| {
+                        "Final image preparation failed or delivery was interrupted".into()
+                    });
                     payload.report_kind = payload.report_kind.replace("success", "error");
                 }
                 aether_usage_runtime::build_stream_terminal_usage_seed(

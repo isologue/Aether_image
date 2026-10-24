@@ -81,8 +81,27 @@ pub(crate) async fn resolve_local_failover_analysis_for_attempt(
     status_code: u16,
     response_text: Option<&str>,
 ) -> LocalFailoverAnalysis {
-    if status_code == 400
-        && crate::execution_runtime::chatgpt_web_image_has_local_request_error(plan, report_context)
+    if status_code == 409
+        && crate::execution_runtime::chatgpt_web_image_response_is_account_unavailable(
+            plan,
+            report_context,
+            response_text,
+        )
+    {
+        return LocalFailoverAnalysis {
+            classification: LocalFailoverClassification::RetryAccountUnavailable,
+            decision: LocalFailoverDecision::RetryNextCandidate,
+        };
+    }
+    if matches!(status_code, 400 | 413 | 422)
+        && (crate::execution_runtime::chatgpt_web_image_has_local_request_error(
+            plan,
+            report_context,
+        ) || crate::execution_runtime::chatgpt_web_image_response_is_input_error(
+            plan,
+            report_context,
+            response_text,
+        ))
     {
         // Rotating credentials cannot fix a local request validation error.
         return LocalFailoverAnalysis {

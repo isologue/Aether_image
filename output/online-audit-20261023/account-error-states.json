@@ -1,0 +1,817 @@
+[
+  {
+    "id": "014f87b8-45d0-4e17-b1fc-a8f9d7e1ff48",
+    "status": "active",
+    "is_active": true,
+    "oauth_invalid_at": null,
+    "oauth_invalid_reason": null,
+    "last_error_at": null,
+    "last_error_msg": null,
+    "health_by_format": {
+      "openai:image": {
+        "health_score": 1.0,
+        "last_failure_at": null,
+        "consecutive_failures": 0
+      }
+    },
+    "circuit_breaker_by_format": null,
+    "status_snapshot": {
+      "oauth": {
+        "code": "valid",
+        "label": "有效",
+        "reason": null,
+        "source": "expires_at",
+        "expires_at": 1793415289,
+        "invalid_at": null,
+        "expiring_soon": false,
+        "requires_reauth": false
+      },
+      "quota": {
+        "code": "exhausted",
+        "label": "额度耗尽",
+        "reason": "Quota is exhausted",
+        "source": "image_success",
+        "version": 2,
+        "windows": [
+          {
+            "code": "image_gen",
+            "unit": "count",
+            "label": "生图",
+            "scope": "account",
+            "reset_at": 1792823856,
+            "used_ratio": 1.0,
+            "used_value": 4.0,
+            "limit_value": 4.0,
+            "is_exhausted": true,
+            "reset_seconds": 86361,
+            "remaining_ratio": 0.0,
+            "remaining_value": 0.0
+          }
+        ],
+        "reset_at": 1792823856,
+        "exhausted": true,
+        "freshness": "fresh",
+        "plan_type": null,
+        "updated_at": 1792737495,
+        "observed_at": 1792737495,
+        "usage_ratio": 1.0,
+        "provider_type": "chatgpt_web",
+        "reset_seconds": 86361
+      }
+    },
+    "upstream_metadata_keys": [
+      "chatgpt_web"
+    ]
+  },
+  {
+    "id": "0154e7ce-7b02-4a53-bf3d-e920b4ee81e7",
+    "status": "active",
+    "is_active": true,
+    "oauth_invalid_at": null,
+    "oauth_invalid_reason": null,
+    "last_error_at": null,
+    "last_error_msg": null,
+    "health_by_format": {
+      "openai:image": {
+        "health_score": 1.0,
+        "last_failure_at": null,
+        "consecutive_failures": 0
+      }
+    },
+    "circuit_breaker_by_format": null,
+    "status_snapshot": {
+      "oauth": {
+        "code": "valid",
+        "label": "有效",
+        "reason": null,
+        "source": "expires_at",
+        "expires_at": 1793426437,
+        "invalid_at": null,
+        "expiring_soon": false,
+        "requires_reauth": false
+      },
+      "quota": {
+        "code": "exhausted",
+        "label": "额度耗尽",
+        "reason": "Quota is exhausted",
+        "source": "image_success",
+        "version": 2,
+        "windows": [
+          {
+            "code": "image_gen",
+            "unit": "count",
+            "label": "生图",
+            "scope": "account",
+            "reset_at": 1792823911,
+            "used_ratio": 1.0,
+            "used_value": 24.0,
+            "limit_value": 24.0,
+            "is_exhausted": true,
+            "reset_seconds": 85894,
+            "remaining_ratio": 0.0,
+            "remaining_value": 0.0
+          }
+        ],
+        "reset_at": 1792823911,
+        "exhausted": true,
+        "freshness": "fresh",
+        "plan_type": null,
+        "updated_at": 1792738017,
+        "observed_at": 1792738017,
+        "usage_ratio": 1.0,
+        "provider_type": "chatgpt_web",
+        "reset_seconds": 85894
+      }
+    },
+    "upstream_metadata_keys": [
+      "chatgpt_web"
+    ]
+  },
+  {
+    "id": "01825443-9072-4289-b0b3-922ab2dfe47f",
+    "status": "active",
+    "is_active": true,
+    "oauth_invalid_at": null,
+    "oauth_invalid_reason": null,
+    "last_error_at": null,
+    "last_error_msg": null,
+    "health_by_format": {},
+    "circuit_breaker_by_format": {},
+    "status_snapshot": {
+      "oauth": {
+        "code": "valid",
+        "label": "有效",
+        "reason": null,
+        "source": "expires_at",
+        "expires_at": 1793370052,
+        "invalid_at": null,
+        "expiring_soon": false,
+        "requires_reauth": false
+      },
+      "quota": {
+        "code": "ok",
+        "label": null,
+        "reason": null,
+        "source": "image_success",
+        "version": 2,
+        "windows": [
+          {
+            "code": "image_gen",
+            "unit": "count",
+            "label": "生图",
+            "scope": "account",
+            "reset_at": 1792824846,
+            "used_ratio": 0.0,
+            "used_value": 0.0,
+            "limit_value": 25.0,
+            "is_exhausted": false,
+            "reset_seconds": 86399,
+            "remaining_ratio": 1.0,
+            "remaining_value": 25.0
+          }
+        ],
+        "reset_at": 1792824846,
+        "exhausted": false,
+        "freshness": "fresh",
+        "plan_type": null,
+        "updated_at": 1792738447,
+        "observed_at": 1792738447,
+        "usage_ratio": 0.0,
+        "provider_type": "chatgpt_web",
+        "reset_seconds": 86399
+      }
+    },
+    "upstream_metadata_keys": [
+      "chatgpt_web"
+    ]
+  },
+  {
+    "id": "01904bfb-2db4-4c04-8368-669f424f594b",
+    "status": "active",
+    "is_active": true,
+    "oauth_invalid_at": null,
+    "oauth_invalid_reason": null,
+    "last_error_at": null,
+    "last_error_msg": null,
+    "health_by_format": {},
+    "circuit_breaker_by_format": {},
+    "status_snapshot": {
+      "oauth": {
+        "code": "valid",
+        "label": "有效",
+        "reason": null,
+        "source": "expires_at",
+        "expires_at": 1793413221,
+        "invalid_at": null,
+        "expiring_soon": false,
+        "requires_reauth": false
+      },
+      "quota": {
+        "code": "ok",
+        "label": null,
+        "reason": null,
+        "source": "image_success",
+        "version": 2,
+        "windows": [
+          {
+            "code": "image_gen",
+            "unit": "count",
+            "label": "生图",
+            "scope": "account",
+            "reset_at": 1792824863,
+            "used_ratio": 0.0,
+            "used_value": 0.0,
+            "limit_value": 25.0,
+            "is_exhausted": false,
+            "reset_seconds": 86399,
+            "remaining_ratio": 1.0,
+            "remaining_value": 25.0
+          }
+        ],
+        "reset_at": 1792824863,
+        "exhausted": false,
+        "freshness": "fresh",
+        "plan_type": null,
+        "updated_at": 1792738464,
+        "observed_at": 1792738464,
+        "usage_ratio": 0.0,
+        "provider_type": "chatgpt_web",
+        "reset_seconds": 86399
+      }
+    },
+    "upstream_metadata_keys": [
+      "chatgpt_web"
+    ]
+  },
+  {
+    "id": "01a67540-cab8-44b0-842c-4d3a30555a5d",
+    "status": "active",
+    "is_active": true,
+    "oauth_invalid_at": null,
+    "oauth_invalid_reason": null,
+    "last_error_at": null,
+    "last_error_msg": null,
+    "health_by_format": {
+      "openai:image": {
+        "health_score": 1.0,
+        "last_failure_at": null,
+        "consecutive_failures": 0
+      }
+    },
+    "circuit_breaker_by_format": null,
+    "status_snapshot": {
+      "oauth": {
+        "code": "valid",
+        "label": "有效",
+        "reason": null,
+        "source": "expires_at",
+        "expires_at": 1793345273,
+        "invalid_at": null,
+        "expiring_soon": false,
+        "requires_reauth": false
+      },
+      "quota": {
+        "code": "ok",
+        "label": null,
+        "reason": null,
+        "source": "image_success",
+        "version": 2,
+        "windows": [
+          {
+            "code": "image_gen",
+            "unit": "count",
+            "label": "生图",
+            "scope": "account",
+            "reset_at": 1792824876,
+            "used_ratio": 0.7272727272727273,
+            "used_value": 16.0,
+            "limit_value": 22.0,
+            "is_exhausted": false,
+            "reset_seconds": 85966,
+            "remaining_ratio": 0.2727272727272727,
+            "remaining_value": 6.0
+          }
+        ],
+        "reset_at": 1792824876,
+        "exhausted": false,
+        "freshness": "fresh",
+        "plan_type": null,
+        "updated_at": 1792738910,
+        "observed_at": 1792738910,
+        "usage_ratio": 0.7272727272727273,
+        "provider_type": "chatgpt_web",
+        "reset_seconds": 85966
+      }
+    },
+    "upstream_metadata_keys": [
+      "chatgpt_web"
+    ]
+  },
+  {
+    "id": "01764f22-cda5-4b5d-bd3c-7aa2f1358291",
+    "status": "active",
+    "is_active": true,
+    "oauth_invalid_at": null,
+    "oauth_invalid_reason": null,
+    "last_error_at": null,
+    "last_error_msg": null,
+    "health_by_format": {
+      "openai:image": {
+        "health_score": 1.0,
+        "last_failure_at": null,
+        "consecutive_failures": 0
+      }
+    },
+    "circuit_breaker_by_format": null,
+    "status_snapshot": {
+      "oauth": {
+        "code": "valid",
+        "label": "有效",
+        "reason": null,
+        "source": "expires_at",
+        "expires_at": 1793426309,
+        "invalid_at": null,
+        "expiring_soon": false,
+        "requires_reauth": false
+      },
+      "quota": {
+        "code": "ok",
+        "label": null,
+        "reason": null,
+        "source": "image_success",
+        "version": 2,
+        "windows": [
+          {
+            "code": "image_gen",
+            "unit": "count",
+            "label": "生图",
+            "scope": "account",
+            "reset_at": 1792824804,
+            "used_ratio": 0.64,
+            "used_value": 16.0,
+            "limit_value": 25.0,
+            "is_exhausted": false,
+            "reset_seconds": 85404,
+            "remaining_ratio": 0.36,
+            "remaining_value": 9.0
+          }
+        ],
+        "reset_at": 1792824804,
+        "exhausted": false,
+        "freshness": "fresh",
+        "plan_type": null,
+        "updated_at": 1792739400,
+        "observed_at": 1792739400,
+        "usage_ratio": 0.64,
+        "provider_type": "chatgpt_web",
+        "reset_seconds": 85404
+      }
+    },
+    "upstream_metadata_keys": [
+      "chatgpt_web"
+    ]
+  },
+  {
+    "id": "01635009-8490-4d0b-b6fb-94916f9b7d3a",
+    "status": "active",
+    "is_active": true,
+    "oauth_invalid_at": "2026-10-23T14:30:41+08:00",
+    "oauth_invalid_reason": "[OAUTH_EXPIRED] ChatGPT-Web requirements returned HTTP 401",
+    "last_error_at": null,
+    "last_error_msg": null,
+    "health_by_format": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-23T06:30:41Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit_breaker_by_format": null,
+    "status_snapshot": {
+      "oauth": {
+        "code": "expired",
+        "label": "已过期",
+        "reason": "ChatGPT-Web requirements returned HTTP 401",
+        "source": "oauth_invalid",
+        "expires_at": 1793414227,
+        "invalid_at": 1792737041,
+        "expiring_soon": false,
+        "requires_reauth": false
+      },
+      "quota": {
+        "code": "ok",
+        "label": null,
+        "reason": null,
+        "source": "refresh_api",
+        "version": 2,
+        "windows": [
+          {
+            "code": "image_gen",
+            "unit": "count",
+            "label": "生图",
+            "scope": "account",
+            "reset_at": 1792569413,
+            "used_ratio": 0.0,
+            "used_value": 0.0,
+            "limit_value": 4.0,
+            "is_exhausted": false,
+            "reset_seconds": 19185,
+            "remaining_ratio": 1.0,
+            "remaining_value": 4.0
+          }
+        ],
+        "reset_at": 1792569413,
+        "exhausted": false,
+        "freshness": "fresh",
+        "plan_type": null,
+        "updated_at": 1792550228,
+        "observed_at": 1792550228,
+        "usage_ratio": 0.0,
+        "provider_type": "chatgpt_web",
+        "reset_seconds": 19185
+      }
+    },
+    "upstream_metadata_keys": [
+      "chatgpt_web",
+      "oauth_refresh"
+    ]
+  },
+  {
+    "id": "017332c0-d2bb-4996-be73-ab3f1ef4ca43",
+    "status": "active",
+    "is_active": true,
+    "oauth_invalid_at": null,
+    "oauth_invalid_reason": null,
+    "last_error_at": null,
+    "last_error_msg": null,
+    "health_by_format": {
+      "openai:image": {
+        "health_score": 1.0,
+        "last_failure_at": null,
+        "consecutive_failures": 0
+      }
+    },
+    "circuit_breaker_by_format": null,
+    "status_snapshot": {
+      "oauth": {
+        "code": "valid",
+        "label": "有效",
+        "reason": null,
+        "source": "expires_at",
+        "expires_at": 1793413257,
+        "invalid_at": null,
+        "expiring_soon": false,
+        "requires_reauth": false
+      },
+      "quota": {
+        "code": "exhausted",
+        "label": "额度耗尽",
+        "reason": "Quota is exhausted",
+        "source": "image_success",
+        "version": 2,
+        "windows": [
+          {
+            "code": "image_gen",
+            "unit": "count",
+            "label": "生图",
+            "scope": "account",
+            "reset_at": 1792824701,
+            "used_ratio": 1.0,
+            "used_value": 25.0,
+            "limit_value": 25.0,
+            "is_exhausted": true,
+            "reset_seconds": 84329,
+            "remaining_ratio": 0.0,
+            "remaining_value": 0.0
+          }
+        ],
+        "reset_at": 1792824701,
+        "exhausted": true,
+        "freshness": "fresh",
+        "plan_type": null,
+        "updated_at": 1792740372,
+        "observed_at": 1792740372,
+        "usage_ratio": 1.0,
+        "provider_type": "chatgpt_web",
+        "reset_seconds": 84329
+      }
+    },
+    "upstream_metadata_keys": [
+      "chatgpt_web"
+    ]
+  },
+  {
+    "id": "01af90e4-f3ff-4495-afab-de25b7abc6d5",
+    "status": "active",
+    "is_active": true,
+    "oauth_invalid_at": null,
+    "oauth_invalid_reason": null,
+    "last_error_at": null,
+    "last_error_msg": null,
+    "health_by_format": {
+      "openai:image": {
+        "health_score": 1.0,
+        "last_failure_at": null,
+        "consecutive_failures": 0
+      }
+    },
+    "circuit_breaker_by_format": null,
+    "status_snapshot": {
+      "oauth": {
+        "code": "valid",
+        "label": "有效",
+        "reason": null,
+        "source": "expires_at",
+        "expires_at": 1793426609,
+        "invalid_at": null,
+        "expiring_soon": false,
+        "requires_reauth": false
+      },
+      "quota": {
+        "code": "exhausted",
+        "label": "额度耗尽",
+        "reason": "Quota is exhausted",
+        "source": "image_success",
+        "version": 2,
+        "windows": [
+          {
+            "code": "image_gen",
+            "unit": "count",
+            "label": "生图",
+            "scope": "account",
+            "reset_at": 1792827439,
+            "used_ratio": 1.0,
+            "used_value": 3.0,
+            "limit_value": 3.0,
+            "is_exhausted": true,
+            "reset_seconds": 86310,
+            "remaining_ratio": 0.0,
+            "remaining_value": 0.0
+          }
+        ],
+        "reset_at": 1792827439,
+        "exhausted": true,
+        "freshness": "fresh",
+        "plan_type": null,
+        "updated_at": 1792741129,
+        "observed_at": 1792741129,
+        "usage_ratio": 1.0,
+        "provider_type": "chatgpt_web",
+        "reset_seconds": 86310
+      }
+    },
+    "upstream_metadata_keys": [
+      "chatgpt_web"
+    ]
+  },
+  {
+    "id": "15928c07-bc6c-4db5-bcfb-b1cdc74c3e64",
+    "status": "active",
+    "is_active": true,
+    "oauth_invalid_at": null,
+    "oauth_invalid_reason": null,
+    "last_error_at": null,
+    "last_error_msg": null,
+    "health_by_format": {
+      "openai:image": {
+        "health_score": 1.0,
+        "last_failure_at": null,
+        "consecutive_failures": 0
+      }
+    },
+    "circuit_breaker_by_format": null,
+    "status_snapshot": {
+      "oauth": {
+        "code": "valid",
+        "label": "有效",
+        "reason": null,
+        "source": "expires_at",
+        "expires_at": 1793236594,
+        "invalid_at": null,
+        "expiring_soon": false,
+        "requires_reauth": false
+      },
+      "quota": {
+        "code": "ok",
+        "label": null,
+        "reason": null,
+        "source": "refresh_api",
+        "version": 2,
+        "windows": [
+          {
+            "code": "image_gen",
+            "unit": "count",
+            "label": "生图",
+            "scope": "account",
+            "reset_at": 1792808449,
+            "used_ratio": 0.08,
+            "used_value": 2.0,
+            "limit_value": 25.0,
+            "is_exhausted": false,
+            "reset_seconds": 65274,
+            "remaining_ratio": 0.92,
+            "remaining_value": 23.0
+          }
+        ],
+        "reset_at": 1792808449,
+        "exhausted": false,
+        "freshness": "fresh",
+        "plan_type": "free",
+        "updated_at": 1792743175,
+        "observed_at": 1792743175,
+        "usage_ratio": 0.08,
+        "provider_type": "chatgpt_web",
+        "reset_seconds": 65274
+      }
+    },
+    "upstream_metadata_keys": [
+      "chatgpt_web"
+    ]
+  },
+  {
+    "id": "0976df80-788d-4580-a5cd-1794ea74eaa5",
+    "status": "active",
+    "is_active": true,
+    "oauth_invalid_at": null,
+    "oauth_invalid_reason": null,
+    "last_error_at": null,
+    "last_error_msg": null,
+    "health_by_format": {},
+    "circuit_breaker_by_format": {},
+    "status_snapshot": {
+      "oauth": {
+        "code": "valid",
+        "label": "有效",
+        "reason": null,
+        "source": "expires_at",
+        "expires_at": 1793549709,
+        "invalid_at": null,
+        "expiring_soon": false,
+        "requires_reauth": false
+      },
+      "quota": {
+        "code": "ok",
+        "label": null,
+        "reason": null,
+        "source": "refresh_api",
+        "version": 2,
+        "windows": [
+          {
+            "code": "image_gen",
+            "unit": "count",
+            "label": "生图",
+            "scope": "account",
+            "reset_at": 1792829724,
+            "used_ratio": 0.0,
+            "used_value": 0.0,
+            "limit_value": 25.0,
+            "is_exhausted": false,
+            "reset_seconds": 86399,
+            "remaining_ratio": 1.0,
+            "remaining_value": 25.0
+          }
+        ],
+        "reset_at": 1792829724,
+        "exhausted": false,
+        "freshness": "fresh",
+        "plan_type": "free",
+        "updated_at": 1792743325,
+        "observed_at": 1792743325,
+        "usage_ratio": 0.0,
+        "provider_type": "chatgpt_web",
+        "reset_seconds": 86399
+      }
+    },
+    "upstream_metadata_keys": [
+      "chatgpt_web"
+    ]
+  },
+  {
+    "id": "0144b66f-1bd3-4f3d-9c63-b15817213dfa",
+    "status": "active",
+    "is_active": true,
+    "oauth_invalid_at": null,
+    "oauth_invalid_reason": null,
+    "last_error_at": null,
+    "last_error_msg": null,
+    "health_by_format": {
+      "openai:image": {
+        "health_score": 1.0,
+        "last_failure_at": null,
+        "consecutive_failures": 0
+      }
+    },
+    "circuit_breaker_by_format": null,
+    "status_snapshot": {
+      "oauth": {
+        "code": "valid",
+        "label": "有效",
+        "reason": null,
+        "source": "expires_at",
+        "expires_at": 1793416104,
+        "invalid_at": null,
+        "expiring_soon": false,
+        "requires_reauth": false
+      },
+      "quota": {
+        "code": "exhausted",
+        "label": "额度耗尽",
+        "reason": "Quota is exhausted",
+        "source": "image_success",
+        "version": 2,
+        "windows": [
+          {
+            "code": "image_gen",
+            "unit": "count",
+            "label": "生图",
+            "scope": "account",
+            "reset_at": 1792823211,
+            "used_ratio": 1.0,
+            "used_value": 25.0,
+            "limit_value": 25.0,
+            "is_exhausted": true,
+            "reset_seconds": 85787,
+            "remaining_ratio": 0.0,
+            "remaining_value": 0.0
+          }
+        ],
+        "reset_at": 1792823211,
+        "exhausted": true,
+        "freshness": "fresh",
+        "plan_type": null,
+        "updated_at": 1792737424,
+        "observed_at": 1792737424,
+        "usage_ratio": 1.0,
+        "provider_type": "chatgpt_web",
+        "reset_seconds": 85787
+      }
+    },
+    "upstream_metadata_keys": [
+      "chatgpt_web"
+    ]
+  },
+  {
+    "id": "014d1b54-57ea-4b07-a6d7-7fc17dfbbdc0",
+    "status": "active",
+    "is_active": true,
+    "oauth_invalid_at": null,
+    "oauth_invalid_reason": null,
+    "last_error_at": null,
+    "last_error_msg": null,
+    "health_by_format": {
+      "openai:image": {
+        "health_score": 1.0,
+        "last_failure_at": null,
+        "consecutive_failures": 0
+      }
+    },
+    "circuit_breaker_by_format": null,
+    "status_snapshot": {
+      "oauth": {
+        "code": "valid",
+        "label": "有效",
+        "reason": null,
+        "source": "expires_at",
+        "expires_at": 1793415630,
+        "invalid_at": null,
+        "expiring_soon": false,
+        "requires_reauth": false
+      },
+      "quota": {
+        "code": "exhausted",
+        "label": "额度耗尽",
+        "reason": "Quota is exhausted",
+        "source": "image_success",
+        "version": 2,
+        "windows": [
+          {
+            "code": "image_gen",
+            "unit": "count",
+            "label": "生图",
+            "scope": "account",
+            "reset_at": 1792823233,
+            "used_ratio": 1.0,
+            "used_value": 25.0,
+            "limit_value": 25.0,
+            "is_exhausted": true,
+            "reset_seconds": 85897,
+            "remaining_ratio": 0.0,
+            "remaining_value": 0.0
+          }
+        ],
+        "reset_at": 1792823233,
+        "exhausted": true,
+        "freshness": "fresh",
+        "plan_type": null,
+        "updated_at": 1792737336,
+        "observed_at": 1792737336,
+        "usage_ratio": 1.0,
+        "provider_type": "chatgpt_web",
+        "reset_seconds": 85897
+      }
+    },
+    "upstream_metadata_keys": [
+      "chatgpt_web"
+    ]
+  }
+]

@@ -55,6 +55,7 @@ pub(crate) use self::request_gzip::resolve_transport_request_encoding_policy;
 pub(crate) use self::route::is_matching_stream_request as planner_is_matching_stream_request;
 pub(crate) use self::runtime_miss::{
     apply_local_runtime_candidate_terminal_reason, record_local_runtime_candidate_skip_reason,
+    set_local_runtime_miss_diagnostic_reason,
 };
 pub(crate) use self::specialized::{
     build_local_gemini_files_stream_attempt_source_for_kind,

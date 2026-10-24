@@ -33,6 +33,9 @@ const MAX_IMAGE_OUTPUT_KEYS: usize = 64;
 pub struct OpenAiImageStreamState {
     buffered: Vec<u8>,
     latest_image: Option<OpenAiImageFrame>,
+    completed_images: Vec<OpenAiImageFrame>,
+    completed_image_keys: BTreeSet<String>,
+    completed_image_bytes: usize,
     emitted_partial_count: u64,
     saw_upstream_partial: bool,
     emitted_failure: bool,
@@ -207,9 +210,7 @@ impl OpenAiImageStreamState {
         if !is_safe_openai_image_base64_payload(result) {
             return Ok(Vec::new());
         }
-        self.latest_image = Some(OpenAiImageFrame {
-            b64_json: result.to_string(),
-        });
+        self.retain_completed_image(item, result)?;
 
         if requested_partial_images(report_context) == 0 || self.saw_upstream_partial {
             return Ok(Vec::new());
@@ -231,6 +232,29 @@ impl OpenAiImageStreamState {
         )
     }
 
+    fn retain_completed_image(
+        &mut self,
+        item: &Map<String, Value>,
+        result: &str,
+    ) -> Result<(), AiSurfaceFinalizeError> {
+        if !insert_bounded_image_key(
+            &mut self.completed_image_keys,
+            image_chat_output_key(item, result),
+        ) {
+            return Ok(());
+        }
+        self.completed_image_bytes = self.completed_image_bytes.saturating_add(result.len());
+        if self.completed_image_bytes > MAX_STREAM_REWRITE_BUFFER_BYTES {
+            return Err(AiSurfaceFinalizeError::new(
+                "Completed image payloads exceed the stream buffer limit",
+            ));
+        }
+        self.completed_images.push(OpenAiImageFrame {
+            b64_json: result.to_string(),
+        });
+        Ok(())
+    }
+
     fn handle_completed(
         &mut self,
         report_context: &Value,
@@ -239,14 +263,30 @@ impl OpenAiImageStreamState {
         if self.emitted_failure {
             return Ok(Vec::new());
         }
-        if self.latest_image.is_none() {
-            if let Some(result) = completed_response_image_result(event) {
-                self.latest_image = Some(OpenAiImageFrame {
-                    b64_json: result.to_string(),
-                });
+        if let Some(output) = event.pointer("/response/output").and_then(Value::as_array) {
+            for item in output
+                .iter()
+                .take(MAX_IMAGE_OUTPUT_KEYS)
+                .filter_map(Value::as_object)
+            {
+                if item.get("type").and_then(Value::as_str) == Some("image_generation_call") {
+                    if let Some(result) = item
+                        .get("result")
+                        .and_then(Value::as_str)
+                        .map(str::trim)
+                        .filter(|value| is_safe_openai_image_base64_payload(value))
+                    {
+                        self.retain_completed_image(item, result)?;
+                    }
+                }
             }
         }
-        if self.latest_image.is_none() {
+        if self.completed_images.is_empty() {
+            if let Some(image) = self.latest_image.take() {
+                self.completed_images.push(image);
+            }
+        }
+        if self.completed_images.is_empty() {
             if let Some(reason) = event.get("response").and_then(super::image_content_refusal) {
                 return encode_json_sse(
                     Some(image_completed_event_name(report_context)),
@@ -256,10 +296,8 @@ impl OpenAiImageStreamState {
                     }),
                 );
             }
-        }
-        let Some(latest_image) = self.latest_image.clone() else {
             return Ok(Vec::new());
-        };
+        }
         let usage = event
             .get("response")
             .and_then(Value::as_object)
@@ -272,14 +310,27 @@ impl OpenAiImageStreamState {
             })
             .unwrap_or(Value::Null);
 
-        encode_json_sse(
-            Some(image_completed_event_name(report_context)),
-            &serde_json::json!({
+        let images = std::mem::take(&mut self.completed_images);
+        let image_count = images.len();
+        let mut output = Vec::new();
+        for (index, image) in images.into_iter().enumerate() {
+            let mut frame = serde_json::json!({
                 "type": image_completed_event_name(report_context),
-                "b64_json": latest_image.b64_json,
-                "usage": usage,
-            }),
-        )
+                "b64_json": image.b64_json,
+            });
+            if image_count > 1 {
+                frame["image_index"] = serde_json::json!(index);
+            }
+            // Request usage belongs to the whole batch and is emitted only once.
+            if index + 1 == image_count {
+                frame["usage"] = usage.clone();
+            }
+            output.extend(encode_json_sse(
+                Some(image_completed_event_name(report_context)),
+                &frame,
+            )?);
+        }
+        Ok(output)
     }
 
     fn handle_failed(
@@ -1100,19 +1151,6 @@ fn image_failure_error(event: &Value) -> Value {
     }
 
     Value::Object(error)
-}
-
-fn completed_response_image_result(event: &Value) -> Option<&str> {
-    event
-        .get("response")
-        .and_then(|value| value.get("output"))
-        .and_then(Value::as_array)
-        .into_iter()
-        .flatten()
-        .filter(|item| item.get("type").and_then(Value::as_str) == Some("image_generation_call"))
-        .filter_map(|item| item.get("result").and_then(Value::as_str))
-        .map(str::trim)
-        .find(|value| is_safe_openai_image_base64_payload(value))
 }
 
 fn requested_partial_images(report_context: &Value) -> u64 {

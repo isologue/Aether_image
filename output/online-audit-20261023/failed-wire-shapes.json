@@ -1,0 +1,2577 @@
+[
+  {
+    "request_id": "1465d481-b50c-48c8-96b2-a3ce402d88c3",
+    "group": "body",
+    "content_type": "multipart/form-data; boundary=07061e8c109cefa3939d61dc49519442e06cf65da506196ed153382d4bb4",
+    "raw_bytes": 621683,
+    "json_parseable": false,
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "content_type": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "n",
+        "content_type": "text/plain",
+        "bytes": 1,
+        "file": false,
+        "value": "2"
+      },
+      {
+        "name": "prompt",
+        "content_type": "text/plain",
+        "bytes": 1413,
+        "file": false,
+        "utf8_bytes": 1413
+      },
+      {
+        "name": "size",
+        "content_type": "text/plain",
+        "bytes": 9,
+        "file": false,
+        "value": "1024x1024"
+      },
+      {
+        "name": "quality",
+        "content_type": "text/plain",
+        "bytes": 4,
+        "file": false
+      },
+      {
+        "name": "image",
+        "content_type": "image/png",
+        "bytes": 619448,
+        "file": true
+      }
+    ]
+  },
+  {
+    "request_id": "f620d2d2-6aae-4604-9a38-665b5db32c15",
+    "group": "body",
+    "content_type": "multipart/form-data; boundary=24bd0c6969c7af7af2be255a17bc016e798777baee78d3ce49efdf6c0cde",
+    "raw_bytes": 304919,
+    "json_parseable": false,
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "content_type": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "n",
+        "content_type": "text/plain",
+        "bytes": 1,
+        "file": false,
+        "value": "2"
+      },
+      {
+        "name": "prompt",
+        "content_type": "text/plain",
+        "bytes": 705,
+        "file": false,
+        "utf8_bytes": 705
+      },
+      {
+        "name": "size",
+        "content_type": "text/plain",
+        "bytes": 9,
+        "file": false,
+        "value": "1024x1024"
+      },
+      {
+        "name": "quality",
+        "content_type": "text/plain",
+        "bytes": 4,
+        "file": false
+      },
+      {
+        "name": "image",
+        "content_type": "image/png",
+        "bytes": 303392,
+        "file": true
+      }
+    ]
+  },
+  {
+    "request_id": "e0ae23e3-17be-497a-9566-24412ea60365",
+    "group": "body",
+    "content_type": "multipart/form-data; boundary=3ba0ad3a7f5f6913be4f72110091b6761116dec9696564e0ade193c826b9",
+    "raw_bytes": 180127,
+    "json_parseable": false,
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "content_type": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "n",
+        "content_type": "text/plain",
+        "bytes": 1,
+        "file": false,
+        "value": "2"
+      },
+      {
+        "name": "prompt",
+        "content_type": "text/plain",
+        "bytes": 1413,
+        "file": false,
+        "utf8_bytes": 1413
+      },
+      {
+        "name": "size",
+        "content_type": "text/plain",
+        "bytes": 9,
+        "file": false,
+        "value": "1024x1024"
+      },
+      {
+        "name": "quality",
+        "content_type": "text/plain",
+        "bytes": 4,
+        "file": false
+      },
+      {
+        "name": "image",
+        "content_type": "image/png",
+        "bytes": 177892,
+        "file": true
+      }
+    ]
+  },
+  {
+    "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+    "group": "invalid_url",
+    "content_type": "multipart/form-data; boundary=14fd5f69d087bb788796dabe01e85fa53d795f3f3dd90c7d61fa62c422ee",
+    "raw_bytes": 157537,
+    "json_parseable": false,
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "content_type": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "size",
+        "content_type": "text/plain",
+        "bytes": 9,
+        "file": false,
+        "value": "1024x1536"
+      },
+      {
+        "name": "prompt",
+        "content_type": "text/plain",
+        "bytes": 8280,
+        "file": false,
+        "utf8_bytes": 8280
+      },
+      {
+        "name": "image",
+        "content_type": "image/jpeg",
+        "bytes": 148665,
+        "file": true
+      }
+    ]
+  },
+  {
+    "request_id": "4f8f1af8-f1d7-465b-a9e3-1a38ca950b56",
+    "group": "body",
+    "content_type": "multipart/form-data; boundary=b1f05230704875540a58d82a16c83691baae23ed3234718a361910f26bcc",
+    "raw_bytes": 304919,
+    "json_parseable": false,
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "content_type": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "size",
+        "content_type": "text/plain",
+        "bytes": 9,
+        "file": false,
+        "value": "1024x1024"
+      },
+      {
+        "name": "quality",
+        "content_type": "text/plain",
+        "bytes": 4,
+        "file": false
+      },
+      {
+        "name": "n",
+        "content_type": "text/plain",
+        "bytes": 1,
+        "file": false,
+        "value": "2"
+      },
+      {
+        "name": "prompt",
+        "content_type": "text/plain",
+        "bytes": 705,
+        "file": false,
+        "utf8_bytes": 705
+      },
+      {
+        "name": "image",
+        "content_type": "image/png",
+        "bytes": 303392,
+        "file": true
+      }
+    ]
+  },
+  {
+    "request_id": "8d74ef79-397e-4762-827f-fe3444831c31",
+    "group": "body",
+    "content_type": "multipart/form-data; boundary=5001aa86f152b71346d5619786ca0e2022978557f9fdb8b0b04015a62358",
+    "raw_bytes": 304919,
+    "json_parseable": false,
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "content_type": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "n",
+        "content_type": "text/plain",
+        "bytes": 1,
+        "file": false,
+        "value": "2"
+      },
+      {
+        "name": "prompt",
+        "content_type": "text/plain",
+        "bytes": 705,
+        "file": false,
+        "utf8_bytes": 705
+      },
+      {
+        "name": "size",
+        "content_type": "text/plain",
+        "bytes": 9,
+        "file": false,
+        "value": "1024x1024"
+      },
+      {
+        "name": "quality",
+        "content_type": "text/plain",
+        "bytes": 4,
+        "file": false
+      },
+      {
+        "name": "image",
+        "content_type": "image/png",
+        "bytes": 303392,
+        "file": true
+      }
+    ]
+  },
+  {
+    "request_id": "2a522fcf-dfc4-41fd-89fe-b5b528e7207e",
+    "group": "body",
+    "content_type": "multipart/form-data; boundary=acc15615222e68564d670f5e53b6bb3752066210d5620aba7348fe765e0b",
+    "raw_bytes": 304919,
+    "json_parseable": false,
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "content_type": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "size",
+        "content_type": "text/plain",
+        "bytes": 9,
+        "file": false,
+        "value": "1024x1024"
+      },
+      {
+        "name": "quality",
+        "content_type": "text/plain",
+        "bytes": 4,
+        "file": false
+      },
+      {
+        "name": "n",
+        "content_type": "text/plain",
+        "bytes": 1,
+        "file": false,
+        "value": "2"
+      },
+      {
+        "name": "prompt",
+        "content_type": "text/plain",
+        "bytes": 705,
+        "file": false,
+        "utf8_bytes": 705
+      },
+      {
+        "name": "image",
+        "content_type": "image/png",
+        "bytes": 303392,
+        "file": true
+      }
+    ]
+  },
+  {
+    "request_id": "97de52c9-4c0a-4250-a1b1-fe355a5289cf",
+    "group": "body",
+    "content_type": "multipart/form-data; boundary=98283de4f171da38d177bc5f68afd228f726ade85620b9a4f2ccc99d796a",
+    "raw_bytes": 304919,
+    "json_parseable": false,
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "content_type": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "n",
+        "content_type": "text/plain",
+        "bytes": 1,
+        "file": false,
+        "value": "2"
+      },
+      {
+        "name": "prompt",
+        "content_type": "text/plain",
+        "bytes": 705,
+        "file": false,
+        "utf8_bytes": 705
+      },
+      {
+        "name": "size",
+        "content_type": "text/plain",
+        "bytes": 9,
+        "file": false,
+        "value": "1024x1024"
+      },
+      {
+        "name": "quality",
+        "content_type": "text/plain",
+        "bytes": 4,
+        "file": false
+      },
+      {
+        "name": "image",
+        "content_type": "image/png",
+        "bytes": 303392,
+        "file": true
+      }
+    ]
+  },
+  {
+    "request_id": "897f4162-104e-4098-a768-5c7c1e899d4a",
+    "group": "body",
+    "content_type": "multipart/form-data; boundary=c0496879c9e8a730ad8596b000283320c72d74c93d8933decc5a2dd4cd13",
+    "raw_bytes": 304919,
+    "json_parseable": false,
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "content_type": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "prompt",
+        "content_type": "text/plain",
+        "bytes": 705,
+        "file": false,
+        "utf8_bytes": 705
+      },
+      {
+        "name": "size",
+        "content_type": "text/plain",
+        "bytes": 9,
+        "file": false,
+        "value": "1024x1024"
+      },
+      {
+        "name": "quality",
+        "content_type": "text/plain",
+        "bytes": 4,
+        "file": false
+      },
+      {
+        "name": "n",
+        "content_type": "text/plain",
+        "bytes": 1,
+        "file": false,
+        "value": "2"
+      },
+      {
+        "name": "image",
+        "content_type": "image/png",
+        "bytes": 303392,
+        "file": true
+      }
+    ]
+  },
+  {
+    "request_id": "3a39f9cf-6018-4c03-bc57-0211011f7d27",
+    "group": "body",
+    "content_type": "multipart/form-data; boundary=ff731b44c2134fd661e770077fcfe0202c010648c653f2f7b949f2e35ef3",
+    "raw_bytes": 304919,
+    "json_parseable": false,
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "content_type": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "size",
+        "content_type": "text/plain",
+        "bytes": 9,
+        "file": false,
+        "value": "1024x1024"
+      },
+      {
+        "name": "quality",
+        "content_type": "text/plain",
+        "bytes": 4,
+        "file": false
+      },
+      {
+        "name": "n",
+        "content_type": "text/plain",
+        "bytes": 1,
+        "file": false,
+        "value": "2"
+      },
+      {
+        "name": "prompt",
+        "content_type": "text/plain",
+        "bytes": 705,
+        "file": false,
+        "utf8_bytes": 705
+      },
+      {
+        "name": "image",
+        "content_type": "image/png",
+        "bytes": 303392,
+        "file": true
+      }
+    ]
+  },
+  {
+    "request_id": "6f83c71b-45f5-4753-957c-639efae32c59",
+    "group": "body",
+    "content_type": "multipart/form-data; boundary=40cd64a9b29aacbe38cf37e3036314e25762c8f77daa8094a0d62615bbaa",
+    "raw_bytes": 304919,
+    "json_parseable": false,
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "content_type": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "quality",
+        "content_type": "text/plain",
+        "bytes": 4,
+        "file": false
+      },
+      {
+        "name": "n",
+        "content_type": "text/plain",
+        "bytes": 1,
+        "file": false,
+        "value": "2"
+      },
+      {
+        "name": "prompt",
+        "content_type": "text/plain",
+        "bytes": 705,
+        "file": false,
+        "utf8_bytes": 705
+      },
+      {
+        "name": "size",
+        "content_type": "text/plain",
+        "bytes": 9,
+        "file": false,
+        "value": "1024x1024"
+      },
+      {
+        "name": "image",
+        "content_type": "image/png",
+        "bytes": 303392,
+        "file": true
+      }
+    ]
+  },
+  {
+    "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+    "group": "invalid_url",
+    "content_type": "multipart/form-data; boundary=2b84ec0f6e3192b9bbb5bba121d60bd14de1b20db3fa93330cd5a2b8d2bf",
+    "raw_bytes": 382970,
+    "json_parseable": false,
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "content_type": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "prompt",
+        "content_type": "text/plain",
+        "bytes": 96,
+        "file": false,
+        "utf8_bytes": 96
+      },
+      {
+        "name": "size",
+        "content_type": "text/plain",
+        "bytes": 9,
+        "file": false,
+        "value": "1024x1536"
+      },
+      {
+        "name": "n",
+        "content_type": "text/plain",
+        "bytes": 1,
+        "file": false,
+        "value": "1"
+      },
+      {
+        "name": "image",
+        "content_type": "image/png",
+        "bytes": 382173,
+        "file": true
+      }
+    ]
+  },
+  {
+    "request_id": "eac587f1-0492-4fbb-a0d2-60a4284bc55d",
+    "group": "body",
+    "content_type": "multipart/form-data; boundary=e256efceb5ef00603a4ff39e28e15fc24a2f1efb8e32e6e3c4cce3c24e5c",
+    "raw_bytes": 304919,
+    "json_parseable": false,
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "content_type": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "n",
+        "content_type": "text/plain",
+        "bytes": 1,
+        "file": false,
+        "value": "2"
+      },
+      {
+        "name": "prompt",
+        "content_type": "text/plain",
+        "bytes": 705,
+        "file": false,
+        "utf8_bytes": 705
+      },
+      {
+        "name": "size",
+        "content_type": "text/plain",
+        "bytes": 9,
+        "file": false,
+        "value": "1024x1024"
+      },
+      {
+        "name": "quality",
+        "content_type": "text/plain",
+        "bytes": 4,
+        "file": false
+      },
+      {
+        "name": "image",
+        "content_type": "image/png",
+        "bytes": 303392,
+        "file": true
+      }
+    ]
+  },
+  {
+    "request_id": "bbc60668-f88d-4e10-8d27-81845498fb06",
+    "group": "invalid_url",
+    "content_type": "multipart/form-data; boundary=61abfeaf2885b5cb5485c2b7a51407350d91f179edaa2cf84f82c3e00dcd",
+    "raw_bytes": 954367,
+    "json_parseable": false,
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "content_type": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "prompt",
+        "content_type": "text/plain",
+        "bytes": 7894,
+        "file": false,
+        "utf8_bytes": 7894
+      },
+      {
+        "name": "size",
+        "content_type": "text/plain",
+        "bytes": 9,
+        "file": false,
+        "value": "1024x1024"
+      },
+      {
+        "name": "response_format",
+        "content_type": "text/plain",
+        "bytes": 8,
+        "file": false,
+        "value": "b64_json"
+      },
+      {
+        "name": "image[]",
+        "content_type": "image/png",
+        "bytes": 198407,
+        "file": true
+      },
+      {
+        "name": "image[]",
+        "content_type": "image/png",
+        "bytes": 166998,
+        "file": true
+      },
+      {
+        "name": "image[]",
+        "content_type": "image/png",
+        "bytes": 225610,
+        "file": true
+      },
+      {
+        "name": "image[]",
+        "content_type": "image/png",
+        "bytes": 213733,
+        "file": true
+      },
+      {
+        "name": "image[]",
+        "content_type": "image/png",
+        "bytes": 140235,
+        "file": true
+      }
+    ]
+  },
+  {
+    "request_id": "6da43f84-afce-4563-bcb5-e28f80fd9619",
+    "group": "invalid_url",
+    "content_type": "multipart/form-data; boundary=636866e98d9456294ec6d580788a8b9e801977b5e73ea9f9f95456212f45",
+    "raw_bytes": 954729,
+    "json_parseable": false,
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "content_type": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "prompt",
+        "content_type": "text/plain",
+        "bytes": 8256,
+        "file": false,
+        "utf8_bytes": 8256
+      },
+      {
+        "name": "size",
+        "content_type": "text/plain",
+        "bytes": 9,
+        "file": false,
+        "value": "1024x1024"
+      },
+      {
+        "name": "response_format",
+        "content_type": "text/plain",
+        "bytes": 8,
+        "file": false,
+        "value": "b64_json"
+      },
+      {
+        "name": "image[]",
+        "content_type": "image/png",
+        "bytes": 198407,
+        "file": true
+      },
+      {
+        "name": "image[]",
+        "content_type": "image/png",
+        "bytes": 166998,
+        "file": true
+      },
+      {
+        "name": "image[]",
+        "content_type": "image/png",
+        "bytes": 225610,
+        "file": true
+      },
+      {
+        "name": "image[]",
+        "content_type": "image/png",
+        "bytes": 213733,
+        "file": true
+      },
+      {
+        "name": "image[]",
+        "content_type": "image/png",
+        "bytes": 140235,
+        "file": true
+      }
+    ]
+  },
+  {
+    "request_id": "48805a7b-9dcf-4506-a830-42e60a4060ca",
+    "group": "invalid_url",
+    "content_type": "multipart/form-data; boundary=c6c80414cc5c227d5c2a7379325a1ad50ad2c1cc5b755c8c4e6ff22b976f",
+    "raw_bytes": 954420,
+    "json_parseable": false,
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "content_type": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "response_format",
+        "content_type": "text/plain",
+        "bytes": 8,
+        "file": false,
+        "value": "b64_json"
+      },
+      {
+        "name": "prompt",
+        "content_type": "text/plain",
+        "bytes": 7947,
+        "file": false,
+        "utf8_bytes": 7947
+      },
+      {
+        "name": "size",
+        "content_type": "text/plain",
+        "bytes": 9,
+        "file": false,
+        "value": "1024x1024"
+      },
+      {
+        "name": "image[]",
+        "content_type": "image/png",
+        "bytes": 198407,
+        "file": true
+      },
+      {
+        "name": "image[]",
+        "content_type": "image/png",
+        "bytes": 166998,
+        "file": true
+      },
+      {
+        "name": "image[]",
+        "content_type": "image/png",
+        "bytes": 225610,
+        "file": true
+      },
+      {
+        "name": "image[]",
+        "content_type": "image/png",
+        "bytes": 213733,
+        "file": true
+      },
+      {
+        "name": "image[]",
+        "content_type": "image/png",
+        "bytes": 140235,
+        "file": true
+      }
+    ]
+  },
+  {
+    "request_id": "3faf75b5-db57-468e-bca0-5d59a15db6c4",
+    "group": "invalid_url",
+    "content_type": "multipart/form-data; boundary=bef6e25dc9ac6dc77e17e915ca897b51b72ce44954ac4a60b3ae4e7b6f0f",
+    "raw_bytes": 954334,
+    "json_parseable": false,
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "content_type": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "prompt",
+        "content_type": "text/plain",
+        "bytes": 7861,
+        "file": false,
+        "utf8_bytes": 7861
+      },
+      {
+        "name": "size",
+        "content_type": "text/plain",
+        "bytes": 9,
+        "file": false,
+        "value": "1024x1024"
+      },
+      {
+        "name": "response_format",
+        "content_type": "text/plain",
+        "bytes": 8,
+        "file": false,
+        "value": "b64_json"
+      },
+      {
+        "name": "image[]",
+        "content_type": "image/png",
+        "bytes": 198407,
+        "file": true
+      },
+      {
+        "name": "image[]",
+        "content_type": "image/png",
+        "bytes": 166998,
+        "file": true
+      },
+      {
+        "name": "image[]",
+        "content_type": "image/png",
+        "bytes": 225610,
+        "file": true
+      },
+      {
+        "name": "image[]",
+        "content_type": "image/png",
+        "bytes": 213733,
+        "file": true
+      },
+      {
+        "name": "image[]",
+        "content_type": "image/png",
+        "bytes": 140235,
+        "file": true
+      }
+    ]
+  },
+  {
+    "request_id": "53ca422a-8d37-4048-9100-f59348e878b5",
+    "group": "invalid_url",
+    "content_type": "multipart/form-data; boundary=3266aab74a7f2a31073d6e9ec8beb4fcae82280ceaaf72102329a41727b6",
+    "raw_bytes": 147271,
+    "json_parseable": false,
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "content_type": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "prompt",
+        "content_type": "text/plain",
+        "bytes": 303,
+        "file": false,
+        "utf8_bytes": 303
+      },
+      {
+        "name": "size",
+        "content_type": "text/plain",
+        "bytes": 9,
+        "file": false,
+        "value": "1024x1024"
+      },
+      {
+        "name": "n",
+        "content_type": "text/plain",
+        "bytes": 1,
+        "file": false,
+        "value": "1"
+      },
+      {
+        "name": "image",
+        "content_type": "image/png",
+        "bytes": 146268,
+        "file": true
+      }
+    ]
+  },
+  {
+    "request_id": "48f20d05-00f0-4838-b650-d4b6f53772df",
+    "group": "invalid_url",
+    "content_type": "multipart/form-data; boundary=bae7592fb9a09c2a477a81268fe6bea78be689cc7302281b7bf4aa1a9305",
+    "raw_bytes": 954367,
+    "json_parseable": false,
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "content_type": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "response_format",
+        "content_type": "text/plain",
+        "bytes": 8,
+        "file": false,
+        "value": "b64_json"
+      },
+      {
+        "name": "prompt",
+        "content_type": "text/plain",
+        "bytes": 7894,
+        "file": false,
+        "utf8_bytes": 7894
+      },
+      {
+        "name": "size",
+        "content_type": "text/plain",
+        "bytes": 9,
+        "file": false,
+        "value": "1024x1024"
+      },
+      {
+        "name": "image[]",
+        "content_type": "image/png",
+        "bytes": 198407,
+        "file": true
+      },
+      {
+        "name": "image[]",
+        "content_type": "image/png",
+        "bytes": 166998,
+        "file": true
+      },
+      {
+        "name": "image[]",
+        "content_type": "image/png",
+        "bytes": 225610,
+        "file": true
+      },
+      {
+        "name": "image[]",
+        "content_type": "image/png",
+        "bytes": 213733,
+        "file": true
+      },
+      {
+        "name": "image[]",
+        "content_type": "image/png",
+        "bytes": 140235,
+        "file": true
+      }
+    ]
+  },
+  {
+    "request_id": "df70b8c3-07fa-4f21-b1f2-ae5072ca9a2f",
+    "group": "no_candidates",
+    "content_type": "application/json",
+    "json_keys": [
+      "input",
+      "max_output_tokens",
+      "model",
+      "stream",
+      "tool_choice",
+      "tools"
+    ],
+    "model": "gpt-image-2.5-flare",
+    "stream": false
+  },
+  {
+    "request_id": "84ecd70e-1556-4182-860c-fe1a2dc3a033",
+    "group": "no_candidates",
+    "content_type": "application/json",
+    "json_keys": [
+      "input",
+      "max_output_tokens",
+      "model",
+      "stream",
+      "tool_choice",
+      "tools"
+    ],
+    "model": "gpt-image-2.5-flare",
+    "stream": false
+  },
+  {
+    "request_id": "93f8c53d-a98f-4b4a-8582-0b7528cd3162",
+    "group": "no_candidates",
+    "content_type": "application/json",
+    "json_keys": [
+      "input",
+      "max_output_tokens",
+      "model",
+      "stream",
+      "tool_choice",
+      "tools"
+    ],
+    "model": "gpt-image-2.5-flare",
+    "stream": false
+  },
+  {
+    "request_id": "221b26d0-6782-4f2a-a1be-64882079bc7f",
+    "group": "no_candidates",
+    "content_type": "application/json",
+    "json_keys": [
+      "input",
+      "max_output_tokens",
+      "model",
+      "stream",
+      "tool_choice",
+      "tools"
+    ],
+    "model": "gpt-image-2",
+    "stream": false
+  },
+  {
+    "request_id": "e2706b9c-aa01-4b20-a358-beecbb2ac752",
+    "group": "body",
+    "content_type": "multipart/form-data; boundary=----OpenAiCompatible1792737456801",
+    "raw_bytes": 28957,
+    "json_parseable": false,
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "content_type": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "n",
+        "content_type": "text/plain",
+        "bytes": 1,
+        "file": false,
+        "value": "2"
+      },
+      {
+        "name": "prompt",
+        "content_type": "text/plain",
+        "bytes": 9,
+        "file": false,
+        "utf8_bytes": 9
+      },
+      {
+        "name": "size",
+        "content_type": "text/plain",
+        "bytes": 9,
+        "file": false,
+        "value": "1024x1024"
+      },
+      {
+        "name": "quality",
+        "content_type": "text/plain",
+        "bytes": 4,
+        "file": false
+      },
+      {
+        "name": "image",
+        "content_type": "image/jpeg",
+        "bytes": 28314,
+        "file": true
+      }
+    ]
+  },
+  {
+    "request_id": "ebdfcd6f-d3c4-4b4d-a207-c282e987626a",
+    "group": "body",
+    "content_type": "multipart/form-data; boundary=----OpenAiCompatible1792737466803",
+    "raw_bytes": 28957,
+    "json_parseable": false,
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "content_type": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "n",
+        "content_type": "text/plain",
+        "bytes": 1,
+        "file": false,
+        "value": "2"
+      },
+      {
+        "name": "prompt",
+        "content_type": "text/plain",
+        "bytes": 9,
+        "file": false,
+        "utf8_bytes": 9
+      },
+      {
+        "name": "size",
+        "content_type": "text/plain",
+        "bytes": 9,
+        "file": false,
+        "value": "1024x1024"
+      },
+      {
+        "name": "quality",
+        "content_type": "text/plain",
+        "bytes": 4,
+        "file": false
+      },
+      {
+        "name": "image",
+        "content_type": "image/jpeg",
+        "bytes": 28314,
+        "file": true
+      }
+    ]
+  },
+  {
+    "request_id": "9d009778-8110-4c42-90a2-e20d8401b9b2",
+    "group": "body",
+    "content_type": "multipart/form-data; boundary=----OpenAiCompatible1792737671864",
+    "raw_bytes": 28957,
+    "json_parseable": false,
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "content_type": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "n",
+        "content_type": "text/plain",
+        "bytes": 1,
+        "file": false,
+        "value": "2"
+      },
+      {
+        "name": "prompt",
+        "content_type": "text/plain",
+        "bytes": 9,
+        "file": false,
+        "utf8_bytes": 9
+      },
+      {
+        "name": "size",
+        "content_type": "text/plain",
+        "bytes": 9,
+        "file": false,
+        "value": "1024x1024"
+      },
+      {
+        "name": "quality",
+        "content_type": "text/plain",
+        "bytes": 4,
+        "file": false
+      },
+      {
+        "name": "image",
+        "content_type": "image/jpeg",
+        "bytes": 28314,
+        "file": true
+      }
+    ]
+  },
+  {
+    "request_id": "57eb0fcf-50ba-4a72-bf14-e13191a7ba8c",
+    "group": "no_candidates",
+    "content_type": "application/json",
+    "json_keys": [
+      "input",
+      "max_output_tokens",
+      "model",
+      "stream",
+      "tool_choice",
+      "tools"
+    ],
+    "model": "gpt-image-2",
+    "stream": false
+  },
+  {
+    "request_id": "5074f517-2309-467a-a360-6915f1799520",
+    "group": "no_candidates",
+    "content_type": "application/json",
+    "json_keys": [
+      "input",
+      "max_output_tokens",
+      "model",
+      "stream",
+      "tool_choice",
+      "tools"
+    ],
+    "model": "gpt-image-2",
+    "stream": false
+  },
+  {
+    "request_id": "3c32b614-a37d-4f6e-899a-570a408069c1",
+    "group": "invalid_url",
+    "content_type": "multipart/form-data; boundary=db3f76aedb3758bc340f0e76fd6bdf0d59fe8c8345cfd39095c8ba0db227",
+    "raw_bytes": 476529,
+    "json_parseable": false,
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "content_type": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "prompt",
+        "content_type": "text/plain",
+        "bytes": 24872,
+        "file": false,
+        "utf8_bytes": 24872
+      },
+      {
+        "name": "n",
+        "content_type": "text/plain",
+        "bytes": 1,
+        "file": false,
+        "value": "1"
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 118634,
+        "file": true
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 171110,
+        "file": true
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 160968,
+        "file": true
+      }
+    ]
+  },
+  {
+    "request_id": "5169b9a4-9163-4111-aca6-7b668703ba07",
+    "group": "invalid_url",
+    "content_type": "multipart/form-data; boundary=8cc77a9a673f582cee3ee7e1337c5d61c447c119f0e791f7fec75be93ce8",
+    "raw_bytes": 476562,
+    "json_parseable": false,
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "content_type": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "prompt",
+        "content_type": "text/plain",
+        "bytes": 24905,
+        "file": false,
+        "utf8_bytes": 24905
+      },
+      {
+        "name": "n",
+        "content_type": "text/plain",
+        "bytes": 1,
+        "file": false,
+        "value": "1"
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 118634,
+        "file": true
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 171110,
+        "file": true
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 160968,
+        "file": true
+      }
+    ]
+  },
+  {
+    "request_id": "5ef50029-06bf-4fc5-b02a-0acb4d50e6a7",
+    "group": "no_candidates",
+    "content_type": "application/json",
+    "json_keys": [
+      "input",
+      "max_output_tokens",
+      "model",
+      "stream",
+      "tool_choice",
+      "tools"
+    ],
+    "model": "gpt-image-2",
+    "stream": false
+  },
+  {
+    "request_id": "02b5a394-b72b-4761-9fa6-5b8a2b6cb1d0",
+    "group": "invalid_url",
+    "content_type": "multipart/form-data; boundary=51744318e87341ec14dd51526de9e7a6ceb2dfc6ee127bf6cee0065699f8",
+    "raw_bytes": 375015,
+    "json_parseable": false,
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "content_type": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "prompt",
+        "content_type": "text/plain",
+        "bytes": 27992,
+        "file": false,
+        "utf8_bytes": 27992
+      },
+      {
+        "name": "n",
+        "content_type": "text/plain",
+        "bytes": 1,
+        "file": false,
+        "value": "1"
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 115111,
+        "file": true
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 115454,
+        "file": true
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 115513,
+        "file": true
+      }
+    ]
+  },
+  {
+    "request_id": "60c96d01-fb34-4300-8136-9b50d7209b5a",
+    "group": "no_candidates",
+    "content_type": "application/json",
+    "json_keys": [
+      "input",
+      "max_output_tokens",
+      "model",
+      "stream",
+      "tool_choice",
+      "tools"
+    ],
+    "model": "gpt-image-2",
+    "stream": false
+  },
+  {
+    "request_id": "722aa949-5651-40cb-addc-97811dbdef96",
+    "group": "body",
+    "content_type": "multipart/form-data; boundary=----OpenAiCompatible1792738151971",
+    "raw_bytes": 28957,
+    "json_parseable": false,
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "content_type": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "n",
+        "content_type": "text/plain",
+        "bytes": 1,
+        "file": false,
+        "value": "2"
+      },
+      {
+        "name": "prompt",
+        "content_type": "text/plain",
+        "bytes": 9,
+        "file": false,
+        "utf8_bytes": 9
+      },
+      {
+        "name": "size",
+        "content_type": "text/plain",
+        "bytes": 9,
+        "file": false,
+        "value": "1024x1024"
+      },
+      {
+        "name": "quality",
+        "content_type": "text/plain",
+        "bytes": 4,
+        "file": false
+      },
+      {
+        "name": "image",
+        "content_type": "image/jpeg",
+        "bytes": 28314,
+        "file": true
+      }
+    ]
+  },
+  {
+    "request_id": "dde478cb-6696-4903-9ba1-70e61e9cd245",
+    "group": "invalid_url",
+    "content_type": "multipart/form-data; boundary=3b1ff2b19f7f935ff62d9a816eaa077f0734bfcb2b7c26545fd03db89783",
+    "raw_bytes": 479842,
+    "json_parseable": false,
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "content_type": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "prompt",
+        "content_type": "text/plain",
+        "bytes": 28185,
+        "file": false,
+        "utf8_bytes": 28185
+      },
+      {
+        "name": "n",
+        "content_type": "text/plain",
+        "bytes": 1,
+        "file": false,
+        "value": "1"
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 118634,
+        "file": true
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 171110,
+        "file": true
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 160968,
+        "file": true
+      }
+    ]
+  },
+  {
+    "request_id": "a9a3cb57-3de4-48f8-b3d0-6a37eca88412",
+    "group": "invalid_url",
+    "content_type": "multipart/form-data; boundary=28d1850dea2adc3b535605e73cd631a233833fee367d11d74bcf27286c45",
+    "raw_bytes": 462810,
+    "json_parseable": false,
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "content_type": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "prompt",
+        "content_type": "text/plain",
+        "bytes": 24700,
+        "file": false,
+        "utf8_bytes": 24700
+      },
+      {
+        "name": "n",
+        "content_type": "text/plain",
+        "bytes": 1,
+        "file": false,
+        "value": "1"
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 135442,
+        "file": true
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 132856,
+        "file": true
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 168867,
+        "file": true
+      }
+    ]
+  },
+  {
+    "request_id": "181ede00-cdba-4253-95db-22e833fcb656",
+    "group": "invalid_url",
+    "content_type": "multipart/form-data; boundary=b9abf6d71338a253427848770ae3050def01bf2dfe1ba0a42f6a0a35c1d1",
+    "raw_bytes": 371711,
+    "json_parseable": false,
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "content_type": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "prompt",
+        "content_type": "text/plain",
+        "bytes": 24688,
+        "file": false,
+        "utf8_bytes": 24688
+      },
+      {
+        "name": "n",
+        "content_type": "text/plain",
+        "bytes": 1,
+        "file": false,
+        "value": "1"
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 115111,
+        "file": true
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 115454,
+        "file": true
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 115513,
+        "file": true
+      }
+    ]
+  },
+  {
+    "request_id": "29991925-f5b9-42fe-b371-8d6de5d0c44f",
+    "group": "invalid_url",
+    "content_type": "multipart/form-data; boundary=b0bca31128226f29c94099adc0847d161125c2e839fb2d4ca25a5f212d9a",
+    "raw_bytes": 479836,
+    "json_parseable": false,
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "content_type": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "prompt",
+        "content_type": "text/plain",
+        "bytes": 28179,
+        "file": false,
+        "utf8_bytes": 28179
+      },
+      {
+        "name": "n",
+        "content_type": "text/plain",
+        "bytes": 1,
+        "file": false,
+        "value": "1"
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 118634,
+        "file": true
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 171110,
+        "file": true
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 160968,
+        "file": true
+      }
+    ]
+  },
+  {
+    "request_id": "8500bfe3-0e12-44c5-9673-95038140cf61",
+    "group": "invalid_url",
+    "content_type": "multipart/form-data; boundary=4e098f3d4c578a3526334816d43b421cee3e631b25374a7b0ec4a22792fc",
+    "raw_bytes": 375003,
+    "json_parseable": false,
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "content_type": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "prompt",
+        "content_type": "text/plain",
+        "bytes": 27980,
+        "file": false,
+        "utf8_bytes": 27980
+      },
+      {
+        "name": "n",
+        "content_type": "text/plain",
+        "bytes": 1,
+        "file": false,
+        "value": "1"
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 115111,
+        "file": true
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 115454,
+        "file": true
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 115513,
+        "file": true
+      }
+    ]
+  },
+  {
+    "request_id": "6e65273e-832a-4c6f-801c-8fbccc936068",
+    "group": "invalid_url",
+    "content_type": "multipart/form-data; boundary=37f6c5272ebe5364a8ad265e7b9c8ccf6c262144df046d0eb31d76e0b9ef",
+    "raw_bytes": 462825,
+    "json_parseable": false,
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "content_type": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "prompt",
+        "content_type": "text/plain",
+        "bytes": 24715,
+        "file": false,
+        "utf8_bytes": 24715
+      },
+      {
+        "name": "n",
+        "content_type": "text/plain",
+        "bytes": 1,
+        "file": false,
+        "value": "1"
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 135442,
+        "file": true
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 132856,
+        "file": true
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 168867,
+        "file": true
+      }
+    ]
+  },
+  {
+    "request_id": "f3787e8c-03c1-4557-94be-ad400f462017",
+    "group": "invalid_url",
+    "content_type": "multipart/form-data; boundary=237adae0defb4e99a5e2f1662abc19d9c8c310f433cb7b4b6e86e0656805",
+    "raw_bytes": 515503,
+    "json_parseable": false,
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "content_type": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "prompt",
+        "content_type": "text/plain",
+        "bytes": 27585,
+        "file": false,
+        "utf8_bytes": 27585
+      },
+      {
+        "name": "n",
+        "content_type": "text/plain",
+        "bytes": 1,
+        "file": false,
+        "value": "1"
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 256408,
+        "file": true
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 115111,
+        "file": true
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 115454,
+        "file": true
+      }
+    ]
+  },
+  {
+    "request_id": "2c2c7ce1-1fd3-4b60-a0c5-8dcaa33443e1",
+    "group": "invalid_url",
+    "content_type": "multipart/form-data; boundary=1e4643bb753e2c5037977b604e74af3885f50000058b2ae421d2e0efcf0e",
+    "raw_bytes": 409240,
+    "json_parseable": false,
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "content_type": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "prompt",
+        "content_type": "text/plain",
+        "bytes": 27602,
+        "file": false,
+        "utf8_bytes": 27602
+      },
+      {
+        "name": "n",
+        "content_type": "text/plain",
+        "bytes": 1,
+        "file": false,
+        "value": "1"
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 112395,
+        "file": true
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 135442,
+        "file": true
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 132856,
+        "file": true
+      }
+    ]
+  },
+  {
+    "request_id": "8124bc6d-4e73-4234-86f2-940e90c0bc6a",
+    "group": "invalid_url",
+    "content_type": "multipart/form-data; boundary=059ae647f4118eff2af7cafe2c2896e16a71e452330ed8d062b6dc0628a9",
+    "raw_bytes": 409231,
+    "json_parseable": false,
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "content_type": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "prompt",
+        "content_type": "text/plain",
+        "bytes": 27593,
+        "file": false,
+        "utf8_bytes": 27593
+      },
+      {
+        "name": "n",
+        "content_type": "text/plain",
+        "bytes": 1,
+        "file": false,
+        "value": "1"
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 112395,
+        "file": true
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 135442,
+        "file": true
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 132856,
+        "file": true
+      }
+    ]
+  },
+  {
+    "request_id": "a5eaf348-4b37-4625-993f-848e72bbd434",
+    "group": "invalid_url",
+    "content_type": "multipart/form-data; boundary=1704cfc7088f942f9662cc2631a076689060471bc4c6b66809d994bdfc79",
+    "raw_bytes": 409231,
+    "json_parseable": false,
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "content_type": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "prompt",
+        "content_type": "text/plain",
+        "bytes": 27593,
+        "file": false,
+        "utf8_bytes": 27593
+      },
+      {
+        "name": "n",
+        "content_type": "text/plain",
+        "bytes": 1,
+        "file": false,
+        "value": "1"
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 112395,
+        "file": true
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 135442,
+        "file": true
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 132856,
+        "file": true
+      }
+    ]
+  },
+  {
+    "request_id": "f1f2a15d-3e6e-4c07-92b5-225c79522f72",
+    "group": "invalid_url",
+    "content_type": "multipart/form-data; boundary=4ed329a47ef3345353762362fe892ed8dc7aaf5098a5ea0fe7e439b9167a",
+    "raw_bytes": 315323,
+    "json_parseable": false,
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "content_type": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "prompt",
+        "content_type": "text/plain",
+        "bytes": 19741,
+        "file": false,
+        "utf8_bytes": 19741
+      },
+      {
+        "name": "n",
+        "content_type": "text/plain",
+        "bytes": 1,
+        "file": false,
+        "value": "1"
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 135442,
+        "file": true
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 92205,
+        "file": true
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 66990,
+        "file": true
+      }
+    ]
+  },
+  {
+    "request_id": "1d04b711-133f-42c4-bcf2-475ec6c25e27",
+    "group": "invalid_url",
+    "content_type": "multipart/form-data; boundary=86e4b6ca20b8a6501a930259bbb17fdab14a788ddda50472d12fb5fd9e77",
+    "raw_bytes": 462810,
+    "json_parseable": false,
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "content_type": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "prompt",
+        "content_type": "text/plain",
+        "bytes": 24700,
+        "file": false,
+        "utf8_bytes": 24700
+      },
+      {
+        "name": "n",
+        "content_type": "text/plain",
+        "bytes": 1,
+        "file": false,
+        "value": "1"
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 135442,
+        "file": true
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 132856,
+        "file": true
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 168867,
+        "file": true
+      }
+    ]
+  },
+  {
+    "request_id": "677bd683-3a43-47c2-a59e-513401270d81",
+    "group": "invalid_url",
+    "content_type": "multipart/form-data; boundary=4bebcc76e3c59ecd29f42146e7230dfa68119c8b50dc8a916f927ddab3af",
+    "raw_bytes": 476562,
+    "json_parseable": false,
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "content_type": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "prompt",
+        "content_type": "text/plain",
+        "bytes": 24905,
+        "file": false,
+        "utf8_bytes": 24905
+      },
+      {
+        "name": "n",
+        "content_type": "text/plain",
+        "bytes": 1,
+        "file": false,
+        "value": "1"
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 118634,
+        "file": true
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 171110,
+        "file": true
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 160968,
+        "file": true
+      }
+    ]
+  },
+  {
+    "request_id": "f116705a-27b6-497e-a012-754f7a6f3d51",
+    "group": "invalid_url",
+    "content_type": "multipart/form-data; boundary=ad32dd85b258f18d826158c2f8894984883cdd18545a0bd079f1cafd61fa",
+    "raw_bytes": 375015,
+    "json_parseable": false,
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "content_type": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "prompt",
+        "content_type": "text/plain",
+        "bytes": 27992,
+        "file": false,
+        "utf8_bytes": 27992
+      },
+      {
+        "name": "n",
+        "content_type": "text/plain",
+        "bytes": 1,
+        "file": false,
+        "value": "1"
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 115111,
+        "file": true
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 115454,
+        "file": true
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 115513,
+        "file": true
+      }
+    ]
+  },
+  {
+    "request_id": "a07d039c-bac9-4ad1-8e4d-ac1f30587af0",
+    "group": "invalid_url",
+    "content_type": "multipart/form-data; boundary=fabab26e3814bdd48011a5d56382de8a87b069b3792e49e9076debe8fc0d",
+    "raw_bytes": 479839,
+    "json_parseable": false,
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "content_type": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "prompt",
+        "content_type": "text/plain",
+        "bytes": 28182,
+        "file": false,
+        "utf8_bytes": 28182
+      },
+      {
+        "name": "n",
+        "content_type": "text/plain",
+        "bytes": 1,
+        "file": false,
+        "value": "1"
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 118634,
+        "file": true
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 171110,
+        "file": true
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 160968,
+        "file": true
+      }
+    ]
+  },
+  {
+    "request_id": "2312fa34-b3f7-4ae2-9225-1a6fe9d7b163",
+    "group": "invalid_url",
+    "content_type": "multipart/form-data; boundary=42c479568ce9a1d815c07ac7c19f2001c24f97462c0e5b3e60333df5c6b0",
+    "raw_bytes": 354198,
+    "json_parseable": false,
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "content_type": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "prompt",
+        "content_type": "text/plain",
+        "bytes": 19735,
+        "file": false,
+        "utf8_bytes": 19735
+      },
+      {
+        "name": "n",
+        "content_type": "text/plain",
+        "bytes": 1,
+        "file": false,
+        "value": "1"
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 115111,
+        "file": true
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 142561,
+        "file": true
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 75846,
+        "file": true
+      }
+    ]
+  },
+  {
+    "request_id": "1180b920-9191-456b-a2e7-9139df142b12",
+    "group": "invalid_url",
+    "content_type": "multipart/form-data; boundary=5ed1644ad2bc662f899cd6816f1738f7d91a2ba5f20e7051d08d4003a400",
+    "raw_bytes": 462819,
+    "json_parseable": false,
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "content_type": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "prompt",
+        "content_type": "text/plain",
+        "bytes": 24709,
+        "file": false,
+        "utf8_bytes": 24709
+      },
+      {
+        "name": "n",
+        "content_type": "text/plain",
+        "bytes": 1,
+        "file": false,
+        "value": "1"
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 135442,
+        "file": true
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 132856,
+        "file": true
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 168867,
+        "file": true
+      }
+    ]
+  },
+  {
+    "request_id": "562ce25b-70b1-434c-9740-a8a8bb158db2",
+    "group": "no_candidates",
+    "content_type": "application/json",
+    "json_keys": [
+      "input",
+      "max_output_tokens",
+      "model",
+      "stream",
+      "tool_choice",
+      "tools"
+    ],
+    "model": "gpt-image-2",
+    "stream": false
+  },
+  {
+    "request_id": "8194c968-6bb8-4391-aa33-f590705ea206",
+    "group": "invalid_url",
+    "content_type": "multipart/form-data; boundary=34b3306d1fdf20e30d57ce86793808491c30464f8b6ec087bc9179fda217",
+    "raw_bytes": 375015,
+    "json_parseable": false,
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "content_type": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "prompt",
+        "content_type": "text/plain",
+        "bytes": 27992,
+        "file": false,
+        "utf8_bytes": 27992
+      },
+      {
+        "name": "n",
+        "content_type": "text/plain",
+        "bytes": 1,
+        "file": false,
+        "value": "1"
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 115111,
+        "file": true
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 115454,
+        "file": true
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 115513,
+        "file": true
+      }
+    ]
+  },
+  {
+    "request_id": "eedc35a9-7cf3-49fe-8d55-5f57064b0399",
+    "group": "invalid_url",
+    "content_type": "multipart/form-data; boundary=3d643a5cb15c779a3b377793425184ee4ae045f802810d25d446f62d3dae",
+    "raw_bytes": 371711,
+    "json_parseable": false,
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "content_type": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "prompt",
+        "content_type": "text/plain",
+        "bytes": 24688,
+        "file": false,
+        "utf8_bytes": 24688
+      },
+      {
+        "name": "n",
+        "content_type": "text/plain",
+        "bytes": 1,
+        "file": false,
+        "value": "1"
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 115111,
+        "file": true
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 115454,
+        "file": true
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 115513,
+        "file": true
+      }
+    ]
+  },
+  {
+    "request_id": "8c57e612-3cf2-4266-b614-a240fd8002ac",
+    "group": "invalid_url",
+    "content_type": "multipart/form-data; boundary=ee60ee1f03a49d8683822ddc8672ccc49bd2c4fff69f86c8138e6de64fb1",
+    "raw_bytes": 371699,
+    "json_parseable": false,
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "content_type": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "prompt",
+        "content_type": "text/plain",
+        "bytes": 24676,
+        "file": false,
+        "utf8_bytes": 24676
+      },
+      {
+        "name": "n",
+        "content_type": "text/plain",
+        "bytes": 1,
+        "file": false,
+        "value": "1"
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 115111,
+        "file": true
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 115454,
+        "file": true
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 115513,
+        "file": true
+      }
+    ]
+  },
+  {
+    "request_id": "0fdfa21b-dc44-4ec3-83d4-9d1c4d06989f",
+    "group": "invalid_url",
+    "content_type": "multipart/form-data; boundary=cd221c66526e9cd7849b27bf6f4746d4010df5a4881fc11198819355a500",
+    "raw_bytes": 371744,
+    "json_parseable": false,
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "content_type": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "prompt",
+        "content_type": "text/plain",
+        "bytes": 24721,
+        "file": false,
+        "utf8_bytes": 24721
+      },
+      {
+        "name": "n",
+        "content_type": "text/plain",
+        "bytes": 1,
+        "file": false,
+        "value": "1"
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 115111,
+        "file": true
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 115454,
+        "file": true
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 115513,
+        "file": true
+      }
+    ]
+  },
+  {
+    "request_id": "2b1b5dd0-121b-4b70-9983-b136eaa2f7e8",
+    "group": "invalid_url",
+    "content_type": "multipart/form-data; boundary=b9fc5a77230e03382effdf9cf87e50fdd2e4790c2bcb4a02650548c0b1b7",
+    "raw_bytes": 354210,
+    "json_parseable": false,
+    "multipart_valid": true,
+    "parts": [
+      {
+        "name": "model",
+        "content_type": "text/plain",
+        "bytes": 11,
+        "file": false,
+        "value": "gpt-image-2"
+      },
+      {
+        "name": "prompt",
+        "content_type": "text/plain",
+        "bytes": 19747,
+        "file": false,
+        "utf8_bytes": 19747
+      },
+      {
+        "name": "n",
+        "content_type": "text/plain",
+        "bytes": 1,
+        "file": false,
+        "value": "1"
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 115111,
+        "file": true
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 142561,
+        "file": true
+      },
+      {
+        "name": "image",
+        "content_type": "application/octet-stream",
+        "bytes": 75846,
+        "file": true
+      }
+    ]
+  }
+]

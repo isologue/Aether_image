@@ -1164,7 +1164,7 @@ fn gateway_plans_chatgpt_web_image_sync_with_internal_web_executor_url() {
 }
 
 async fn gateway_plans_chatgpt_web_image_sync_with_internal_web_executor_url_impl() {
-    run_chatgpt_web_image_plan_scenario(false, false).await;
+    run_chatgpt_web_image_plan_scenario(false, false, 1).await;
 }
 
 #[test]
@@ -1172,7 +1172,7 @@ async fn gateway_plans_chatgpt_web_image_sync_with_internal_web_executor_url_imp
 fn gateway_plans_chatgpt_web_image_native_generation_then_local_resize() {
     run_image_sync_test(
         "gateway_plans_chatgpt_web_image_native_generation_then_local_resize",
-        || run_chatgpt_web_image_plan_scenario(true, false),
+        || run_chatgpt_web_image_plan_scenario(true, false, 1),
     );
 }
 
@@ -1180,11 +1180,23 @@ fn gateway_plans_chatgpt_web_image_native_generation_then_local_resize() {
 fn gateway_content_refusal_completes_once_as_success_without_storing_an_image() {
     run_image_sync_test(
         "gateway_content_refusal_completes_once_as_success_without_storing_an_image",
-        || run_chatgpt_web_image_plan_scenario(false, true),
+        || run_chatgpt_web_image_plan_scenario(false, true, 1),
     );
 }
 
-async fn run_chatgpt_web_image_plan_scenario(resize_enabled: bool, refused: bool) {
+#[test]
+fn gateway_plans_chatgpt_web_image_with_configured_count_limit() {
+    run_image_sync_test(
+        "gateway_plans_chatgpt_web_image_with_configured_count_limit",
+        || run_chatgpt_web_image_plan_scenario(false, false, 3),
+    );
+}
+
+async fn run_chatgpt_web_image_plan_scenario(
+    resize_enabled: bool,
+    refused: bool,
+    requested_count: u64,
+) {
     use aether_data_contracts::repository::candidates::{
         RequestCandidateReadRepository, RequestCandidateStatus,
     };
@@ -1204,6 +1216,7 @@ async fn run_chatgpt_web_image_plan_scenario(resize_enabled: bool, refused: bool
         prompt: String,
         size: String,
         ratio: String,
+        count: u64,
     }
 
     fn hash_api_key(value: &str) -> String {
@@ -1419,6 +1432,7 @@ async fn run_chatgpt_web_image_plan_scenario(resize_enabled: bool, refused: bool
                         .and_then(|value| value.as_str())
                         .unwrap_or_default()
                         .to_string(),
+                    count: body.get("count").and_then(|value| value.as_u64()).unwrap_or(0),
                     ratio: body
                         .get("ratio")
                         .and_then(|value| value.as_str())
@@ -1491,7 +1505,7 @@ async fn run_chatgpt_web_image_plan_scenario(resize_enabled: bool, refused: bool
                 DEVELOPMENT_ENCRYPTION_KEY,
             ).with_system_config_values_for_tests([("image_storage".into(), json!({
                 "resize_enabled":resize_enabled, "storage_mode":"local", "return_format":"base64"
-            }))]),
+            })), (crate::image_generation::MAX_IMAGE_COUNT_KEY.into(), json!(requested_count))]),
         );
     let storage_root =
         std::env::temp_dir().join(format!("aether-image-plan-{}", uuid::Uuid::new_v4()));
@@ -1508,7 +1522,7 @@ async fn run_chatgpt_web_image_plan_scenario(resize_enabled: bool, refused: bool
             format!("Bearer {client_api_key}"),
         )
         .header(TRACE_ID_HEADER, "trace-chatgpt-web-image-plan-123")
-        .json(&json!({"model":"gpt-image-2", "prompt":"生成一张测试图",
+        .json(&json!({"model":"gpt-image-2", "prompt":"生成一张测试图", "n":requested_count,
             "size": if resize_enabled { "2048x1024" } else { "1024x1024" }, "response_format":"b64_json"}))
         .send()
         .await
@@ -1567,6 +1581,7 @@ async fn run_chatgpt_web_image_plan_scenario(resize_enabled: bool, refused: bool
         seen_execution_runtime_request.authorization,
         "Bearer chatgpt-web-access-token"
     );
+    assert_eq!(seen_execution_runtime_request.count, requested_count);
     assert_eq!(seen_execution_runtime_request.operation, "generate");
     assert_eq!(seen_execution_runtime_request.model, "gpt-image-2");
     assert_eq!(seen_execution_runtime_request.web_model, "gpt-5-5-thinking");

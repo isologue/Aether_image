@@ -35,6 +35,7 @@ pub(crate) enum LocalFailoverClassification {
     StopExecutionError,
     StopCyberPolicy,
     RetrySuccessPattern,
+    RetryAccountUnavailable,
     RetryStatusCode,
     RetryUpstreamFailure,
 }
@@ -47,6 +48,7 @@ impl LocalFailoverClassification {
             Self::StopErrorPattern => "stop_error_pattern",
             Self::StopExecutionError => "stop_execution_error",
             Self::StopCyberPolicy => "stop_cyber_policy",
+            Self::RetryAccountUnavailable => "retry_account_unavailable",
             Self::RetrySuccessPattern => "retry_success_pattern",
             Self::RetryStatusCode => "retry_status_code",
             Self::RetryUpstreamFailure => "retry_upstream_failure",
@@ -159,7 +161,8 @@ pub(crate) const fn failure_disposition_from_local_classification(
             FailureTokenAction::None,
             status_code >= 400,
         ),
-        LocalFailoverClassification::RetrySuccessPattern => FailureDisposition::new(
+        LocalFailoverClassification::RetrySuccessPattern
+        | LocalFailoverClassification::RetryAccountUnavailable => FailureDisposition::new(
             FailureRetryAction::NextCandidate,
             FailureScope::None,
             FailureTokenAction::None,

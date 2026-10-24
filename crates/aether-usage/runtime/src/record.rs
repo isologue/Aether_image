@@ -48,6 +48,39 @@ pub fn build_upsert_usage_record_from_event(
         data.total_cost_usd = Some(0.0);
         data.actual_total_cost_usd = Some(0.0);
     }
+    if event.event_type == UsageEventType::Failed
+        && data
+            .error_message
+            .as_deref()
+            .is_none_or(|message| message.trim().is_empty())
+    {
+        data.error_message = metadata_string(data.request_metadata.as_ref(), "last_attempt_error")
+            .or_else(|| {
+                let code = data
+                    .client_response_body
+                    .as_ref()
+                    .or(data.response_body.as_ref())
+                    .and_then(|body| body.pointer("/error/code"))
+                    .and_then(serde_json::Value::as_str)
+                    .filter(|code| {
+                        !code.is_empty()
+                            && code.len() <= 80
+                            && code.bytes().all(|b| {
+                                b.is_ascii_alphanumeric() || matches!(b, b'_' | b'-' | b'.')
+                            })
+                    });
+                Some(match code {
+                    Some(code) => format!(
+                        "Request failed: {code} (HTTP {})",
+                        data.status_code.unwrap_or(500)
+                    ),
+                    None => format!(
+                        "Request failed (HTTP {}); see candidate details for the upstream cause",
+                        data.status_code.unwrap_or(500)
+                    ),
+                })
+            });
+    }
     if usage_is_explicitly_unavailable(data.request_metadata.as_ref()) {
         clear_unavailable_usage_fields(&mut data);
     } else if usage_pricing_is_explicitly_unavailable(data.request_metadata.as_ref()) {
@@ -279,6 +312,50 @@ fn empty_to_none(value: Option<String>) -> Option<String> {
 
 #[cfg(test)]
 mod tests {
+
+    #[test]
+    fn audit_failed_usage_retains_safe_cause_and_never_has_an_empty_error() {
+        for metadata in [
+            serde_json::json!({"last_attempt_error":"Input reference returned HTTP 404"}),
+            serde_json::json!({}),
+        ] {
+            let record = build_upsert_usage_record_from_event(&UsageEvent {
+                event_type: UsageEventType::Failed,
+                request_id: "audit-request".into(),
+                timestamp_ms: 1700000000000,
+                data: UsageEventData {
+                    status_code: Some(400),
+                    request_metadata: Some(metadata.clone()),
+                    ..Default::default()
+                },
+            })
+            .unwrap();
+            let message = record.error_message.unwrap();
+            assert!(!message.trim().is_empty());
+            if metadata.get("last_attempt_error").is_some() {
+                assert_eq!(message, "Input reference returned HTTP 404");
+            }
+        }
+    }
+
+    #[test]
+    fn audit_success_with_retry_metadata_does_not_get_a_failure_message() {
+        let record = build_upsert_usage_record_from_event(&UsageEvent {
+            event_type: UsageEventType::Completed,
+            request_id: "audit-request".into(),
+            timestamp_ms: 1700000000000,
+            data: UsageEventData {
+                status_code: Some(200),
+                request_metadata: Some(
+                    serde_json::json!({"last_attempt_error":"earlier attempt failed"}),
+                ),
+                ..Default::default()
+            },
+        })
+        .unwrap();
+        assert!(record.error_message.is_none());
+    }
+
     use aether_data_contracts::repository::usage::UsageBodyCaptureState;
 
     use crate::{UsageEvent, UsageEventData, UsageEventType};

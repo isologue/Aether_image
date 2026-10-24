@@ -863,6 +863,12 @@ impl IntoResponse for ExecutionRuntimeAppError {
                 ExecutionRuntimeTransportError::UpstreamHttpStatus { status_code, .. },
             ) => StatusCode::from_u16(*status_code).unwrap_or(StatusCode::BAD_GATEWAY),
             ExecutionRuntimeServerError::Transport(
+                ExecutionRuntimeTransportError::ImageAccountUnavailable,
+            ) => StatusCode::CONFLICT,
+            ExecutionRuntimeServerError::Transport(
+                ExecutionRuntimeTransportError::ImageInput { status_code, .. },
+            ) => StatusCode::from_u16(*status_code).unwrap_or(StatusCode::BAD_REQUEST),
+            ExecutionRuntimeServerError::Transport(
                 ExecutionRuntimeTransportError::ClientBuild(_)
                 | ExecutionRuntimeTransportError::BrowserClientBuild(_)
                 | ExecutionRuntimeTransportError::BrowserBody(_)
@@ -904,6 +910,12 @@ impl IntoResponse for ExecutionRuntimeAppError {
                 | ExecutionRuntimeTransportError::InvalidJson(_),
             ) => "Upstream request failed".to_string(),
             ExecutionRuntimeServerError::Overloaded { .. } => unreachable!(),
+            ExecutionRuntimeServerError::Transport(
+                ExecutionRuntimeTransportError::ImageAccountUnavailable,
+            ) => "Selected image account is no longer available".to_string(),
+            ExecutionRuntimeServerError::Transport(
+                ExecutionRuntimeTransportError::ImageInput { .. },
+            ) => self.0.to_string(),
         };
 
         (
@@ -1559,6 +1571,7 @@ mod tests {
             ExecutionRuntimeTransportError::UpstreamHttpStatus {
                 status_code: 429,
                 message: "authorization=Bearer upstream-secret".to_string(),
+                response_body: None,
             },
         ))
         .into_response();

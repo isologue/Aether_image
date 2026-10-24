@@ -14,6 +14,8 @@ pub(crate) use aether_ai_formats::api::{
     apply_model_directive_overrides_from_model, apply_model_directive_overrides_from_request,
     apply_openai_responses_compact_special_body_edits, apply_xai_upstream_payload_edits,
     apply_xai_upstream_payload_edits_with_client, build_chatgpt_web_image_request_body,
+    build_chatgpt_web_image_request_body_with_limits,
+    build_chatgpt_web_image_request_body_with_options,
     build_chatgpt_web_image_request_body_with_resize_target, build_codex_model_catalog_metadata,
     build_codex_openai_image_api_provider_request_body, build_core_error_body_for_client_format,
     build_cross_format_openai_chat_request_body,

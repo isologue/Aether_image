@@ -1,0 +1,1032 @@
+[
+  {
+    "request_id": "1465d481-b50c-48c8-96b2-a3ce402d88c3",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "当前 AI 请求无法在本地执行：没有匹配到可用的执行路径"
+      }
+    }
+  },
+  {
+    "request_id": "e0ae23e3-17be-497a-9566-24412ea60365",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "当前 AI 请求无法在本地执行：没有匹配到可用的执行路径"
+      }
+    }
+  },
+  {
+    "request_id": "59477a3b-617c-4869-a2de-44b9dce3276e",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "b1c04e19-a18b-44fc-95c2-e05039b49319",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "f620d2d2-6aae-4604-9a38-665b5db32c15",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "当前 AI 请求无法在本地执行：没有匹配到可用的执行路径"
+      }
+    }
+  },
+  {
+    "request_id": "f2ebe94d-342f-407b-b572-5ad4290af4ae",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "051b664e-6c71-4775-a716-3e0ad0b8159a",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "4f8f1af8-f1d7-465b-a9e3-1a38ca950b56",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "当前 AI 请求无法在本地执行：没有匹配到可用的执行路径"
+      }
+    }
+  },
+  {
+    "request_id": "8d74ef79-397e-4762-827f-fe3444831c31",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "当前 AI 请求无法在本地执行：没有匹配到可用的执行路径"
+      }
+    }
+  },
+  {
+    "request_id": "316547ad-f979-4569-8a66-1d9c80814c24",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "cf2480b1-cfac-4289-a096-f9d86144dc5d",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "f51da7ce-b68e-4402-bc51-e0e86f3db1dd",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "2a522fcf-dfc4-41fd-89fe-b5b528e7207e",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "当前 AI 请求无法在本地执行：没有匹配到可用的执行路径"
+      }
+    }
+  },
+  {
+    "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "97de52c9-4c0a-4250-a1b1-fe355a5289cf",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "当前 AI 请求无法在本地执行：没有匹配到可用的执行路径"
+      }
+    }
+  },
+  {
+    "request_id": "897f4162-104e-4098-a768-5c7c1e899d4a",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "当前 AI 请求无法在本地执行：没有匹配到可用的执行路径"
+      }
+    }
+  },
+  {
+    "request_id": "3a39f9cf-6018-4c03-bc57-0211011f7d27",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "当前 AI 请求无法在本地执行：没有匹配到可用的执行路径"
+      }
+    }
+  },
+  {
+    "request_id": "6f83c71b-45f5-4753-957c-639efae32c59",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "当前 AI 请求无法在本地执行：没有匹配到可用的执行路径"
+      }
+    }
+  },
+  {
+    "request_id": "34bf29be-f7f5-4160-82c4-16f0221d7a86",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "1a3d762c-c6b9-4dc7-9716-c5ef8c94259d",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "706468af-8b30-41e9-bed2-c8c574334c84",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "79869f1e-26eb-47fa-9d8a-e8523f6ba4ac",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "0d96d4f9-3877-4857-993a-3755ff516a87",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "a9faa2e9-8c67-4f27-a940-5ccede2ce4bb",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "eac587f1-0492-4fbb-a0d2-60a4284bc55d",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "当前 AI 请求无法在本地执行：没有匹配到可用的执行路径"
+      }
+    }
+  },
+  {
+    "request_id": "dfdbf3e0-8ef6-48cd-8500-5739d9e2af5c",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "f125a2e0-0c0b-4893-bb23-d443d87b18e9",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "bbc60668-f88d-4e10-8d27-81845498fb06",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "6da43f84-afce-4563-bcb5-e28f80fd9619",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "48805a7b-9dcf-4506-a830-42e60a4060ca",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "3faf75b5-db57-468e-bca0-5d59a15db6c4",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "53ca422a-8d37-4048-9100-f59348e878b5",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "48f20d05-00f0-4838-b650-d4b6f53772df",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "df70b8c3-07fa-4f21-b1f2-ae5072ca9a2f",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "没有可用提供商支持模型 gpt-image-2.5-flare 的同步请求"
+      }
+    }
+  },
+  {
+    "request_id": "84ecd70e-1556-4182-860c-fe1a2dc3a033",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "没有可用提供商支持模型 gpt-image-2.5-flare 的同步请求"
+      }
+    }
+  },
+  {
+    "request_id": "imgtask_30858cdb58704eb5a6b3dd01a8012b35",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "93f8c53d-a98f-4b4a-8582-0b7528cd3162",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "没有可用提供商支持模型 gpt-image-2.5-flare 的同步请求"
+      }
+    }
+  },
+  {
+    "request_id": "221b26d0-6782-4f2a-a1be-64882079bc7f",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "没有可用提供商支持模型 gpt-image-2 的同步请求"
+      }
+    }
+  },
+  {
+    "request_id": "e2706b9c-aa01-4b20-a358-beecbb2ac752",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "当前 AI 请求无法在本地执行：没有匹配到可用的执行路径"
+      }
+    }
+  },
+  {
+    "request_id": "ebdfcd6f-d3c4-4b4d-a207-c282e987626a",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "当前 AI 请求无法在本地执行：没有匹配到可用的执行路径"
+      }
+    }
+  },
+  {
+    "request_id": "9d009778-8110-4c42-90a2-e20d8401b9b2",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "当前 AI 请求无法在本地执行：没有匹配到可用的执行路径"
+      }
+    }
+  },
+  {
+    "request_id": "64b024a8-8f0c-44df-829e-ae08066be815",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "当前 AI 请求无法在本地执行：没有匹配到可用的执行路径"
+      }
+    }
+  },
+  {
+    "request_id": "3731efdb-d230-489e-a353-e879ce4a37d7",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "当前 AI 请求无法在本地执行：没有匹配到可用的执行路径"
+      }
+    }
+  },
+  {
+    "request_id": "57eb0fcf-50ba-4a72-bf14-e13191a7ba8c",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "没有可用提供商支持模型 gpt-image-2 的同步请求"
+      }
+    }
+  },
+  {
+    "request_id": "5074f517-2309-467a-a360-6915f1799520",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "没有可用提供商支持模型 gpt-image-2 的同步请求"
+      }
+    }
+  },
+  {
+    "request_id": "bd5235af-e9ad-44e7-837a-3ecd3950a10a",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "fb7158bb-9571-4a93-94b0-28200ac998b6",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "3c32b614-a37d-4f6e-899a-570a408069c1",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "5169b9a4-9163-4111-aca6-7b668703ba07",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "5ef50029-06bf-4fc5-b02a-0acb4d50e6a7",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "没有可用提供商支持模型 gpt-image-2 的同步请求"
+      }
+    }
+  },
+  {
+    "request_id": "02b5a394-b72b-4761-9fa6-5b8a2b6cb1d0",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "60c96d01-fb34-4300-8136-9b50d7209b5a",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "没有可用提供商支持模型 gpt-image-2 的同步请求"
+      }
+    }
+  },
+  {
+    "request_id": "722aa949-5651-40cb-addc-97811dbdef96",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "当前 AI 请求无法在本地执行：没有匹配到可用的执行路径"
+      }
+    }
+  },
+  {
+    "request_id": "dde478cb-6696-4903-9ba1-70e61e9cd245",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "ae3245bc-d5ef-45ef-925a-94b2b3226d9a",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "a9a3cb57-3de4-48f8-b3d0-6a37eca88412",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "c0552f4c-7991-4471-94cb-004868a80ca9",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "181ede00-cdba-4253-95db-22e833fcb656",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "02a2f970-c7ae-4712-87c0-90a43e3a9816",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "29991925-f5b9-42fe-b371-8d6de5d0c44f",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "8500bfe3-0e12-44c5-9673-95038140cf61",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "e571b8fa-8f1d-4dd9-ac62-9d3f461a727a",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "747d7506-b985-428f-a736-af8f04b3eb35",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "0e051dc9-7692-4f43-a009-f59d97751fa0",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "63b6a43e-abcb-49de-b66e-a797004de56b",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "3505cee7-e284-4cf7-81fb-5f77fa95e852",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "e76beb34-446a-4e89-82e7-acdc5074e5c8",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "f3787e8c-03c1-4557-94be-ad400f462017",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "2c2c7ce1-1fd3-4b60-a0c5-8dcaa33443e1",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "8dc83e7f-54a9-4678-9ddf-7749a29866ee",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "f378a000-212c-4d2d-b8af-76b27cdf7dac",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "e8e13ebf-bb11-44cd-9106-82e2f6ae5803",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "4d08df96-c2e9-4e3b-866e-dffbbf4c935e",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "8124bc6d-4e73-4234-86f2-940e90c0bc6a",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "a5eaf348-4b37-4625-993f-848e72bbd434",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "f1f2a15d-3e6e-4c07-92b5-225c79522f72",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "6e65273e-832a-4c6f-801c-8fbccc936068",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "1d04b711-133f-42c4-bcf2-475ec6c25e27",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "677bd683-3a43-47c2-a59e-513401270d81",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "f116705a-27b6-497e-a012-754f7a6f3d51",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "a07d039c-bac9-4ad1-8e4d-ac1f30587af0",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "5357e1ae-1fa1-4a22-bfec-678d3eefcc92",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "29bec5f6-5ed6-465b-855a-c5be50b73e59",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "1180b920-9191-456b-a2e7-9139df142b12",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "562ce25b-70b1-434c-9740-a8a8bb158db2",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "没有可用提供商支持模型 gpt-image-2 的同步请求"
+      }
+    }
+  },
+  {
+    "request_id": "8d64f643-61ec-463c-a8aa-45283e361e6e",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "8194c968-6bb8-4391-aa33-f590705ea206",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "088b3e69-590e-4cd4-85c9-535c8dbfcec4",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "eedc35a9-7cf3-49fe-8d55-5f57064b0399",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "2312fa34-b3f7-4ae2-9225-1a6fe9d7b163",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "8da5d288-0c26-4a19-9982-104c5d494970",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "ab9dc378-1fa7-4c78-bf18-4a5248d6b12e",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "8c57e612-3cf2-4266-b614-a240fd8002ac",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "7ef724d6-1236-417b-a518-e037e24c42bc",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "bb08577e-8172-4b40-a437-1debf5dfa0fd",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "0fdfa21b-dc44-4ec3-83d4-9d1c4d06989f",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "7a194e9d-0bf2-42eb-96ba-06b0eef5b470",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "2b1b5dd0-121b-4b70-9983-b136eaa2f7e8",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "已尝试所有本地执行候选提供商，但没有任何候选成功完成请求"
+      }
+    }
+  },
+  {
+    "request_id": "5540bd89-009a-44eb-bec9-d1e6c585c0b0",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "当前 AI 请求无法在本地执行：没有匹配到可用的执行路径"
+      }
+    }
+  },
+  {
+    "request_id": "1db6e452-c685-47f7-9989-9ecc13562cdc",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "当前 AI 请求无法在本地执行：没有匹配到可用的执行路径"
+      }
+    }
+  },
+  {
+    "request_id": "ed92f8ca-cc8d-43e2-9682-18dbb4adcc0d",
+    "body_field": "client_response_body",
+    "body": {
+      "error": {
+        "type": "http_error",
+        "message": "当前 AI 请求无法在本地执行：没有匹配到可用的执行路径"
+      }
+    }
+  }
+]

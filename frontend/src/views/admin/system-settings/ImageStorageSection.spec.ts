@@ -17,6 +17,9 @@ beforeEach(() => {
   api.get.mockImplementation(async (key: string) => key === 'image_storage' ? { value: { ...persistedConfig } } : { value: null, is_set: true })
   api.update.mockImplementation(async (key: string, value: unknown) => {
     if (key === 'image_storage') persistedConfig = { ...persistedConfig, ...(value as typeof persistedConfig) }
+    if (key === 'image_task_policy') {
+      persistedConfig = { ...persistedConfig, ...((value as { image_storage: typeof persistedConfig }).image_storage) }
+    }
     return {}
   })
   api.stats.mockResolvedValue({ directory: '/data/images', count: 2, bytes: 2048, disk: null, updated_at: 1, last_cleanup: null, next_cleanup_at: null, sync: { running: false, total: 0 }, failure_details: [] })
@@ -37,6 +40,28 @@ describe('图片存储设置', () => {
     app?.unmount(); app = undefined; host.remove()
     await mount()
     expect((host.querySelector('#image-resize-enabled') as HTMLInputElement).checked).toBe(true)
+  })
+  it('saves automatic cleanup and task retention atomically and keeps it enabled after reload', async () => {
+    await mount()
+    const cleanup = host.querySelector('#image-cleanup-enabled') as HTMLInputElement
+    expect(cleanup).not.toBeNull()
+    expect(cleanup.checked).toBe(false)
+    cleanup.checked = true
+    cleanup.dispatchEvent(new Event('change', { bubbles: true }))
+    await flush()
+
+    button('保存').click()
+    await flush()
+
+    expect(api.update).toHaveBeenCalledWith('image_task_policy', {
+      image_storage: expect.objectContaining({ cleanup_enabled: true }),
+      async_task_retention_days: 30,
+    })
+    expect((host.querySelector('#image-cleanup-enabled') as HTMLInputElement).checked).toBe(true)
+
+    app?.unmount(); app = undefined; host.remove()
+    await mount()
+    expect((host.querySelector('#image-cleanup-enabled') as HTMLInputElement).checked).toBe(true)
   })
   it('defaults to ignoring response_format and preserves an existing password when saving preferences', async () => {
     await mount()
@@ -80,6 +105,8 @@ describe('图片存储设置', () => {
     expect(host.querySelector('#image-dav-url')).not.toBeNull()
     expect(host.querySelector('#image-public-url')).toBeNull()
     expect(host.textContent).toContain('不保存本地副本')
+    expect(host.textContent).toContain('上传成功后返回 WebDAV 地址，不再回读校验公开图片')
+    expect(host.textContent).not.toContain('等待上传和公开访问校验成功')
     for (const [id, value] of [['image-dav-url', 'https://dav.example.com'], ['image-dav-public', 'https://img.example.com/images']]) {
       const input = host.querySelector(`#${id}`) as HTMLInputElement
       input.value = value; input.dispatchEvent(new Event('input', { bubbles: true }))

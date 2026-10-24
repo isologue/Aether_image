@@ -198,10 +198,14 @@ async fn execute(state: AppState, owner: String, task: Value) {
         request_id: Some(id.clone()),
         ..Default::default()
     })));
-    let work = super::flow::scope(
-        Some(flow.clone()),
-        tokio::time::timeout(Duration::from_secs(1800), run(&state, &task)),
-    );
+    let work = crate::request_diagnostics::scope_request_diagnostics(async {
+        crate::request_diagnostics::record_request_accepted_at(std::time::Instant::now());
+        super::flow::scope(
+            Some(flow.clone()),
+            tokio::time::timeout(Duration::from_secs(1800), run(&state, &task)),
+        )
+        .await
+    });
     tokio::pin!(work);
     let mut renew = tokio::time::interval(Duration::from_secs(20));
     let mut last_lease = std::time::Instant::now();
@@ -252,6 +256,12 @@ async fn execute(state: AppState, owner: String, task: Value) {
     }
     let terminal = match flow.terminal_event(success) {
         Ok(Some(mut event)) => {
+            if !success {
+                if let Some(message) = body.pointer("/error/message").and_then(Value::as_str) {
+                    event.data.error_message =
+                        Some(crate::request_diagnostics::safe_failure_summary(message));
+                }
+            }
             event.data.request_body = None;
             event.data.provider_request_body = None;
             event.data.response_body = None;

@@ -45,12 +45,14 @@ pub(super) async fn resolve_local_openai_image_decision_input(
     decision: &GatewayControlDecision,
 ) -> Result<Option<LocalOpenAiImageDecisionInput>, GatewayError> {
     let Some(auth_context) = resolve_local_openai_image_auth_context(decision) else {
+        super::log_local_openai_image_plan_exit(trace_id, parts, "auth_context_unavailable");
         return Ok(None);
     };
 
     let Some(requested_model) =
         resolve_requested_image_model_for_request(parts, body_json, body_base64)
     else {
+        super::log_local_openai_image_plan_exit(trace_id, parts, "requested_model_unresolved");
         return Ok(None);
     };
 
@@ -65,7 +67,10 @@ pub(super) async fn resolve_local_openai_image_decision_input(
     .await
     {
         Ok(Some(resolved_input)) => resolved_input,
-        Ok(None) => return Ok(None),
+        Ok(None) => {
+            super::log_local_openai_image_plan_exit(trace_id, parts, "auth_snapshot_unavailable");
+            return Ok(None);
+        }
         Err(err) => {
             warn!(
                 trace_id = %trace_id,

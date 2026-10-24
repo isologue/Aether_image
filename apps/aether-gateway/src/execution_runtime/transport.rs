@@ -780,6 +780,15 @@ pub(crate) fn format_hyper_error_chain(err: &dyn std::error::Error) -> String {
 
 #[derive(Error)]
 pub(crate) enum ExecutionRuntimeTransportError {
+    #[error("Selected image account is no longer available")]
+    ImageAccountUnavailable,
+    #[error("{}", sanitize_error_detail(message))]
+    ImageInput {
+        status_code: u16,
+        code: &'static str,
+        param: &'static str,
+        message: String,
+    },
     #[error("request body must contain json_body or body_bytes_b64")]
     RequestBodyRequired,
     #[error("request body must not contain both json_body and body_bytes_b64")]
@@ -811,7 +820,11 @@ pub(crate) enum ExecutionRuntimeTransportError {
     #[error("browser impersonation response body failed: {}", sanitize_error_detail(.0))]
     BrowserBody(String),
     #[error("{}", sanitize_error_detail(message))]
-    UpstreamHttpStatus { status_code: u16, message: String },
+    UpstreamHttpStatus {
+        status_code: u16,
+        message: String,
+        response_body: Option<Value>,
+    },
     #[error("failed to execute upstream request: {}", sanitize_error_detail(.0))]
     UpstreamRequest(String),
     #[error("upstream response {phase} body exceeds {limit_bytes} bytes")]
@@ -841,6 +854,19 @@ pub(crate) enum ExecutionRuntimeTransportError {
 impl std::fmt::Debug for ExecutionRuntimeTransportError {
     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
+            Self::ImageInput {
+                status_code,
+                code,
+                param,
+                message,
+            } => formatter
+                .debug_struct("ImageInput")
+                .field("status_code", status_code)
+                .field("code", code)
+                .field("param", param)
+                .field("message", &sanitize_error_detail(message))
+                .finish(),
+            Self::ImageAccountUnavailable => formatter.write_str("ImageAccountUnavailable"),
             Self::RequestBodyRequired => formatter.write_str("RequestBodyRequired"),
             Self::RequestBodyAmbiguous => formatter.write_str("RequestBodyAmbiguous"),
             Self::BodyDecode(error) => formatter
@@ -895,6 +921,7 @@ impl std::fmt::Debug for ExecutionRuntimeTransportError {
             Self::UpstreamHttpStatus {
                 status_code,
                 message,
+                ..
             } => formatter
                 .debug_struct("UpstreamHttpStatus")
                 .field("status_code", status_code)
@@ -5975,6 +6002,7 @@ mod tests {
         let status = ExecutionRuntimeTransportError::UpstreamHttpStatus {
             status_code: 502,
             message: secret_url.to_string(),
+            response_body: None,
         };
         let status_debug = format!("{status:?}");
         assert!(!status_debug.contains("upstream-password"));

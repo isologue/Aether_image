@@ -119,7 +119,8 @@ const fn decision_from_classification(
         | LocalFailoverClassification::StopErrorPattern
         | LocalFailoverClassification::StopExecutionError
         | LocalFailoverClassification::StopCyberPolicy => LocalFailoverDecision::StopLocalFailover,
-        LocalFailoverClassification::RetrySuccessPattern
+        LocalFailoverClassification::RetryAccountUnavailable
+        | LocalFailoverClassification::RetrySuccessPattern
         | LocalFailoverClassification::RetryStatusCode
         | LocalFailoverClassification::RetryUpstreamFailure => {
             LocalFailoverDecision::RetryNextCandidate

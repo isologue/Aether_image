@@ -1,0 +1,1705 @@
+[
+  {
+    "request_id": "imgtask_af17bb40f8a84ffab16ad2f0ad3063c2",
+    "candidate_index": 0,
+    "retry_index": 0,
+    "status": "failed",
+    "status_code": 400,
+    "error_type": "stream_terminal_error",
+    "error_message": "我",
+    "skip_reason": null,
+    "latency_ms": 57488,
+    "key_id": "0976df80-788d-4580-a5cd-1794ea74eaa5",
+    "failure_diagnostic": null,
+    "request_body_build_error": null,
+    "error_flow": {
+      "stage": "candidate",
+      "source": "upstream_response",
+      "message": "我",
+      "decision": "retry_next_candidate",
+      "retryable": true,
+      "propagation": "suppressed",
+      "status_code": 400,
+      "classification": "retry_upstream_failure",
+      "safe_to_expose": false
+    },
+    "upstream_response": {
+      "body": {
+        "error": {
+          "code": "chatgpt_web_no_image",
+          "type": "stream_terminal_error",
+          "message": "我"
+        }
+      },
+      "headers": {
+        "content-type": "text/event-stream",
+        "cache-control": "no-cache"
+      },
+      "status_code": 400
+    }
+  },
+  {
+    "request_id": "imgtask_13d460eeff66489a92167f7910f847a2",
+    "candidate_index": 0,
+    "retry_index": 0,
+    "status": "failed",
+    "status_code": 400,
+    "error_type": "stream_terminal_error",
+    "error_message": "非常抱歉，生成的图片可能违反了关于裸露、色情或情色内容的防护限制。如果你认为此判断有误，请重试或修改提示语。",
+    "skip_reason": null,
+    "latency_ms": 60751,
+    "key_id": "15928c07-bc6c-4db5-bcfb-b1cdc74c3e64",
+    "failure_diagnostic": null,
+    "request_body_build_error": null,
+    "error_flow": {
+      "stage": "candidate",
+      "source": "upstream_response",
+      "message": "非常抱歉，生成的图片可能违反了关于裸露、色情或情色内容的防护限制。如果你认为此判断有误，请重试或修改提示语。",
+      "decision": "retry_next_candidate",
+      "retryable": true,
+      "propagation": "suppressed",
+      "status_code": 400,
+      "classification": "retry_upstream_failure",
+      "safe_to_expose": false
+    },
+    "upstream_response": {
+      "body": {
+        "error": {
+          "code": "chatgpt_web_no_image",
+          "type": "stream_terminal_error",
+          "message": "非常抱歉，生成的图片可能违反了关于裸露、色情或情色内容的防护限制。如果你认为此判断有误，请重试或修改提示语。"
+        }
+      },
+      "headers": {
+        "content-type": "text/event-stream",
+        "cache-control": "no-cache"
+      },
+      "status_code": 400
+    }
+  },
+  {
+    "request_id": "e0ae23e3-17be-497a-9566-24412ea60365",
+    "candidate_index": 0,
+    "retry_index": 0,
+    "status": "skipped",
+    "status_code": null,
+    "error_type": null,
+    "error_message": null,
+    "skip_reason": "provider_request_body_missing",
+    "latency_ms": null,
+    "key_id": "f98473d2-57da-4b26-a867-20fa866d60ac",
+    "failure_diagnostic": {
+      "path": "$",
+      "stage": "request",
+      "message": "无法构建上游请求体；请检查请求体是否为支持的 JSON object，以及该任务类型必需字段是否存在且取值受支持",
+      "safe_to_show": true,
+      "source_format": "openai:image",
+      "target_format": "openai:image"
+    },
+    "request_body_build_error": {
+      "path": "$",
+      "message": "无法构建上游请求体；请检查请求体是否为支持的 JSON object，以及该任务类型必需字段是否存在且取值受支持"
+    },
+    "error_flow": null,
+    "upstream_response": null
+  },
+  {
+    "request_id": "1465d481-b50c-48c8-96b2-a3ce402d88c3",
+    "candidate_index": 0,
+    "retry_index": 0,
+    "status": "skipped",
+    "status_code": null,
+    "error_type": null,
+    "error_message": null,
+    "skip_reason": "provider_request_body_missing",
+    "latency_ms": null,
+    "key_id": "cae085f7-e31e-4666-b7ce-943212e963e8",
+    "failure_diagnostic": {
+      "path": "$",
+      "stage": "request",
+      "message": "无法构建上游请求体；请检查请求体是否为支持的 JSON object，以及该任务类型必需字段是否存在且取值受支持",
+      "safe_to_show": true,
+      "source_format": "openai:image",
+      "target_format": "openai:image"
+    },
+    "request_body_build_error": {
+      "path": "$",
+      "message": "无法构建上游请求体；请检查请求体是否为支持的 JSON object，以及该任务类型必需字段是否存在且取值受支持"
+    },
+    "error_flow": null,
+    "upstream_response": null
+  },
+  {
+    "request_id": "8d74ef79-397e-4762-827f-fe3444831c31",
+    "candidate_index": 0,
+    "retry_index": 0,
+    "status": "skipped",
+    "status_code": null,
+    "error_type": null,
+    "error_message": null,
+    "skip_reason": "provider_request_body_missing",
+    "latency_ms": null,
+    "key_id": "001b945d-bf5c-4f00-bee2-1705259b4006",
+    "failure_diagnostic": {
+      "path": "$",
+      "stage": "request",
+      "message": "无法构建上游请求体；请检查请求体是否为支持的 JSON object，以及该任务类型必需字段是否存在且取值受支持",
+      "safe_to_show": true,
+      "source_format": "openai:image",
+      "target_format": "openai:image"
+    },
+    "request_body_build_error": {
+      "path": "$",
+      "message": "无法构建上游请求体；请检查请求体是否为支持的 JSON object，以及该任务类型必需字段是否存在且取值受支持"
+    },
+    "error_flow": null,
+    "upstream_response": null
+  },
+  {
+    "request_id": "8d74ef79-397e-4762-827f-fe3444831c31",
+    "candidate_index": 1,
+    "retry_index": 0,
+    "status": "skipped",
+    "status_code": null,
+    "error_type": null,
+    "error_message": null,
+    "skip_reason": "provider_request_body_missing",
+    "latency_ms": null,
+    "key_id": "8ead1034-7777-41e8-97b9-8a5e61bfd81c",
+    "failure_diagnostic": {
+      "path": "$",
+      "stage": "request",
+      "message": "无法构建上游请求体；请检查请求体是否为支持的 JSON object，以及该任务类型必需字段是否存在且取值受支持",
+      "safe_to_show": true,
+      "source_format": "openai:image",
+      "target_format": "openai:image"
+    },
+    "request_body_build_error": {
+      "path": "$",
+      "message": "无法构建上游请求体；请检查请求体是否为支持的 JSON object，以及该任务类型必需字段是否存在且取值受支持"
+    },
+    "error_flow": null,
+    "upstream_response": null
+  },
+  {
+    "request_id": "4f8f1af8-f1d7-465b-a9e3-1a38ca950b56",
+    "candidate_index": 0,
+    "retry_index": 0,
+    "status": "skipped",
+    "status_code": null,
+    "error_type": null,
+    "error_message": null,
+    "skip_reason": "provider_request_body_missing",
+    "latency_ms": null,
+    "key_id": "3112372c-72f8-4c14-b972-7a569e1ed309",
+    "failure_diagnostic": {
+      "path": "$",
+      "stage": "request",
+      "message": "无法构建上游请求体；请检查请求体是否为支持的 JSON object，以及该任务类型必需字段是否存在且取值受支持",
+      "safe_to_show": true,
+      "source_format": "openai:image",
+      "target_format": "openai:image"
+    },
+    "request_body_build_error": {
+      "path": "$",
+      "message": "无法构建上游请求体；请检查请求体是否为支持的 JSON object，以及该任务类型必需字段是否存在且取值受支持"
+    },
+    "error_flow": null,
+    "upstream_response": null
+  },
+  {
+    "request_id": "4f8f1af8-f1d7-465b-a9e3-1a38ca950b56",
+    "candidate_index": 1,
+    "retry_index": 0,
+    "status": "skipped",
+    "status_code": null,
+    "error_type": null,
+    "error_message": null,
+    "skip_reason": "provider_request_body_missing",
+    "latency_ms": null,
+    "key_id": "007a6147-4df2-40ca-9dd2-c73195fd0fb1",
+    "failure_diagnostic": {
+      "path": "$",
+      "stage": "request",
+      "message": "无法构建上游请求体；请检查请求体是否为支持的 JSON object，以及该任务类型必需字段是否存在且取值受支持",
+      "safe_to_show": true,
+      "source_format": "openai:image",
+      "target_format": "openai:image"
+    },
+    "request_body_build_error": {
+      "path": "$",
+      "message": "无法构建上游请求体；请检查请求体是否为支持的 JSON object，以及该任务类型必需字段是否存在且取值受支持"
+    },
+    "error_flow": null,
+    "upstream_response": null
+  },
+  {
+    "request_id": "f620d2d2-6aae-4604-9a38-665b5db32c15",
+    "candidate_index": 0,
+    "retry_index": 0,
+    "status": "skipped",
+    "status_code": null,
+    "error_type": null,
+    "error_message": null,
+    "skip_reason": "provider_request_body_missing",
+    "latency_ms": null,
+    "key_id": "01706faf-2384-4c4f-9a6c-83e709c499d1",
+    "failure_diagnostic": {
+      "path": "$",
+      "stage": "request",
+      "message": "无法构建上游请求体；请检查请求体是否为支持的 JSON object，以及该任务类型必需字段是否存在且取值受支持",
+      "safe_to_show": true,
+      "source_format": "openai:image",
+      "target_format": "openai:image"
+    },
+    "request_body_build_error": {
+      "path": "$",
+      "message": "无法构建上游请求体；请检查请求体是否为支持的 JSON object，以及该任务类型必需字段是否存在且取值受支持"
+    },
+    "error_flow": null,
+    "upstream_response": null
+  },
+  {
+    "request_id": "f620d2d2-6aae-4604-9a38-665b5db32c15",
+    "candidate_index": 1,
+    "retry_index": 0,
+    "status": "skipped",
+    "status_code": null,
+    "error_type": null,
+    "error_message": null,
+    "skip_reason": "provider_request_body_missing",
+    "latency_ms": null,
+    "key_id": "007a6147-4df2-40ca-9dd2-c73195fd0fb1",
+    "failure_diagnostic": {
+      "path": "$",
+      "stage": "request",
+      "message": "无法构建上游请求体；请检查请求体是否为支持的 JSON object，以及该任务类型必需字段是否存在且取值受支持",
+      "safe_to_show": true,
+      "source_format": "openai:image",
+      "target_format": "openai:image"
+    },
+    "request_body_build_error": {
+      "path": "$",
+      "message": "无法构建上游请求体；请检查请求体是否为支持的 JSON object，以及该任务类型必需字段是否存在且取值受支持"
+    },
+    "error_flow": null,
+    "upstream_response": null
+  },
+  {
+    "request_id": "2a522fcf-dfc4-41fd-89fe-b5b528e7207e",
+    "candidate_index": 0,
+    "retry_index": 0,
+    "status": "skipped",
+    "status_code": null,
+    "error_type": null,
+    "error_message": null,
+    "skip_reason": "provider_request_body_missing",
+    "latency_ms": null,
+    "key_id": "0edabd2d-6927-4f38-a359-d9774019f416",
+    "failure_diagnostic": {
+      "path": "$",
+      "stage": "request",
+      "message": "无法构建上游请求体；请检查请求体是否为支持的 JSON object，以及该任务类型必需字段是否存在且取值受支持",
+      "safe_to_show": true,
+      "source_format": "openai:image",
+      "target_format": "openai:image"
+    },
+    "request_body_build_error": {
+      "path": "$",
+      "message": "无法构建上游请求体；请检查请求体是否为支持的 JSON object，以及该任务类型必需字段是否存在且取值受支持"
+    },
+    "error_flow": null,
+    "upstream_response": null
+  },
+  {
+    "request_id": "2a522fcf-dfc4-41fd-89fe-b5b528e7207e",
+    "candidate_index": 1,
+    "retry_index": 0,
+    "status": "skipped",
+    "status_code": null,
+    "error_type": null,
+    "error_message": null,
+    "skip_reason": "provider_request_body_missing",
+    "latency_ms": null,
+    "key_id": "007a6147-4df2-40ca-9dd2-c73195fd0fb1",
+    "failure_diagnostic": {
+      "path": "$",
+      "stage": "request",
+      "message": "无法构建上游请求体；请检查请求体是否为支持的 JSON object，以及该任务类型必需字段是否存在且取值受支持",
+      "safe_to_show": true,
+      "source_format": "openai:image",
+      "target_format": "openai:image"
+    },
+    "request_body_build_error": {
+      "path": "$",
+      "message": "无法构建上游请求体；请检查请求体是否为支持的 JSON object，以及该任务类型必需字段是否存在且取值受支持"
+    },
+    "error_flow": null,
+    "upstream_response": null
+  },
+  {
+    "request_id": "97de52c9-4c0a-4250-a1b1-fe355a5289cf",
+    "candidate_index": 0,
+    "retry_index": 0,
+    "status": "skipped",
+    "status_code": null,
+    "error_type": null,
+    "error_message": null,
+    "skip_reason": "provider_request_body_missing",
+    "latency_ms": null,
+    "key_id": "007a6147-4df2-40ca-9dd2-c73195fd0fb1",
+    "failure_diagnostic": {
+      "path": "$",
+      "stage": "request",
+      "message": "无法构建上游请求体；请检查请求体是否为支持的 JSON object，以及该任务类型必需字段是否存在且取值受支持",
+      "safe_to_show": true,
+      "source_format": "openai:image",
+      "target_format": "openai:image"
+    },
+    "request_body_build_error": {
+      "path": "$",
+      "message": "无法构建上游请求体；请检查请求体是否为支持的 JSON object，以及该任务类型必需字段是否存在且取值受支持"
+    },
+    "error_flow": null,
+    "upstream_response": null
+  },
+  {
+    "request_id": "97de52c9-4c0a-4250-a1b1-fe355a5289cf",
+    "candidate_index": 1,
+    "retry_index": 0,
+    "status": "skipped",
+    "status_code": null,
+    "error_type": null,
+    "error_message": null,
+    "skip_reason": "provider_request_body_missing",
+    "latency_ms": null,
+    "key_id": "0af80141-b9ec-4440-85ed-307d7030ea4e",
+    "failure_diagnostic": {
+      "path": "$",
+      "stage": "request",
+      "message": "无法构建上游请求体；请检查请求体是否为支持的 JSON object，以及该任务类型必需字段是否存在且取值受支持",
+      "safe_to_show": true,
+      "source_format": "openai:image",
+      "target_format": "openai:image"
+    },
+    "request_body_build_error": {
+      "path": "$",
+      "message": "无法构建上游请求体；请检查请求体是否为支持的 JSON object，以及该任务类型必需字段是否存在且取值受支持"
+    },
+    "error_flow": null,
+    "upstream_response": null
+  },
+  {
+    "request_id": "897f4162-104e-4098-a768-5c7c1e899d4a",
+    "candidate_index": 0,
+    "retry_index": 0,
+    "status": "skipped",
+    "status_code": null,
+    "error_type": null,
+    "error_message": null,
+    "skip_reason": "provider_request_body_missing",
+    "latency_ms": null,
+    "key_id": "faec4429-b708-4dd6-9766-9861bb466a61",
+    "failure_diagnostic": {
+      "path": "$",
+      "stage": "request",
+      "message": "无法构建上游请求体；请检查请求体是否为支持的 JSON object，以及该任务类型必需字段是否存在且取值受支持",
+      "safe_to_show": true,
+      "source_format": "openai:image",
+      "target_format": "openai:image"
+    },
+    "request_body_build_error": {
+      "path": "$",
+      "message": "无法构建上游请求体；请检查请求体是否为支持的 JSON object，以及该任务类型必需字段是否存在且取值受支持"
+    },
+    "error_flow": null,
+    "upstream_response": null
+  },
+  {
+    "request_id": "897f4162-104e-4098-a768-5c7c1e899d4a",
+    "candidate_index": 1,
+    "retry_index": 0,
+    "status": "skipped",
+    "status_code": null,
+    "error_type": null,
+    "error_message": null,
+    "skip_reason": "provider_request_body_missing",
+    "latency_ms": null,
+    "key_id": "007a6147-4df2-40ca-9dd2-c73195fd0fb1",
+    "failure_diagnostic": {
+      "path": "$",
+      "stage": "request",
+      "message": "无法构建上游请求体；请检查请求体是否为支持的 JSON object，以及该任务类型必需字段是否存在且取值受支持",
+      "safe_to_show": true,
+      "source_format": "openai:image",
+      "target_format": "openai:image"
+    },
+    "request_body_build_error": {
+      "path": "$",
+      "message": "无法构建上游请求体；请检查请求体是否为支持的 JSON object，以及该任务类型必需字段是否存在且取值受支持"
+    },
+    "error_flow": null,
+    "upstream_response": null
+  },
+  {
+    "request_id": "3a39f9cf-6018-4c03-bc57-0211011f7d27",
+    "candidate_index": 0,
+    "retry_index": 0,
+    "status": "skipped",
+    "status_code": null,
+    "error_type": null,
+    "error_message": null,
+    "skip_reason": "provider_request_body_missing",
+    "latency_ms": null,
+    "key_id": "001b945d-bf5c-4f00-bee2-1705259b4006",
+    "failure_diagnostic": {
+      "path": "$",
+      "stage": "request",
+      "message": "无法构建上游请求体；请检查请求体是否为支持的 JSON object，以及该任务类型必需字段是否存在且取值受支持",
+      "safe_to_show": true,
+      "source_format": "openai:image",
+      "target_format": "openai:image"
+    },
+    "request_body_build_error": {
+      "path": "$",
+      "message": "无法构建上游请求体；请检查请求体是否为支持的 JSON object，以及该任务类型必需字段是否存在且取值受支持"
+    },
+    "error_flow": null,
+    "upstream_response": null
+  },
+  {
+    "request_id": "3a39f9cf-6018-4c03-bc57-0211011f7d27",
+    "candidate_index": 1,
+    "retry_index": 0,
+    "status": "skipped",
+    "status_code": null,
+    "error_type": null,
+    "error_message": null,
+    "skip_reason": "provider_request_body_missing",
+    "latency_ms": null,
+    "key_id": "c1568be6-420d-44fa-9456-b47c7ef2a137",
+    "failure_diagnostic": {
+      "path": "$",
+      "stage": "request",
+      "message": "无法构建上游请求体；请检查请求体是否为支持的 JSON object，以及该任务类型必需字段是否存在且取值受支持",
+      "safe_to_show": true,
+      "source_format": "openai:image",
+      "target_format": "openai:image"
+    },
+    "request_body_build_error": {
+      "path": "$",
+      "message": "无法构建上游请求体；请检查请求体是否为支持的 JSON object，以及该任务类型必需字段是否存在且取值受支持"
+    },
+    "error_flow": null,
+    "upstream_response": null
+  },
+  {
+    "request_id": "eac587f1-0492-4fbb-a0d2-60a4284bc55d",
+    "candidate_index": 0,
+    "retry_index": 0,
+    "status": "skipped",
+    "status_code": null,
+    "error_type": null,
+    "error_message": null,
+    "skip_reason": "provider_request_body_missing",
+    "latency_ms": null,
+    "key_id": "264d44ba-9572-4bde-97a2-495505a9fd84",
+    "failure_diagnostic": {
+      "path": "$",
+      "stage": "request",
+      "message": "无法构建上游请求体；请检查请求体是否为支持的 JSON object，以及该任务类型必需字段是否存在且取值受支持",
+      "safe_to_show": true,
+      "source_format": "openai:image",
+      "target_format": "openai:image"
+    },
+    "request_body_build_error": {
+      "path": "$",
+      "message": "无法构建上游请求体；请检查请求体是否为支持的 JSON object，以及该任务类型必需字段是否存在且取值受支持"
+    },
+    "error_flow": null,
+    "upstream_response": null
+  },
+  {
+    "request_id": "eac587f1-0492-4fbb-a0d2-60a4284bc55d",
+    "candidate_index": 1,
+    "retry_index": 0,
+    "status": "skipped",
+    "status_code": null,
+    "error_type": null,
+    "error_message": null,
+    "skip_reason": "provider_request_body_missing",
+    "latency_ms": null,
+    "key_id": "00af4835-aacf-4730-bd2a-5910ce6cb7e1",
+    "failure_diagnostic": {
+      "path": "$",
+      "stage": "request",
+      "message": "无法构建上游请求体；请检查请求体是否为支持的 JSON object，以及该任务类型必需字段是否存在且取值受支持",
+      "safe_to_show": true,
+      "source_format": "openai:image",
+      "target_format": "openai:image"
+    },
+    "request_body_build_error": {
+      "path": "$",
+      "message": "无法构建上游请求体；请检查请求体是否为支持的 JSON object，以及该任务类型必需字段是否存在且取值受支持"
+    },
+    "error_flow": null,
+    "upstream_response": null
+  },
+  {
+    "request_id": "6f83c71b-45f5-4753-957c-639efae32c59",
+    "candidate_index": 0,
+    "retry_index": 0,
+    "status": "skipped",
+    "status_code": null,
+    "error_type": null,
+    "error_message": null,
+    "skip_reason": "provider_request_body_missing",
+    "latency_ms": null,
+    "key_id": "00af4835-aacf-4730-bd2a-5910ce6cb7e1",
+    "failure_diagnostic": {
+      "path": "$",
+      "stage": "request",
+      "message": "无法构建上游请求体；请检查请求体是否为支持的 JSON object，以及该任务类型必需字段是否存在且取值受支持",
+      "safe_to_show": true,
+      "source_format": "openai:image",
+      "target_format": "openai:image"
+    },
+    "request_body_build_error": {
+      "path": "$",
+      "message": "无法构建上游请求体；请检查请求体是否为支持的 JSON object，以及该任务类型必需字段是否存在且取值受支持"
+    },
+    "error_flow": null,
+    "upstream_response": null
+  },
+  {
+    "request_id": "6f83c71b-45f5-4753-957c-639efae32c59",
+    "candidate_index": 1,
+    "retry_index": 0,
+    "status": "skipped",
+    "status_code": null,
+    "error_type": null,
+    "error_message": null,
+    "skip_reason": "provider_request_body_missing",
+    "latency_ms": null,
+    "key_id": "062f682f-58c7-493b-aa4f-0c4375f9e61a",
+    "failure_diagnostic": {
+      "path": "$",
+      "stage": "request",
+      "message": "无法构建上游请求体；请检查请求体是否为支持的 JSON object，以及该任务类型必需字段是否存在且取值受支持",
+      "safe_to_show": true,
+      "source_format": "openai:image",
+      "target_format": "openai:image"
+    },
+    "request_body_build_error": {
+      "path": "$",
+      "message": "无法构建上游请求体；请检查请求体是否为支持的 JSON object，以及该任务类型必需字段是否存在且取值受支持"
+    },
+    "error_flow": null,
+    "upstream_response": null
+  },
+  {
+    "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+    "candidate_index": 1,
+    "retry_index": 500,
+    "status": "failed",
+    "status_code": 401,
+    "error_type": null,
+    "error_message": "ChatGPT-Web requirements returned HTTP 401",
+    "skip_reason": null,
+    "latency_ms": 175,
+    "key_id": "01635009-8490-4d0b-b6fb-94916f9b7d3a",
+    "failure_diagnostic": null,
+    "request_body_build_error": null,
+    "error_flow": {
+      "stage": "candidate",
+      "source": "upstream_response",
+      "message": "ChatGPT-Web requirements returned HTTP 401",
+      "decision": "retry_next_candidate",
+      "retryable": true,
+      "propagation": "suppressed",
+      "status_code": 401,
+      "classification": "retry_upstream_failure",
+      "safe_to_expose": false
+    },
+    "upstream_response": {
+      "body": {
+        "error": {
+          "code": "chatgpt_web_image_execution_unavailable",
+          "type": "upstream_error",
+          "message": "ChatGPT-Web requirements returned HTTP 401"
+        }
+      },
+      "headers": {
+        "content-type": "application/json",
+        "content-length": "139"
+      },
+      "status_code": 401
+    }
+  },
+  {
+    "request_id": "f33ef725-ed14-484c-bcfe-783cf2af9f51",
+    "candidate_index": 0,
+    "retry_index": 0,
+    "status": "failed",
+    "status_code": 400,
+    "error_type": "stream_terminal_error",
+    "error_message": "你已达到 Free",
+    "skip_reason": null,
+    "latency_ms": 17289,
+    "key_id": "014d1b54-57ea-4b07-a6d7-7fc17dfbbdc0",
+    "failure_diagnostic": null,
+    "request_body_build_error": null,
+    "error_flow": {
+      "stage": "candidate",
+      "source": "upstream_response",
+      "message": "你已达到 Free",
+      "decision": "retry_next_candidate",
+      "retryable": true,
+      "propagation": "suppressed",
+      "status_code": 400,
+      "classification": "retry_upstream_failure",
+      "safe_to_expose": false
+    },
+    "upstream_response": {
+      "body": {
+        "error": {
+          "code": "chatgpt_web_no_image",
+          "type": "stream_terminal_error",
+          "message": "你已达到 Free"
+        }
+      },
+      "headers": {
+        "content-type": "text/event-stream",
+        "cache-control": "no-cache"
+      },
+      "status_code": 400
+    }
+  },
+  {
+    "request_id": "c74ea578-1c46-4ba4-9da5-3f0c61b54b38",
+    "candidate_index": 0,
+    "retry_index": 0,
+    "status": "failed",
+    "status_code": 400,
+    "error_type": "stream_terminal_error",
+    "error_message": "你已达到 Free",
+    "skip_reason": null,
+    "latency_ms": 17528,
+    "key_id": "014d1b54-57ea-4b07-a6d7-7fc17dfbbdc0",
+    "failure_diagnostic": null,
+    "request_body_build_error": null,
+    "error_flow": {
+      "stage": "candidate",
+      "source": "upstream_response",
+      "message": "你已达到 Free",
+      "decision": "retry_next_candidate",
+      "retryable": true,
+      "propagation": "suppressed",
+      "status_code": 400,
+      "classification": "retry_upstream_failure",
+      "safe_to_expose": false
+    },
+    "upstream_response": {
+      "body": {
+        "error": {
+          "code": "chatgpt_web_no_image",
+          "type": "stream_terminal_error",
+          "message": "你已达到 Free"
+        }
+      },
+      "headers": {
+        "content-type": "text/event-stream",
+        "cache-control": "no-cache"
+      },
+      "status_code": 400
+    }
+  },
+  {
+    "request_id": "d06b41de-e704-4978-b666-af304698b01f",
+    "candidate_index": 0,
+    "retry_index": 0,
+    "status": "failed",
+    "status_code": 400,
+    "error_type": "stream_terminal_error",
+    "error_message": "你已达到 Free",
+    "skip_reason": null,
+    "latency_ms": 27291,
+    "key_id": "014d1b54-57ea-4b07-a6d7-7fc17dfbbdc0",
+    "failure_diagnostic": null,
+    "request_body_build_error": null,
+    "error_flow": {
+      "stage": "candidate",
+      "source": "upstream_response",
+      "message": "你已达到 Free",
+      "decision": "retry_next_candidate",
+      "retryable": true,
+      "propagation": "suppressed",
+      "status_code": 400,
+      "classification": "retry_upstream_failure",
+      "safe_to_expose": false
+    },
+    "upstream_response": {
+      "body": {
+        "error": {
+          "code": "chatgpt_web_no_image",
+          "type": "stream_terminal_error",
+          "message": "你已达到 Free"
+        }
+      },
+      "headers": {
+        "content-type": "text/event-stream",
+        "cache-control": "no-cache"
+      },
+      "status_code": 400
+    }
+  },
+  {
+    "request_id": "d645e892-1b74-4ad6-9318-45fe07dfbc99",
+    "candidate_index": 0,
+    "retry_index": 0,
+    "status": "failed",
+    "status_code": 400,
+    "error_type": "stream_terminal_error",
+    "error_message": "你已达到 Free 套餐的图像生成请求上",
+    "skip_reason": null,
+    "latency_ms": 21218,
+    "key_id": "014d1b54-57ea-4b07-a6d7-7fc17dfbbdc0",
+    "failure_diagnostic": null,
+    "request_body_build_error": null,
+    "error_flow": {
+      "stage": "candidate",
+      "source": "upstream_response",
+      "message": "你已达到 Free 套餐的图像生成请求上",
+      "decision": "retry_next_candidate",
+      "retryable": true,
+      "propagation": "suppressed",
+      "status_code": 400,
+      "classification": "retry_upstream_failure",
+      "safe_to_expose": false
+    },
+    "upstream_response": {
+      "body": {
+        "error": {
+          "code": "chatgpt_web_no_image",
+          "type": "stream_terminal_error",
+          "message": "你已达到 Free 套餐的图像生成请求上"
+        }
+      },
+      "headers": {
+        "content-type": "text/event-stream",
+        "cache-control": "no-cache"
+      },
+      "status_code": 400
+    }
+  },
+  {
+    "request_id": "8c67d383-574b-4be1-961d-e83dd3854f93",
+    "candidate_index": 0,
+    "retry_index": 0,
+    "status": "failed",
+    "status_code": 400,
+    "error_type": "stream_terminal_error",
+    "error_message": "你已达到 Free",
+    "skip_reason": null,
+    "latency_ms": 26149,
+    "key_id": "014d1b54-57ea-4b07-a6d7-7fc17dfbbdc0",
+    "failure_diagnostic": null,
+    "request_body_build_error": null,
+    "error_flow": {
+      "stage": "candidate",
+      "source": "upstream_response",
+      "message": "你已达到 Free",
+      "decision": "retry_next_candidate",
+      "retryable": true,
+      "propagation": "suppressed",
+      "status_code": 400,
+      "classification": "retry_upstream_failure",
+      "safe_to_expose": false
+    },
+    "upstream_response": {
+      "body": {
+        "error": {
+          "code": "chatgpt_web_no_image",
+          "type": "stream_terminal_error",
+          "message": "你已达到 Free"
+        }
+      },
+      "headers": {
+        "content-type": "text/event-stream",
+        "cache-control": "no-cache"
+      },
+      "status_code": 400
+    }
+  },
+  {
+    "request_id": "e8f8aa37-bfcb-4767-a366-87e2c4b0e4b9",
+    "candidate_index": 0,
+    "retry_index": 0,
+    "status": "failed",
+    "status_code": 400,
+    "error_type": "stream_terminal_error",
+    "error_message": "你",
+    "skip_reason": null,
+    "latency_ms": 22127,
+    "key_id": "014d1b54-57ea-4b07-a6d7-7fc17dfbbdc0",
+    "failure_diagnostic": null,
+    "request_body_build_error": null,
+    "error_flow": {
+      "stage": "candidate",
+      "source": "upstream_response",
+      "message": "你",
+      "decision": "retry_next_candidate",
+      "retryable": true,
+      "propagation": "suppressed",
+      "status_code": 400,
+      "classification": "retry_upstream_failure",
+      "safe_to_expose": false
+    },
+    "upstream_response": {
+      "body": {
+        "error": {
+          "code": "chatgpt_web_no_image",
+          "type": "stream_terminal_error",
+          "message": "你"
+        }
+      },
+      "headers": {
+        "content-type": "text/event-stream",
+        "cache-control": "no-cache"
+      },
+      "status_code": 400
+    }
+  },
+  {
+    "request_id": "7b4c663d-a874-45fc-ae27-49d65889c8dc",
+    "candidate_index": 0,
+    "retry_index": 0,
+    "status": "failed",
+    "status_code": 400,
+    "error_type": "stream_terminal_error",
+    "error_message": "你已达到 Free 套餐的",
+    "skip_reason": null,
+    "latency_ms": 20004,
+    "key_id": "0144b66f-1bd3-4f3d-9c63-b15817213dfa",
+    "failure_diagnostic": null,
+    "request_body_build_error": null,
+    "error_flow": {
+      "stage": "candidate",
+      "source": "upstream_response",
+      "message": "你已达到 Free 套餐的",
+      "decision": "retry_next_candidate",
+      "retryable": true,
+      "propagation": "suppressed",
+      "status_code": 400,
+      "classification": "retry_upstream_failure",
+      "safe_to_expose": false
+    },
+    "upstream_response": {
+      "body": {
+        "error": {
+          "code": "chatgpt_web_no_image",
+          "type": "stream_terminal_error",
+          "message": "你已达到 Free 套餐的"
+        }
+      },
+      "headers": {
+        "content-type": "text/event-stream",
+        "cache-control": "no-cache"
+      },
+      "status_code": 400
+    }
+  },
+  {
+    "request_id": "e2706b9c-aa01-4b20-a358-beecbb2ac752",
+    "candidate_index": 0,
+    "retry_index": 0,
+    "status": "skipped",
+    "status_code": null,
+    "error_type": null,
+    "error_message": null,
+    "skip_reason": "provider_request_body_missing",
+    "latency_ms": null,
+    "key_id": "8ff49281-01c0-42ee-90f7-65055ff69225",
+    "failure_diagnostic": {
+      "path": "$",
+      "stage": "request",
+      "message": "无法构建上游请求体；请检查请求体是否为支持的 JSON object，以及该任务类型必需字段是否存在且取值受支持",
+      "safe_to_show": true,
+      "source_format": "openai:image",
+      "target_format": "openai:image"
+    },
+    "request_body_build_error": {
+      "path": "$",
+      "message": "无法构建上游请求体；请检查请求体是否为支持的 JSON object，以及该任务类型必需字段是否存在且取值受支持"
+    },
+    "error_flow": null,
+    "upstream_response": null
+  },
+  {
+    "request_id": "e2706b9c-aa01-4b20-a358-beecbb2ac752",
+    "candidate_index": 1,
+    "retry_index": 0,
+    "status": "skipped",
+    "status_code": null,
+    "error_type": null,
+    "error_message": null,
+    "skip_reason": "provider_request_body_missing",
+    "latency_ms": null,
+    "key_id": "0154e7ce-7b02-4a53-bf3d-e920b4ee81e7",
+    "failure_diagnostic": {
+      "path": "$",
+      "stage": "request",
+      "message": "无法构建上游请求体；请检查请求体是否为支持的 JSON object，以及该任务类型必需字段是否存在且取值受支持",
+      "safe_to_show": true,
+      "source_format": "openai:image",
+      "target_format": "openai:image"
+    },
+    "request_body_build_error": {
+      "path": "$",
+      "message": "无法构建上游请求体；请检查请求体是否为支持的 JSON object，以及该任务类型必需字段是否存在且取值受支持"
+    },
+    "error_flow": null,
+    "upstream_response": null
+  },
+  {
+    "request_id": "ebdfcd6f-d3c4-4b4d-a207-c282e987626a",
+    "candidate_index": 0,
+    "retry_index": 0,
+    "status": "skipped",
+    "status_code": null,
+    "error_type": null,
+    "error_message": null,
+    "skip_reason": "provider_request_body_missing",
+    "latency_ms": null,
+    "key_id": "fcf03c9d-2fa8-4807-9d9c-12a38db35d9f",
+    "failure_diagnostic": {
+      "path": "$",
+      "stage": "request",
+      "message": "无法构建上游请求体；请检查请求体是否为支持的 JSON object，以及该任务类型必需字段是否存在且取值受支持",
+      "safe_to_show": true,
+      "source_format": "openai:image",
+      "target_format": "openai:image"
+    },
+    "request_body_build_error": {
+      "path": "$",
+      "message": "无法构建上游请求体；请检查请求体是否为支持的 JSON object，以及该任务类型必需字段是否存在且取值受支持"
+    },
+    "error_flow": null,
+    "upstream_response": null
+  },
+  {
+    "request_id": "d9000008-6823-443f-bf0f-6a96a84ce23a",
+    "candidate_index": 0,
+    "retry_index": 0,
+    "status": "failed",
+    "status_code": 400,
+    "error_type": "stream_terminal_error",
+    "error_message": "你已达到 Free",
+    "skip_reason": null,
+    "latency_ms": 16674,
+    "key_id": "014f87b8-45d0-4e17-b1fc-a8f9d7e1ff48",
+    "failure_diagnostic": null,
+    "request_body_build_error": null,
+    "error_flow": {
+      "stage": "candidate",
+      "source": "upstream_response",
+      "message": "你已达到 Free",
+      "decision": "retry_next_candidate",
+      "retryable": true,
+      "propagation": "suppressed",
+      "status_code": 400,
+      "classification": "retry_upstream_failure",
+      "safe_to_expose": false
+    },
+    "upstream_response": {
+      "body": {
+        "error": {
+          "code": "chatgpt_web_no_image",
+          "type": "stream_terminal_error",
+          "message": "你已达到 Free"
+        }
+      },
+      "headers": {
+        "content-type": "text/event-stream",
+        "cache-control": "no-cache"
+      },
+      "status_code": 400
+    }
+  },
+  {
+    "request_id": "ebdfcd6f-d3c4-4b4d-a207-c282e987626a",
+    "candidate_index": 1,
+    "retry_index": 0,
+    "status": "skipped",
+    "status_code": null,
+    "error_type": null,
+    "error_message": null,
+    "skip_reason": "provider_request_body_missing",
+    "latency_ms": null,
+    "key_id": "015791b1-39d6-4430-a046-c1bcbf8876d7",
+    "failure_diagnostic": {
+      "path": "$",
+      "stage": "request",
+      "message": "无法构建上游请求体；请检查请求体是否为支持的 JSON object，以及该任务类型必需字段是否存在且取值受支持",
+      "safe_to_show": true,
+      "source_format": "openai:image",
+      "target_format": "openai:image"
+    },
+    "request_body_build_error": {
+      "path": "$",
+      "message": "无法构建上游请求体；请检查请求体是否为支持的 JSON object，以及该任务类型必需字段是否存在且取值受支持"
+    },
+    "error_flow": null,
+    "upstream_response": null
+  },
+  {
+    "request_id": "a740d6a6-37de-4df8-b706-e55a1050e7ac",
+    "candidate_index": 0,
+    "retry_index": 0,
+    "status": "failed",
+    "status_code": 400,
+    "error_type": "stream_terminal_error",
+    "error_message": "你已达到 Free 套餐的图像生成请求上限。上限将在 24小时 后重置，届时可创建更多图像。\n\n本次未能调用图像生成工具，因此暂时无法完成这张鞋子商品图的背景替换。",
+    "skip_reason": null,
+    "latency_ms": 151894,
+    "key_id": "014f87b8-45d0-4e17-b1fc-a8f9d7e1ff48",
+    "failure_diagnostic": null,
+    "request_body_build_error": null,
+    "error_flow": {
+      "stage": "candidate",
+      "source": "upstream_response",
+      "message": "你已达到 Free 套餐的图像生成请求上限。上限将在 24小时 后重置，届时可创建更多图像。\n\n本次未能调用图像生成工具，因此暂时无法完成这张鞋子商品图的背景替换。",
+      "decision": "retry_next_candidate",
+      "retryable": true,
+      "propagation": "suppressed",
+      "status_code": 400,
+      "classification": "retry_upstream_failure",
+      "safe_to_expose": false
+    },
+    "upstream_response": {
+      "body": {
+        "error": {
+          "code": "chatgpt_web_no_image",
+          "type": "stream_terminal_error",
+          "message": "你已达到 Free 套餐的图像生成请求上限。上限将在 24小时 后重置，届时可创建更多图像。\n\n本次未能调用图像生成工具，因此暂时无法完成这张鞋子商品图的背景替换。"
+        }
+      },
+      "headers": {
+        "content-type": "text/event-stream",
+        "cache-control": "no-cache"
+      },
+      "status_code": 400
+    }
+  },
+  {
+    "request_id": "9d009778-8110-4c42-90a2-e20d8401b9b2",
+    "candidate_index": 0,
+    "retry_index": 0,
+    "status": "skipped",
+    "status_code": null,
+    "error_type": null,
+    "error_message": null,
+    "skip_reason": "provider_request_body_missing",
+    "latency_ms": null,
+    "key_id": "01764f22-cda5-4b5d-bd3c-7aa2f1358291",
+    "failure_diagnostic": {
+      "path": "$",
+      "stage": "request",
+      "message": "无法构建上游请求体；请检查请求体是否为支持的 JSON object，以及该任务类型必需字段是否存在且取值受支持",
+      "safe_to_show": true,
+      "source_format": "openai:image",
+      "target_format": "openai:image"
+    },
+    "request_body_build_error": {
+      "path": "$",
+      "message": "无法构建上游请求体；请检查请求体是否为支持的 JSON object，以及该任务类型必需字段是否存在且取值受支持"
+    },
+    "error_flow": null,
+    "upstream_response": null
+  },
+  {
+    "request_id": "9d009778-8110-4c42-90a2-e20d8401b9b2",
+    "candidate_index": 1,
+    "retry_index": 0,
+    "status": "skipped",
+    "status_code": null,
+    "error_type": null,
+    "error_message": null,
+    "skip_reason": "provider_request_body_missing",
+    "latency_ms": null,
+    "key_id": "8fdebefb-374d-4964-ad6a-02cdcd3f5f6a",
+    "failure_diagnostic": {
+      "path": "$",
+      "stage": "request",
+      "message": "无法构建上游请求体；请检查请求体是否为支持的 JSON object，以及该任务类型必需字段是否存在且取值受支持",
+      "safe_to_show": true,
+      "source_format": "openai:image",
+      "target_format": "openai:image"
+    },
+    "request_body_build_error": {
+      "path": "$",
+      "message": "无法构建上游请求体；请检查请求体是否为支持的 JSON object，以及该任务类型必需字段是否存在且取值受支持"
+    },
+    "error_flow": null,
+    "upstream_response": null
+  },
+  {
+    "request_id": "4b8d72b6-027b-400c-a580-f189b2b6a895",
+    "candidate_index": 0,
+    "retry_index": 0,
+    "status": "failed",
+    "status_code": 400,
+    "error_type": "stream_terminal_error",
+    "error_message": "你已达到 Free 套餐的",
+    "skip_reason": null,
+    "latency_ms": 23619,
+    "key_id": "0154e7ce-7b02-4a53-bf3d-e920b4ee81e7",
+    "failure_diagnostic": null,
+    "request_body_build_error": null,
+    "error_flow": {
+      "stage": "candidate",
+      "source": "upstream_response",
+      "message": "你已达到 Free 套餐的",
+      "decision": "retry_next_candidate",
+      "retryable": true,
+      "propagation": "suppressed",
+      "status_code": 400,
+      "classification": "retry_upstream_failure",
+      "safe_to_expose": false
+    },
+    "upstream_response": {
+      "body": {
+        "error": {
+          "code": "chatgpt_web_no_image",
+          "type": "stream_terminal_error",
+          "message": "你已达到 Free 套餐的"
+        }
+      },
+      "headers": {
+        "content-type": "text/event-stream",
+        "cache-control": "no-cache"
+      },
+      "status_code": 400
+    }
+  },
+  {
+    "request_id": "0c1aed5b-1de0-4ab2-ba2f-5ca016cb18e1",
+    "candidate_index": 0,
+    "retry_index": 0,
+    "status": "failed",
+    "status_code": 400,
+    "error_type": "stream_terminal_error",
+    "error_message": "你已达到 Free 套餐的图像生成请求",
+    "skip_reason": null,
+    "latency_ms": 15106,
+    "key_id": "0154e7ce-7b02-4a53-bf3d-e920b4ee81e7",
+    "failure_diagnostic": null,
+    "request_body_build_error": null,
+    "error_flow": {
+      "stage": "candidate",
+      "source": "upstream_response",
+      "message": "你已达到 Free 套餐的图像生成请求",
+      "decision": "retry_next_candidate",
+      "retryable": true,
+      "propagation": "suppressed",
+      "status_code": 400,
+      "classification": "retry_upstream_failure",
+      "safe_to_expose": false
+    },
+    "upstream_response": {
+      "body": {
+        "error": {
+          "code": "chatgpt_web_no_image",
+          "type": "stream_terminal_error",
+          "message": "你已达到 Free 套餐的图像生成请求"
+        }
+      },
+      "headers": {
+        "content-type": "text/event-stream",
+        "cache-control": "no-cache"
+      },
+      "status_code": 400
+    }
+  },
+  {
+    "request_id": "880f94c3-86ca-447e-8c7f-d39e1607c4af",
+    "candidate_index": 0,
+    "retry_index": 0,
+    "status": "failed",
+    "status_code": 400,
+    "error_type": "stream_terminal_error",
+    "error_message": "你已达到 Free 套餐的图像生成请求",
+    "skip_reason": null,
+    "latency_ms": 16069,
+    "key_id": "0154e7ce-7b02-4a53-bf3d-e920b4ee81e7",
+    "failure_diagnostic": null,
+    "request_body_build_error": null,
+    "error_flow": {
+      "stage": "candidate",
+      "source": "upstream_response",
+      "message": "你已达到 Free 套餐的图像生成请求",
+      "decision": "retry_next_candidate",
+      "retryable": true,
+      "propagation": "suppressed",
+      "status_code": 400,
+      "classification": "retry_upstream_failure",
+      "safe_to_expose": false
+    },
+    "upstream_response": {
+      "body": {
+        "error": {
+          "code": "chatgpt_web_no_image",
+          "type": "stream_terminal_error",
+          "message": "你已达到 Free 套餐的图像生成请求"
+        }
+      },
+      "headers": {
+        "content-type": "text/event-stream",
+        "cache-control": "no-cache"
+      },
+      "status_code": 400
+    }
+  },
+  {
+    "request_id": "b39dde70-ef87-43c3-9e0d-73d61afedd53",
+    "candidate_index": 0,
+    "retry_index": 0,
+    "status": "failed",
+    "status_code": 400,
+    "error_type": "stream_terminal_error",
+    "error_message": "你已达到 Free 套餐的图像生成请求",
+    "skip_reason": null,
+    "latency_ms": 15129,
+    "key_id": "0154e7ce-7b02-4a53-bf3d-e920b4ee81e7",
+    "failure_diagnostic": null,
+    "request_body_build_error": null,
+    "error_flow": {
+      "stage": "candidate",
+      "source": "upstream_response",
+      "message": "你已达到 Free 套餐的图像生成请求",
+      "decision": "retry_next_candidate",
+      "retryable": true,
+      "propagation": "suppressed",
+      "status_code": 400,
+      "classification": "retry_upstream_failure",
+      "safe_to_expose": false
+    },
+    "upstream_response": {
+      "body": {
+        "error": {
+          "code": "chatgpt_web_no_image",
+          "type": "stream_terminal_error",
+          "message": "你已达到 Free 套餐的图像生成请求"
+        }
+      },
+      "headers": {
+        "content-type": "text/event-stream",
+        "cache-control": "no-cache"
+      },
+      "status_code": 400
+    }
+  },
+  {
+    "request_id": "a84fcac2-3fa1-49b1-9ed8-51efdafada3b",
+    "candidate_index": 0,
+    "retry_index": 0,
+    "status": "failed",
+    "status_code": 400,
+    "error_type": "stream_terminal_error",
+    "error_message": "你已达到 Free 套餐的图像生成请求上限",
+    "skip_reason": null,
+    "latency_ms": 17860,
+    "key_id": "0154e7ce-7b02-4a53-bf3d-e920b4ee81e7",
+    "failure_diagnostic": null,
+    "request_body_build_error": null,
+    "error_flow": {
+      "stage": "candidate",
+      "source": "upstream_response",
+      "message": "你已达到 Free 套餐的图像生成请求上限",
+      "decision": "retry_next_candidate",
+      "retryable": true,
+      "propagation": "suppressed",
+      "status_code": 400,
+      "classification": "retry_upstream_failure",
+      "safe_to_expose": false
+    },
+    "upstream_response": {
+      "body": {
+        "error": {
+          "code": "chatgpt_web_no_image",
+          "type": "stream_terminal_error",
+          "message": "你已达到 Free 套餐的图像生成请求上限"
+        }
+      },
+      "headers": {
+        "content-type": "text/event-stream",
+        "cache-control": "no-cache"
+      },
+      "status_code": 400
+    }
+  },
+  {
+    "request_id": "eaef55d4-cc72-479f-81fc-55aca2bcad2a",
+    "candidate_index": 0,
+    "retry_index": 0,
+    "status": "failed",
+    "status_code": 400,
+    "error_type": "stream_terminal_error",
+    "error_message": "你已达到 Free 套餐的图像生成请求",
+    "skip_reason": null,
+    "latency_ms": 14921,
+    "key_id": "0154e7ce-7b02-4a53-bf3d-e920b4ee81e7",
+    "failure_diagnostic": null,
+    "request_body_build_error": null,
+    "error_flow": {
+      "stage": "candidate",
+      "source": "upstream_response",
+      "message": "你已达到 Free 套餐的图像生成请求",
+      "decision": "retry_next_candidate",
+      "retryable": true,
+      "propagation": "suppressed",
+      "status_code": 400,
+      "classification": "retry_upstream_failure",
+      "safe_to_expose": false
+    },
+    "upstream_response": {
+      "body": {
+        "error": {
+          "code": "chatgpt_web_no_image",
+          "type": "stream_terminal_error",
+          "message": "你已达到 Free 套餐的图像生成请求"
+        }
+      },
+      "headers": {
+        "content-type": "text/event-stream",
+        "cache-control": "no-cache"
+      },
+      "status_code": 400
+    }
+  },
+  {
+    "request_id": "722aa949-5651-40cb-addc-97811dbdef96",
+    "candidate_index": 0,
+    "retry_index": 0,
+    "status": "skipped",
+    "status_code": null,
+    "error_type": null,
+    "error_message": null,
+    "skip_reason": "provider_request_body_missing",
+    "latency_ms": null,
+    "key_id": "017332c0-d2bb-4996-be73-ab3f1ef4ca43",
+    "failure_diagnostic": {
+      "path": "$",
+      "stage": "request",
+      "message": "无法构建上游请求体；请检查请求体是否为支持的 JSON object，以及该任务类型必需字段是否存在且取值受支持",
+      "safe_to_show": true,
+      "source_format": "openai:image",
+      "target_format": "openai:image"
+    },
+    "request_body_build_error": {
+      "path": "$",
+      "message": "无法构建上游请求体；请检查请求体是否为支持的 JSON object，以及该任务类型必需字段是否存在且取值受支持"
+    },
+    "error_flow": null,
+    "upstream_response": null
+  },
+  {
+    "request_id": "722aa949-5651-40cb-addc-97811dbdef96",
+    "candidate_index": 1,
+    "retry_index": 0,
+    "status": "skipped",
+    "status_code": null,
+    "error_type": null,
+    "error_message": null,
+    "skip_reason": "provider_request_body_missing",
+    "latency_ms": null,
+    "key_id": "eb42c667-14ad-41ff-9d80-08c7137e7a04",
+    "failure_diagnostic": {
+      "path": "$",
+      "stage": "request",
+      "message": "无法构建上游请求体；请检查请求体是否为支持的 JSON object，以及该任务类型必需字段是否存在且取值受支持",
+      "safe_to_show": true,
+      "source_format": "openai:image",
+      "target_format": "openai:image"
+    },
+    "request_body_build_error": {
+      "path": "$",
+      "message": "无法构建上游请求体；请检查请求体是否为支持的 JSON object，以及该任务类型必需字段是否存在且取值受支持"
+    },
+    "error_flow": null,
+    "upstream_response": null
+  },
+  {
+    "request_id": "f563ffcd-aabe-4d3e-8c57-63912967bfba",
+    "candidate_index": 0,
+    "retry_index": 0,
+    "status": "failed",
+    "status_code": 500,
+    "error_type": null,
+    "error_message": "ChatGPT-Web conversation returned HTTP 500",
+    "skip_reason": null,
+    "latency_ms": 5107,
+    "key_id": "017332c0-d2bb-4996-be73-ab3f1ef4ca43",
+    "failure_diagnostic": null,
+    "request_body_build_error": null,
+    "error_flow": {
+      "stage": "candidate",
+      "source": "upstream_response",
+      "message": "ChatGPT-Web conversation returned HTTP 500",
+      "decision": "retry_next_candidate",
+      "retryable": true,
+      "propagation": "suppressed",
+      "status_code": 500,
+      "classification": "retry_upstream_failure",
+      "safe_to_expose": false
+    },
+    "upstream_response": {
+      "body": {
+        "error": {
+          "code": "chatgpt_web_image_execution_unavailable",
+          "type": "upstream_error",
+          "message": "ChatGPT-Web conversation returned HTTP 500"
+        }
+      },
+      "headers": {
+        "content-type": "application/json",
+        "content-length": "139"
+      },
+      "status_code": 500
+    }
+  },
+  {
+    "request_id": "bff5e6b8-fdda-4811-9c65-15e68c771ad9",
+    "candidate_index": 0,
+    "retry_index": 0,
+    "status": "failed",
+    "status_code": 400,
+    "error_type": "stream_terminal_error",
+    "error_message": "可以制作一部《特洛伊病毒木",
+    "skip_reason": null,
+    "latency_ms": 15062,
+    "key_id": "01764f22-cda5-4b5d-bd3c-7aa2f1358291",
+    "failure_diagnostic": null,
+    "request_body_build_error": null,
+    "error_flow": {
+      "stage": "candidate",
+      "source": "upstream_response",
+      "message": "可以制作一部《特洛伊病毒木",
+      "decision": "retry_next_candidate",
+      "retryable": true,
+      "propagation": "suppressed",
+      "status_code": 400,
+      "classification": "retry_upstream_failure",
+      "safe_to_expose": false
+    },
+    "upstream_response": {
+      "body": {
+        "error": {
+          "code": "chatgpt_web_no_image",
+          "type": "stream_terminal_error",
+          "message": "可以制作一部《特洛伊病毒木"
+        }
+      },
+      "headers": {
+        "content-type": "text/event-stream",
+        "cache-control": "no-cache"
+      },
+      "status_code": 400
+    }
+  },
+  {
+    "request_id": "bff5e6b8-fdda-4811-9c65-15e68c771ad9",
+    "candidate_index": 0,
+    "retry_index": 100,
+    "status": "failed",
+    "status_code": 400,
+    "error_type": "stream_terminal_error",
+    "error_message": "你想要的是关于**特洛伊木马病毒（Trojan Horse）**的",
+    "skip_reason": null,
+    "latency_ms": 16152,
+    "key_id": "01825443-9072-4289-b0b3-922ab2dfe47f",
+    "failure_diagnostic": null,
+    "request_body_build_error": null,
+    "error_flow": {
+      "stage": "candidate",
+      "source": "upstream_response",
+      "message": "你想要的是关于**特洛伊木马病毒（Trojan Horse）**的",
+      "decision": "retry_next_candidate",
+      "retryable": true,
+      "propagation": "suppressed",
+      "status_code": 400,
+      "classification": "retry_upstream_failure",
+      "safe_to_expose": false
+    },
+    "upstream_response": {
+      "body": {
+        "error": {
+          "code": "chatgpt_web_no_image",
+          "type": "stream_terminal_error",
+          "message": "你想要的是关于**特洛伊木马病毒（Trojan Horse）**的"
+        }
+      },
+      "headers": {
+        "content-type": "text/event-stream",
+        "cache-control": "no-cache"
+      },
+      "status_code": 400
+    }
+  },
+  {
+    "request_id": "bff5e6b8-fdda-4811-9c65-15e68c771ad9",
+    "candidate_index": 0,
+    "retry_index": 200,
+    "status": "failed",
+    "status_code": 400,
+    "error_type": "stream_terminal_error",
+    "error_message": "可以制作一支《特洛伊木马病毒》主题的宣传片脚本和分镜方案。我先按",
+    "skip_reason": null,
+    "latency_ms": 16866,
+    "key_id": "01904bfb-2db4-4c04-8368-669f424f594b",
+    "failure_diagnostic": null,
+    "request_body_build_error": null,
+    "error_flow": {
+      "stage": "candidate",
+      "source": "upstream_response",
+      "message": "可以制作一支《特洛伊木马病毒》主题的宣传片脚本和分镜方案。我先按",
+      "decision": "retry_next_candidate",
+      "retryable": true,
+      "propagation": "suppressed",
+      "status_code": 400,
+      "classification": "retry_upstream_failure",
+      "safe_to_expose": false
+    },
+    "upstream_response": {
+      "body": {
+        "error": {
+          "code": "chatgpt_web_no_image",
+          "type": "stream_terminal_error",
+          "message": "可以制作一支《特洛伊木马病毒》主题的宣传片脚本和分镜方案。我先按"
+        }
+      },
+      "headers": {
+        "content-type": "text/event-stream",
+        "cache-control": "no-cache"
+      },
+      "status_code": 400
+    }
+  },
+  {
+    "request_id": "imgtask_73162020145e49619fc3e4df0db4242b",
+    "candidate_index": 0,
+    "retry_index": 0,
+    "status": "failed",
+    "status_code": 500,
+    "error_type": null,
+    "error_message": "ChatGPT-Web conversation returned HTTP 500",
+    "skip_reason": null,
+    "latency_ms": 6626,
+    "key_id": "01a67540-cab8-44b0-842c-4d3a30555a5d",
+    "failure_diagnostic": null,
+    "request_body_build_error": null,
+    "error_flow": {
+      "stage": "candidate",
+      "source": "upstream_response",
+      "message": "ChatGPT-Web conversation returned HTTP 500",
+      "decision": "retry_next_candidate",
+      "retryable": true,
+      "propagation": "suppressed",
+      "status_code": 500,
+      "classification": "retry_upstream_failure",
+      "safe_to_expose": false
+    },
+    "upstream_response": {
+      "body": {
+        "error": {
+          "code": "chatgpt_web_image_execution_unavailable",
+          "type": "upstream_error",
+          "message": "ChatGPT-Web conversation returned HTTP 500"
+        }
+      },
+      "headers": {
+        "content-type": "application/json",
+        "content-length": "139"
+      },
+      "status_code": 500
+    }
+  },
+  {
+    "request_id": "imgtask_2e4a335b7cbe4ba5a1d8869770d42172",
+    "candidate_index": 0,
+    "retry_index": 0,
+    "status": "failed",
+    "status_code": 400,
+    "error_type": "stream_terminal_error",
+    "error_message": "你已达到 Free 套餐的图像生成请求上限。上限",
+    "skip_reason": null,
+    "latency_ms": 10221,
+    "key_id": "01af90e4-f3ff-4495-afab-de25b7abc6d5",
+    "failure_diagnostic": null,
+    "request_body_build_error": null,
+    "error_flow": {
+      "stage": "candidate",
+      "source": "upstream_response",
+      "message": "你已达到 Free 套餐的图像生成请求上限。上限",
+      "decision": "retry_next_candidate",
+      "retryable": true,
+      "propagation": "suppressed",
+      "status_code": 400,
+      "classification": "retry_upstream_failure",
+      "safe_to_expose": false
+    },
+    "upstream_response": {
+      "body": {
+        "error": {
+          "code": "chatgpt_web_no_image",
+          "type": "stream_terminal_error",
+          "message": "你已达到 Free 套餐的图像生成请求上限。上限"
+        }
+      },
+      "headers": {
+        "content-type": "text/event-stream",
+        "cache-control": "no-cache"
+      },
+      "status_code": 400
+    }
+  },
+  {
+    "request_id": "imgtask_78ef4e3c93374bdd882da17b9f73449d",
+    "candidate_index": 0,
+    "retry_index": 0,
+    "status": "failed",
+    "status_code": 400,
+    "error_type": "stream_terminal_error",
+    "error_message": "你已达到 Free 套餐的图像生成请求",
+    "skip_reason": null,
+    "latency_ms": 13605,
+    "key_id": "01af90e4-f3ff-4495-afab-de25b7abc6d5",
+    "failure_diagnostic": null,
+    "request_body_build_error": null,
+    "error_flow": {
+      "stage": "candidate",
+      "source": "upstream_response",
+      "message": "你已达到 Free 套餐的图像生成请求",
+      "decision": "retry_next_candidate",
+      "retryable": true,
+      "propagation": "suppressed",
+      "status_code": 400,
+      "classification": "retry_upstream_failure",
+      "safe_to_expose": false
+    },
+    "upstream_response": {
+      "body": {
+        "error": {
+          "code": "chatgpt_web_no_image",
+          "type": "stream_terminal_error",
+          "message": "你已达到 Free 套餐的图像生成请求"
+        }
+      },
+      "headers": {
+        "content-type": "text/event-stream",
+        "cache-control": "no-cache"
+      },
+      "status_code": 400
+    }
+  }
+]

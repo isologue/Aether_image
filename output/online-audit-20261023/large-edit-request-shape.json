@@ -1,0 +1,49 @@
+{
+  "request_id": "3731efdb-d230-489e-a353-e879ce4a37d7",
+  "decoded_json_bytes": 26709309,
+  "root_type": "dict",
+  "keys": [
+    "model",
+    "prompt",
+    "images",
+    "size",
+    "n"
+  ],
+  "values": {
+    "model": "gpt-image-2.5",
+    "n": 1,
+    "size": "3840x2160"
+  },
+  "shapes": {
+    "model": {
+      "type": "str",
+      "length": 13
+    },
+    "prompt": {
+      "type": "str",
+      "length": 81
+    },
+    "images": {
+      "type": "list",
+      "length": 1
+    },
+    "size": {
+      "type": "str",
+      "length": 9
+    },
+    "n": {
+      "type": "int",
+      "length": null
+    }
+  },
+  "images_shapes": [
+    {
+      "keys": [
+        "image_url"
+      ],
+      "types": {
+        "image_url": "str"
+      }
+    }
+  ]
+}

@@ -333,6 +333,7 @@ fn local_candidate_failure_should_project_health(
         }
         LocalFailoverClassification::StopErrorPattern
         | LocalFailoverClassification::StopExecutionError
+        | LocalFailoverClassification::RetryAccountUnavailable
         | LocalFailoverClassification::StopCyberPolicy => false,
     }
 }

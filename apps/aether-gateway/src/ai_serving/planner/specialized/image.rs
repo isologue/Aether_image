@@ -30,6 +30,20 @@ use self::support::{
 
 pub(super) use crate::ai_serving::LocalOpenAiImageSpec;
 
+fn log_local_openai_image_plan_exit(
+    trace_id: &str,
+    parts: &http::request::Parts,
+    reason: &'static str,
+) {
+    warn!(
+        event_name = "local_openai_image_plan_exit",
+        trace_id = %trace_id,
+        path = parts.uri.path(),
+        reason,
+        "Local image planning ended before an execution attempt was available"
+    );
+}
+
 pub(crate) struct LocalOpenAiImageSyncAttemptSource<'a> {
     state: &'a AppState,
     parts: &'a http::request::Parts,
@@ -169,10 +183,12 @@ pub(crate) async fn build_local_image_sync_attempt_source_for_kind<'a>(
     )
     .await?
     else {
+        log_local_openai_image_plan_exit(trace_id, parts, "candidate_source_unavailable");
         return Ok(None);
     };
 
     if candidate_count == 0 {
+        log_local_openai_image_plan_exit(trace_id, parts, "candidate_list_empty");
         return Ok(None);
     }
 
@@ -229,10 +245,12 @@ pub(crate) async fn build_local_image_stream_attempt_source_for_kind<'a>(
     )
     .await?
     else {
+        log_local_openai_image_plan_exit(trace_id, parts, "candidate_source_unavailable");
         return Ok(None);
     };
 
     if candidate_count == 0 {
+        log_local_openai_image_plan_exit(trace_id, parts, "candidate_list_empty");
         return Ok(None);
     }
 

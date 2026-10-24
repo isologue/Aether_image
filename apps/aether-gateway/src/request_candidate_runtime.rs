@@ -296,6 +296,11 @@ pub(crate) async fn persist_local_request_candidate_status_record(
     state: &(impl RequestCandidateRuntimeWriter + ?Sized),
     record: UpsertRequestCandidateRecord,
 ) {
+    if record.status == RequestCandidateStatus::Failed {
+        if let Some(message) = record.error_message.as_deref() {
+            crate::request_diagnostics::record_candidate_failure(&record.id, message);
+        }
+    }
     let candidate_id = record.id.clone();
     let request_id = short_request_id(record.request_id.as_str());
     let candidate_index = record.candidate_index;
@@ -516,6 +521,11 @@ pub(crate) async fn record_report_request_candidate_status(
             status_update,
             now_unix_ms: current_unix_ms(),
         });
+    if record.status == RequestCandidateStatus::Failed {
+        if let Some(message) = record.error_message.as_deref() {
+            crate::request_diagnostics::record_candidate_failure(&record.id, message);
+        }
+    }
     let candidate_id = record.id.clone();
     let status = record.status;
 

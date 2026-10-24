@@ -91,9 +91,9 @@
       </div>
       <div class="space-y-2 border-t border-border pt-5">
         <label class="flex items-center gap-2 text-sm font-medium"><input
-          type="checkbox"
           id="image-resize-enabled"
           v-model="form.resize_enabled"
+          type="checkbox"
           class="h-4 w-4 rounded border-border/60 bg-card/80 text-primary shadow-sm focus:ring-2 focus:ring-primary/40 focus:ring-offset-1 accent-primary"
         >按请求分辨率自动缩放</label>
         <p class="text-xs text-muted-foreground">
@@ -111,7 +111,7 @@
           WebDAV 配置
         </p>
         <p class="text-xs text-muted-foreground">
-          URL 模式等待上传和公开访问校验成功后返回 WebDAV 地址；{{ storesLocal ? '失败时回退本地地址。' : '失败时返回存储错误。' }}Base64 模式仍返回 b64_json，并由后台上传。
+          URL 模式上传成功后返回 WebDAV 地址，不再回读校验公开图片；{{ storesLocal ? '失败时回退本地地址。' : '失败时返回存储错误。' }}Base64 模式仍返回 b64_json，并由后台上传。
         </p>
         <div class="grid gap-4 md:grid-cols-2">
           <div>
@@ -203,7 +203,13 @@
         </div>
       </div>
       <div class="space-y-4 border-t border-border pt-5">
-        <label class="flex items-center gap-2 text-sm font-medium"><Checkbox v-model="form.cleanup_enabled" />启用本地图片定时清理</label>
+        <label
+          for="image-cleanup-enabled"
+          class="flex items-center gap-2 text-sm font-medium"
+        ><Checkbox
+          id="image-cleanup-enabled"
+          v-model="form.cleanup_enabled"
+        />启用本地图片定时清理</label>
         <div class="grid gap-4 md:grid-cols-2">
           <div>
             <Label for="image-retention">删除多少小时以前的图片</Label><Input
@@ -399,11 +405,13 @@ async function save() {
   if (invalid) { error(invalid); return }
   busy.value = 'save'
   try {
+    let asyncTaskRetentionDays: number | undefined
     if (form.value.cleanup_enabled) {
       const policy=await adminApi.getSystemConfig('async_task_retention_days')
       const days=Number(policy.value ?? 30)
       const minimum=Math.max(1,Math.ceil(form.value.retention_hours/24))
       if (!Number.isInteger(days) || days<minimum) { error(`请先将记录清理策略中的异步任务记录保留天数调整为至少 ${minimum} 天`); return }
+      asyncTaskRetentionDays = days
     }
     // Save the secret before enabling a destination; never populate the input with a masked value.
     if (password.value || clearPassword.value) {
@@ -412,7 +420,14 @@ async function save() {
     }
     // All config fields are primitives; spread the Vue proxy into a plain object.
     const configToSave = { ...form.value }
-    await adminApi.updateSystemConfig('image_storage', configToSave)
+    if (asyncTaskRetentionDays !== undefined) {
+      await adminApi.updateSystemConfig('image_task_policy', {
+        image_storage: configToSave,
+        async_task_retention_days: asyncTaskRetentionDays,
+      })
+    } else {
+      await adminApi.updateSystemConfig('image_storage', configToSave)
+    }
     const persisted = await adminApi.getSystemConfig('image_storage')
     form.value = normalizeImageStorageConfig((persisted.value as Partial<ImageStorageConfig> & { webdav_enabled?: boolean }) || {})
     saved.value = JSON.stringify(form.value); testResult.value = null

@@ -1,0 +1,4591 @@
+{
+  "counts": {
+    "auth_context_resolved": 34,
+    "frontdoor_request_body_buffer_started": 34,
+    "frontdoor_request_body_buffer_completed": 34,
+    "http_request_completed": 39,
+    "chatgpt_web_image_stage": 212,
+    "chatgpt_web_image_initial_response_diagnostics": 4,
+    "chatgpt_web_image_response_summary": 4,
+    "chatgpt_web_image_urls_resolved": 4,
+    "chatgpt_web_image_poll_budget": 4,
+    "chatgpt_web_image_no_output_diagnostics": 2,
+    "chatgpt_web_image_no_output": 2,
+    "chatgpt_web_image_attempt_finished": 4,
+    "local_sync_candidate_retry_scheduled": 3,
+    "chatgpt_web_image_download_completed": 2,
+    "admin_monitoring_request_trace_viewed": 6,
+    "": 32,
+    "http_request_failed": 32,
+    "chatgpt_web_image_attempt_failed": 54,
+    "chatgpt_web_image_execution_unavailable": 53,
+    "provider_transfer_limit_reached": 6,
+    "candidate_loop_exhausted": 3,
+    "local_openai_image_candidates_exhausted": 3,
+    "local_oauth_retry_refresh_failed": 1
+  },
+  "fieldnames": {
+    "auth_context_resolved": [
+      "access_allowed",
+      "api_key_id",
+      "api_key_is_standalone",
+      "api_key_name",
+      "balance_remaining",
+      "event_name",
+      "has_local_rejection",
+      "log_type",
+      "route_class",
+      "route_family",
+      "route_kind",
+      "status",
+      "trace_id",
+      "user_id"
+    ],
+    "frontdoor_request_body_buffer_started": [
+      "body_buffer_budget_bytes",
+      "event_name",
+      "log_type",
+      "max_body_bytes",
+      "method",
+      "path",
+      "phase",
+      "reserved_body_bytes",
+      "timeout_enabled",
+      "timeout_ms",
+      "trace_id"
+    ],
+    "frontdoor_request_body_buffer_completed": [
+      "body_bytes",
+      "elapsed_ms",
+      "event_name",
+      "log_type",
+      "method",
+      "path",
+      "phase",
+      "trace_id"
+    ],
+    "http_request_completed": [
+      "api_key_id",
+      "client_ip",
+      "dependency_reason",
+      "elapsed_ms",
+      "event_name",
+      "execution_path",
+      "local_execution_runtime_miss_reason",
+      "log_type",
+      "method",
+      "path",
+      "remote_addr",
+      "request_id",
+      "route_class",
+      "status",
+      "status_code",
+      "trace_id",
+      "user_id"
+    ],
+    "chatgpt_web_image_stage": [
+      "candidate_id",
+      "elapsed_ms",
+      "event_name",
+      "key_id",
+      "poll_count",
+      "previous_stage",
+      "previous_stage_elapsed_ms",
+      "request_id",
+      "stage"
+    ],
+    "chatgpt_web_image_initial_response_diagnostics": [
+      "asset_count",
+      "candidate_id",
+      "chunk_count",
+      "comment_line_count",
+      "done_marker_count",
+      "elapsed_ms",
+      "error",
+      "event_count",
+      "event_name",
+      "event_tail",
+      "first_chunk_ms",
+      "headers_ms",
+      "idle_after_last_chunk_ms",
+      "json_error_count",
+      "json_event_count",
+      "key_id",
+      "last_chunk_ms",
+      "last_json_error_category",
+      "last_json_error_column",
+      "last_json_error_line",
+      "last_message_channel",
+      "last_message_end_turn",
+      "last_message_recipient",
+      "last_message_role",
+      "last_message_source",
+      "last_message_status",
+      "max_chunk_gap_ms",
+      "outcome",
+      "patch_event_count",
+      "read_end",
+      "received_bytes",
+      "request_id",
+      "response_bytes",
+      "sse_parsed",
+      "status_code",
+      "trailing_event_without_separator",
+      "turn_finished",
+      "utf8_lossy"
+    ],
+    "chatgpt_web_image_response_summary": [
+      "asset_count",
+      "candidate_id",
+      "direct_url_count",
+      "elapsed_ms",
+      "event_name",
+      "file_count",
+      "has_conversation_id",
+      "has_failure",
+      "key_id",
+      "poll_count",
+      "request_id",
+      "sediment_count",
+      "source",
+      "stage_elapsed_ms",
+      "turn_finished"
+    ],
+    "chatgpt_web_image_urls_resolved": [
+      "asset_count",
+      "candidate_id",
+      "event_name",
+      "key_id",
+      "poll_count",
+      "request_id",
+      "resolve_elapsed_ms",
+      "url_count"
+    ],
+    "chatgpt_web_image_poll_budget": [
+      "asset_count",
+      "candidate_id",
+      "event_name",
+      "key_id",
+      "max_poll_count",
+      "no_asset_grace_seconds",
+      "request_id",
+      "turn_finished"
+    ],
+    "chatgpt_web_image_no_output_diagnostics": [
+      "candidate_id",
+      "data_image_observations",
+      "download_attempts",
+      "download_failures",
+      "embedded_reference_observations",
+      "encoded_result_observations",
+      "event_name",
+      "extracted_direct_url_count",
+      "extracted_file_count",
+      "extracted_sediment_count",
+      "file_reference_observations",
+      "image_hint_scan_truncated",
+      "image_structure_observations",
+      "image_url_observations",
+      "key_id",
+      "last_assistant_channel",
+      "last_assistant_content_type",
+      "last_assistant_end_turn",
+      "last_assistant_part_types",
+      "last_assistant_recipient",
+      "last_assistant_source",
+      "last_assistant_status",
+      "last_assistant_text_excerpt",
+      "message_state_anchored",
+      "request_id",
+      "resolved_url_observations",
+      "sediment_reference_observations",
+      "terminal_reason",
+      "text_prefix_truncated",
+      "turn_finished",
+      "url_resolution_attempts"
+    ],
+    "chatgpt_web_image_no_output": [
+      "asset_count",
+      "candidate_id",
+      "elapsed_ms",
+      "event_name",
+      "has_conversation_id",
+      "has_failure",
+      "key_id",
+      "no_asset_grace_seconds",
+      "no_asset_timeout",
+      "poll_count",
+      "poll_elapsed_ms",
+      "request_id",
+      "turn_finished"
+    ],
+    "chatgpt_web_image_attempt_finished": [
+      "asset_count",
+      "candidate_id",
+      "downloaded_count",
+      "elapsed_ms",
+      "event_name",
+      "has_failure",
+      "key_id",
+      "poll_count",
+      "request_id",
+      "stage",
+      "stage_elapsed_ms",
+      "status_code"
+    ],
+    "local_sync_candidate_retry_scheduled": [
+      "candidate_index",
+      "endpoint_id",
+      "event_name",
+      "key_id",
+      "log_type",
+      "model_name",
+      "provider_name",
+      "request_id",
+      "status_code",
+      "trace_id"
+    ],
+    "chatgpt_web_image_download_completed": [
+      "candidate_id",
+      "download_elapsed_ms",
+      "download_index",
+      "event_name",
+      "height",
+      "key_id",
+      "mime",
+      "request_id",
+      "width"
+    ],
+    "admin_monitoring_request_trace_viewed": [
+      "action",
+      "admin_management_token_id",
+      "admin_session_id",
+      "admin_user_id",
+      "admin_user_role",
+      "event_name",
+      "log_type",
+      "method",
+      "path",
+      "route_family",
+      "route_kind",
+      "status",
+      "status_code",
+      "target_id",
+      "target_type",
+      "trace_id"
+    ],
+    "": [
+      "auth_api_key_id",
+      "auth_api_key_name",
+      "auth_user_id",
+      "candidate_count",
+      "local_execution_failure_log",
+      "local_execution_runtime_miss_reason",
+      "persisted_candidate_count",
+      "plan_kind",
+      "public_path",
+      "request_candidates",
+      "requested_model",
+      "route_family",
+      "route_kind",
+      "skip_reasons",
+      "skipped_candidate_count",
+      "trace_id"
+    ],
+    "http_request_failed": [
+      "api_key_id",
+      "client_ip",
+      "dependency_reason",
+      "elapsed_ms",
+      "event_name",
+      "execution_path",
+      "local_execution_runtime_miss_reason",
+      "log_type",
+      "method",
+      "path",
+      "remote_addr",
+      "request_id",
+      "route_class",
+      "status",
+      "status_code",
+      "trace_id",
+      "user_id"
+    ],
+    "chatgpt_web_image_attempt_failed": [
+      "asset_count",
+      "candidate_id",
+      "downloaded_count",
+      "elapsed_ms",
+      "error",
+      "event_name",
+      "has_conversation_id",
+      "has_failure",
+      "key_id",
+      "poll_count",
+      "request_id",
+      "stage",
+      "stage_elapsed_ms",
+      "turn_finished"
+    ],
+    "chatgpt_web_image_execution_unavailable": [
+      "candidate_id",
+      "candidate_index",
+      "endpoint_id",
+      "error",
+      "event_name",
+      "key_id",
+      "log_type",
+      "model_name",
+      "provider_name",
+      "request_id",
+      "trace_id"
+    ],
+    "provider_transfer_limit_reached": [
+      "count_reached",
+      "elapsed_ms",
+      "event_name",
+      "log_type",
+      "max_transfer_count",
+      "max_transfer_timeout_seconds",
+      "plan_kind",
+      "provider_id",
+      "timeout_reached",
+      "trace_id",
+      "transfer_count"
+    ],
+    "candidate_loop_exhausted": [
+      "candidate_id",
+      "endpoint_id",
+      "event_name",
+      "key_id",
+      "log_type",
+      "model_name",
+      "plan_kind",
+      "provider_name",
+      "request_id",
+      "trace_id"
+    ],
+    "local_openai_image_candidates_exhausted": [
+      "candidate_count",
+      "event_name",
+      "log_type",
+      "model",
+      "plan_kind",
+      "route_class",
+      "route_family",
+      "trace_id"
+    ],
+    "local_oauth_retry_refresh_failed": [
+      "endpoint_id",
+      "event_name",
+      "key_id",
+      "log_type",
+      "provider_id",
+      "refresh_status_code",
+      "status_code",
+      "trace_id"
+    ]
+  },
+  "rows": [
+    {
+      "event_name": "auth_context_resolved",
+      "trace_id": "imgtask_af17bb40f8a84ffab16ad2f0ad3063c2",
+      "time": "2026-10-22 16:18:08.517"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_started",
+      "trace_id": "imgtask_af17bb40f8a84ffab16ad2f0ad3063c2",
+      "method": "POST",
+      "path": "/v1/images/generations",
+      "time": "2026-10-22 16:18:08.517"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_completed",
+      "trace_id": "imgtask_af17bb40f8a84ffab16ad2f0ad3063c2",
+      "method": "POST",
+      "path": "/v1/images/generations",
+      "elapsed_ms": "0",
+      "time": "2026-10-22 16:18:08.517"
+    },
+    {
+      "event_name": "http_request_completed",
+      "status_code": "200",
+      "trace_id": "7a2b7ae3-fab1-4236-8feb-7bc5d03f9bb9",
+      "request_id": "-",
+      "method": "GET",
+      "path": "/v1/images/tasks/imgtask_af17bb40f8a84ffab16ad2f0ad3063c2",
+      "execution_path": "local_route",
+      "elapsed_ms": "38",
+      "time": "2026-10-22 16:18:08.738"
+    },
+    {
+      "event_name": "auth_context_resolved",
+      "trace_id": "imgtask_13d460eeff66489a92167f7910f847a2",
+      "time": "2026-10-22 16:18:08.770"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_started",
+      "trace_id": "imgtask_13d460eeff66489a92167f7910f847a2",
+      "method": "POST",
+      "path": "/v1/images/generations",
+      "time": "2026-10-22 16:18:08.782"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_completed",
+      "trace_id": "imgtask_13d460eeff66489a92167f7910f847a2",
+      "method": "POST",
+      "path": "/v1/images/generations",
+      "elapsed_ms": "0",
+      "time": "2026-10-22 16:18:08.782"
+    },
+    {
+      "event_name": "http_request_completed",
+      "status_code": "200",
+      "trace_id": "341dfae4-17a8-4226-880e-732cfed3b143",
+      "request_id": "-",
+      "method": "GET",
+      "path": "/v1/images/tasks/imgtask_13d460eeff66489a92167f7910f847a2",
+      "execution_path": "local_route",
+      "elapsed_ms": "5",
+      "time": "2026-10-22 16:18:08.814"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_af17bb40f8a84ffab16ad2f0ad3063c2",
+      "stage": "bootstrap",
+      "elapsed_ms": "0",
+      "time": "2026-10-22 16:18:08.936"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_13d460eeff66489a92167f7910f847a2",
+      "stage": "bootstrap",
+      "elapsed_ms": "0",
+      "time": "2026-10-22 16:18:08.954"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_13d460eeff66489a92167f7910f847a2",
+      "stage": "requirements",
+      "elapsed_ms": "176",
+      "time": "2026-10-22 16:18:09.130"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_af17bb40f8a84ffab16ad2f0ad3063c2",
+      "stage": "requirements",
+      "elapsed_ms": "304",
+      "time": "2026-10-22 16:18:09.241"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_13d460eeff66489a92167f7910f847a2",
+      "stage": "prepare",
+      "elapsed_ms": "672",
+      "time": "2026-10-22 16:18:09.627"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_af17bb40f8a84ffab16ad2f0ad3063c2",
+      "stage": "prepare",
+      "elapsed_ms": "703",
+      "time": "2026-10-22 16:18:09.640"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_af17bb40f8a84ffab16ad2f0ad3063c2",
+      "stage": "initial_response",
+      "elapsed_ms": "912",
+      "time": "2026-10-22 16:18:09.848"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_13d460eeff66489a92167f7910f847a2",
+      "stage": "initial_response",
+      "elapsed_ms": "898",
+      "time": "2026-10-22 16:18:09.852"
+    },
+    {
+      "event_name": "http_request_completed",
+      "status_code": "200",
+      "trace_id": "5969f9e5-9c08-48f4-881b-a99aed591d00",
+      "request_id": "-",
+      "method": "GET",
+      "path": "/v1/images/tasks/imgtask_af17bb40f8a84ffab16ad2f0ad3063c2",
+      "execution_path": "local_route",
+      "elapsed_ms": "2",
+      "time": "2026-10-22 16:18:14.332"
+    },
+    {
+      "event_name": "http_request_completed",
+      "status_code": "200",
+      "trace_id": "610655d1-fbde-4e4c-89ab-bdefe1ccee68",
+      "request_id": "-",
+      "method": "GET",
+      "path": "/v1/images/tasks/imgtask_13d460eeff66489a92167f7910f847a2",
+      "execution_path": "local_route",
+      "elapsed_ms": "25",
+      "time": "2026-10-22 16:18:14.714"
+    },
+    {
+      "event_name": "http_request_completed",
+      "status_code": "200",
+      "trace_id": "359710e1-e61c-4d5e-bd6f-b0faf9d548d6",
+      "request_id": "-",
+      "method": "GET",
+      "path": "/v1/images/tasks/imgtask_af17bb40f8a84ffab16ad2f0ad3063c2",
+      "execution_path": "local_route",
+      "elapsed_ms": "21",
+      "time": "2026-10-22 16:18:20.072"
+    },
+    {
+      "event_name": "http_request_completed",
+      "status_code": "200",
+      "trace_id": "d331348c-0f27-4dfa-81b5-f142a7cf6006",
+      "request_id": "-",
+      "method": "GET",
+      "path": "/v1/images/tasks/imgtask_13d460eeff66489a92167f7910f847a2",
+      "execution_path": "local_route",
+      "elapsed_ms": "2",
+      "time": "2026-10-22 16:18:20.820"
+    },
+    {
+      "event_name": "http_request_completed",
+      "status_code": "200",
+      "trace_id": "3f22faeb-824b-4ee1-a0e5-f0da80418749",
+      "request_id": "-",
+      "method": "GET",
+      "path": "/v1/images/tasks/imgtask_af17bb40f8a84ffab16ad2f0ad3063c2",
+      "execution_path": "local_route",
+      "elapsed_ms": "5",
+      "time": "2026-10-22 16:18:25.618"
+    },
+    {
+      "event_name": "http_request_completed",
+      "status_code": "200",
+      "trace_id": "b20d5d3e-a035-43a1-befa-12d3db97d7a2",
+      "request_id": "-",
+      "method": "GET",
+      "path": "/v1/images/tasks/imgtask_13d460eeff66489a92167f7910f847a2",
+      "execution_path": "local_route",
+      "elapsed_ms": "4",
+      "time": "2026-10-22 16:18:26.254"
+    },
+    {
+      "event_name": "http_request_completed",
+      "status_code": "200",
+      "trace_id": "6d9b6d6a-29a7-41df-8472-276c8ec8d2f8",
+      "request_id": "-",
+      "method": "GET",
+      "path": "/v1/images/tasks/imgtask_af17bb40f8a84ffab16ad2f0ad3063c2",
+      "execution_path": "local_route",
+      "elapsed_ms": "46",
+      "time": "2026-10-22 16:18:31.260"
+    },
+    {
+      "event_name": "http_request_completed",
+      "status_code": "200",
+      "trace_id": "160954b1-23b5-462f-8469-8eee181ac1ad",
+      "request_id": "-",
+      "method": "GET",
+      "path": "/v1/images/tasks/imgtask_13d460eeff66489a92167f7910f847a2",
+      "execution_path": "local_route",
+      "elapsed_ms": "4",
+      "time": "2026-10-22 16:18:31.788"
+    },
+    {
+      "event_name": "http_request_completed",
+      "status_code": "200",
+      "trace_id": "5bbcf469-f218-4fdc-a158-006bc558fee0",
+      "request_id": "-",
+      "method": "GET",
+      "path": "/v1/images/tasks/imgtask_af17bb40f8a84ffab16ad2f0ad3063c2",
+      "execution_path": "local_route",
+      "elapsed_ms": "4",
+      "time": "2026-10-22 16:18:36.755"
+    },
+    {
+      "event_name": "http_request_completed",
+      "status_code": "200",
+      "trace_id": "c1c7ad67-0d34-48a3-88df-a0b717ce06e2",
+      "request_id": "-",
+      "method": "GET",
+      "path": "/v1/images/tasks/imgtask_13d460eeff66489a92167f7910f847a2",
+      "execution_path": "local_route",
+      "elapsed_ms": "8",
+      "time": "2026-10-22 16:18:37.267"
+    },
+    {
+      "event_name": "http_request_completed",
+      "status_code": "200",
+      "trace_id": "e9c7b40c-e408-43c1-98ee-f1c4a542c48a",
+      "request_id": "-",
+      "method": "GET",
+      "path": "/v1/images/tasks/imgtask_af17bb40f8a84ffab16ad2f0ad3063c2",
+      "execution_path": "local_route",
+      "elapsed_ms": "39",
+      "time": "2026-10-22 16:18:44.041"
+    },
+    {
+      "event_name": "http_request_completed",
+      "status_code": "200",
+      "trace_id": "b575866b-386f-4172-8497-9f4e98dbee38",
+      "request_id": "-",
+      "method": "GET",
+      "path": "/v1/images/tasks/imgtask_13d460eeff66489a92167f7910f847a2",
+      "execution_path": "local_route",
+      "elapsed_ms": "43",
+      "time": "2026-10-22 16:18:44.043"
+    },
+    {
+      "event_name": "chatgpt_web_image_initial_response_diagnostics",
+      "request_id": "imgtask_af17bb40f8a84ffab16ad2f0ad3063c2",
+      "elapsed_ms": "56561",
+      "status_code": "Some(200)",
+      "time": "2026-10-22 16:19:06.410"
+    },
+    {
+      "event_name": "chatgpt_web_image_response_summary",
+      "request_id": "imgtask_af17bb40f8a84ffab16ad2f0ad3063c2",
+      "elapsed_ms": "57474",
+      "time": "2026-10-22 16:19:06.410"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_af17bb40f8a84ffab16ad2f0ad3063c2",
+      "stage": "quota_update",
+      "elapsed_ms": "57474",
+      "time": "2026-10-22 16:19:06.410"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_af17bb40f8a84ffab16ad2f0ad3063c2",
+      "stage": "resolve_urls",
+      "elapsed_ms": "57486",
+      "time": "2026-10-22 16:19:06.423"
+    },
+    {
+      "event_name": "chatgpt_web_image_urls_resolved",
+      "request_id": "imgtask_af17bb40f8a84ffab16ad2f0ad3063c2",
+      "time": "2026-10-22 16:19:06.423"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_af17bb40f8a84ffab16ad2f0ad3063c2",
+      "stage": "poll_setup",
+      "elapsed_ms": "57486",
+      "time": "2026-10-22 16:19:06.423"
+    },
+    {
+      "event_name": "chatgpt_web_image_poll_budget",
+      "request_id": "imgtask_af17bb40f8a84ffab16ad2f0ad3063c2",
+      "time": "2026-10-22 16:19:06.423"
+    },
+    {
+      "event_name": "chatgpt_web_image_no_output_diagnostics",
+      "request_id": "imgtask_af17bb40f8a84ffab16ad2f0ad3063c2",
+      "time": "2026-10-22 16:19:06.424"
+    },
+    {
+      "event_name": "chatgpt_web_image_no_output",
+      "request_id": "imgtask_af17bb40f8a84ffab16ad2f0ad3063c2",
+      "elapsed_ms": "57488",
+      "time": "2026-10-22 16:19:06.424"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_af17bb40f8a84ffab16ad2f0ad3063c2",
+      "stage": "response_build",
+      "elapsed_ms": "57488",
+      "time": "2026-10-22 16:19:06.424"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_finished",
+      "request_id": "imgtask_af17bb40f8a84ffab16ad2f0ad3063c2",
+      "stage": "response_build",
+      "elapsed_ms": "57488",
+      "status_code": "200",
+      "time": "2026-10-22 16:19:06.424"
+    },
+    {
+      "event_name": "local_sync_candidate_retry_scheduled",
+      "trace_id": "imgtask_af17bb40f8a84ffab16ad2f0ad3063c2",
+      "request_id": "imgtas...63c2",
+      "status_code": "400",
+      "candidate_index": "0",
+      "time": "2026-10-22 16:19:06.489"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_af17bb40f8a84ffab16ad2f0ad3063c2",
+      "stage": "bootstrap",
+      "elapsed_ms": "0",
+      "time": "2026-10-22 16:19:06.500"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_af17bb40f8a84ffab16ad2f0ad3063c2",
+      "stage": "requirements",
+      "elapsed_ms": "119",
+      "time": "2026-10-22 16:19:06.619"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_af17bb40f8a84ffab16ad2f0ad3063c2",
+      "stage": "prepare",
+      "elapsed_ms": "378",
+      "time": "2026-10-22 16:19:06.878"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_af17bb40f8a84ffab16ad2f0ad3063c2",
+      "stage": "initial_response",
+      "elapsed_ms": "539",
+      "time": "2026-10-22 16:19:07.039"
+    },
+    {
+      "event_name": "chatgpt_web_image_initial_response_diagnostics",
+      "request_id": "imgtask_13d460eeff66489a92167f7910f847a2",
+      "elapsed_ms": "59840",
+      "status_code": "Some(200)",
+      "time": "2026-10-22 16:19:09.693"
+    },
+    {
+      "event_name": "chatgpt_web_image_response_summary",
+      "request_id": "imgtask_13d460eeff66489a92167f7910f847a2",
+      "elapsed_ms": "60739",
+      "time": "2026-10-22 16:19:09.694"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_13d460eeff66489a92167f7910f847a2",
+      "stage": "quota_update",
+      "elapsed_ms": "60740",
+      "time": "2026-10-22 16:19:09.694"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_13d460eeff66489a92167f7910f847a2",
+      "stage": "resolve_urls",
+      "elapsed_ms": "60750",
+      "time": "2026-10-22 16:19:09.705"
+    },
+    {
+      "event_name": "chatgpt_web_image_urls_resolved",
+      "request_id": "imgtask_13d460eeff66489a92167f7910f847a2",
+      "time": "2026-10-22 16:19:09.705"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_13d460eeff66489a92167f7910f847a2",
+      "stage": "poll_setup",
+      "elapsed_ms": "60750",
+      "time": "2026-10-22 16:19:09.705"
+    },
+    {
+      "event_name": "chatgpt_web_image_poll_budget",
+      "request_id": "imgtask_13d460eeff66489a92167f7910f847a2",
+      "time": "2026-10-22 16:19:09.705"
+    },
+    {
+      "event_name": "chatgpt_web_image_no_output_diagnostics",
+      "request_id": "imgtask_13d460eeff66489a92167f7910f847a2",
+      "time": "2026-10-22 16:19:09.705"
+    },
+    {
+      "event_name": "chatgpt_web_image_no_output",
+      "request_id": "imgtask_13d460eeff66489a92167f7910f847a2",
+      "elapsed_ms": "60751",
+      "time": "2026-10-22 16:19:09.705"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_13d460eeff66489a92167f7910f847a2",
+      "stage": "response_build",
+      "elapsed_ms": "60751",
+      "time": "2026-10-22 16:19:09.705"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_finished",
+      "request_id": "imgtask_13d460eeff66489a92167f7910f847a2",
+      "stage": "response_build",
+      "elapsed_ms": "60751",
+      "status_code": "200",
+      "time": "2026-10-22 16:19:09.705"
+    },
+    {
+      "event_name": "local_sync_candidate_retry_scheduled",
+      "trace_id": "imgtask_13d460eeff66489a92167f7910f847a2",
+      "request_id": "imgtas...47a2",
+      "status_code": "400",
+      "candidate_index": "0",
+      "time": "2026-10-22 16:19:09.762"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_13d460eeff66489a92167f7910f847a2",
+      "stage": "bootstrap",
+      "elapsed_ms": "0",
+      "time": "2026-10-22 16:19:09.771"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_13d460eeff66489a92167f7910f847a2",
+      "stage": "requirements",
+      "elapsed_ms": "204",
+      "time": "2026-10-22 16:19:09.976"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_13d460eeff66489a92167f7910f847a2",
+      "stage": "prepare",
+      "elapsed_ms": "620",
+      "time": "2026-10-22 16:19:10.392"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_13d460eeff66489a92167f7910f847a2",
+      "stage": "initial_response",
+      "elapsed_ms": "817",
+      "time": "2026-10-22 16:19:10.589"
+    },
+    {
+      "event_name": "http_request_completed",
+      "status_code": "200",
+      "trace_id": "d540d0be-579d-4e56-aea6-6909d2d10337",
+      "request_id": "-",
+      "method": "GET",
+      "path": "/v1/images/tasks/imgtask_af17bb40f8a84ffab16ad2f0ad3063c2",
+      "execution_path": "local_route",
+      "elapsed_ms": "44",
+      "time": "2026-10-22 16:19:26.027"
+    },
+    {
+      "event_name": "http_request_completed",
+      "status_code": "200",
+      "trace_id": "8f2a4bba-cdab-4aa0-b0fa-d0d916280327",
+      "request_id": "-",
+      "method": "GET",
+      "path": "/v1/images/tasks/imgtask_13d460eeff66489a92167f7910f847a2",
+      "execution_path": "local_route",
+      "elapsed_ms": "39",
+      "time": "2026-10-22 16:19:26.030"
+    },
+    {
+      "event_name": "http_request_completed",
+      "status_code": "200",
+      "trace_id": "97579de4-48f4-4516-8caa-c97d242cc7d5",
+      "request_id": "-",
+      "method": "GET",
+      "path": "/v1/images/tasks/imgtask_af17bb40f8a84ffab16ad2f0ad3063c2",
+      "execution_path": "local_route",
+      "elapsed_ms": "16",
+      "time": "2026-10-22 16:19:40.916"
+    },
+    {
+      "event_name": "http_request_completed",
+      "status_code": "200",
+      "trace_id": "40baae72-84a6-4859-9b10-e38ca0d8c09e",
+      "request_id": "-",
+      "method": "GET",
+      "path": "/v1/images/tasks/imgtask_13d460eeff66489a92167f7910f847a2",
+      "execution_path": "local_route",
+      "elapsed_ms": "15",
+      "time": "2026-10-22 16:19:40.917"
+    },
+    {
+      "event_name": "chatgpt_web_image_initial_response_diagnostics",
+      "request_id": "imgtask_13d460eeff66489a92167f7910f847a2",
+      "elapsed_ms": "31783",
+      "status_code": "Some(200)",
+      "time": "2026-10-22 16:19:42.373"
+    },
+    {
+      "event_name": "chatgpt_web_image_response_summary",
+      "request_id": "imgtask_13d460eeff66489a92167f7910f847a2",
+      "elapsed_ms": "32601",
+      "time": "2026-10-22 16:19:42.373"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_13d460eeff66489a92167f7910f847a2",
+      "stage": "quota_update",
+      "elapsed_ms": "32601",
+      "time": "2026-10-22 16:19:42.373"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_13d460eeff66489a92167f7910f847a2",
+      "stage": "resolve_urls",
+      "elapsed_ms": "32616",
+      "time": "2026-10-22 16:19:42.388"
+    },
+    {
+      "event_name": "chatgpt_web_image_urls_resolved",
+      "request_id": "imgtask_13d460eeff66489a92167f7910f847a2",
+      "time": "2026-10-22 16:19:42.704"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_13d460eeff66489a92167f7910f847a2",
+      "stage": "download",
+      "elapsed_ms": "32932",
+      "time": "2026-10-22 16:19:42.704"
+    },
+    {
+      "event_name": "chatgpt_web_image_download_completed",
+      "request_id": "imgtask_13d460eeff66489a92167f7910f847a2",
+      "time": "2026-10-22 16:19:43.097"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_13d460eeff66489a92167f7910f847a2",
+      "stage": "poll_setup",
+      "elapsed_ms": "33325",
+      "time": "2026-10-22 16:19:43.097"
+    },
+    {
+      "event_name": "chatgpt_web_image_poll_budget",
+      "request_id": "imgtask_13d460eeff66489a92167f7910f847a2",
+      "time": "2026-10-22 16:19:43.097"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_13d460eeff66489a92167f7910f847a2",
+      "stage": "response_build",
+      "elapsed_ms": "33325",
+      "time": "2026-10-22 16:19:43.097"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_finished",
+      "request_id": "imgtask_13d460eeff66489a92167f7910f847a2",
+      "stage": "response_build",
+      "elapsed_ms": "33357",
+      "status_code": "200",
+      "time": "2026-10-22 16:19:43.129"
+    },
+    {
+      "event_name": "http_request_completed",
+      "status_code": "200",
+      "trace_id": "imgtask_13d460eeff66489a92167f7910f847a2",
+      "request_id": "imgtask_13d460eeff66489a92167f7910f847a2",
+      "method": "POST",
+      "path": "/v1/images/generations",
+      "execution_path": "execution_runtime_sync",
+      "local_execution_runtime_miss_reason": "none",
+      "elapsed_ms": "94500",
+      "time": "2026-10-22 16:19:43.271"
+    },
+    {
+      "event_name": "http_request_completed",
+      "status_code": "200",
+      "trace_id": "1951a07f-8ee9-495f-943a-f33e2fce4b35",
+      "request_id": "-",
+      "method": "GET",
+      "path": "/v1/images/tasks/imgtask_af17bb40f8a84ffab16ad2f0ad3063c2",
+      "execution_path": "local_route",
+      "elapsed_ms": "9",
+      "time": "2026-10-22 16:19:47.170"
+    },
+    {
+      "event_name": "http_request_completed",
+      "status_code": "200",
+      "trace_id": "fdfef888-00e2-4c93-ac66-828fc355f728",
+      "request_id": "-",
+      "method": "GET",
+      "path": "/v1/images/tasks/imgtask_13d460eeff66489a92167f7910f847a2",
+      "execution_path": "local_route",
+      "elapsed_ms": "53",
+      "time": "2026-10-22 16:19:47.214"
+    },
+    {
+      "event_name": "http_request_completed",
+      "status_code": "200",
+      "trace_id": "fe26b6a6-7a8a-4512-bb1c-d32e422dac34",
+      "request_id": "-",
+      "method": "GET",
+      "path": "/v1/images/tasks/imgtask_af17bb40f8a84ffab16ad2f0ad3063c2",
+      "execution_path": "local_route",
+      "elapsed_ms": "23",
+      "time": "2026-10-22 16:19:52.932"
+    },
+    {
+      "event_name": "chatgpt_web_image_initial_response_diagnostics",
+      "request_id": "imgtask_af17bb40f8a84ffab16ad2f0ad3063c2",
+      "elapsed_ms": "63414",
+      "status_code": "Some(200)",
+      "time": "2026-10-22 16:20:10.454"
+    },
+    {
+      "event_name": "chatgpt_web_image_response_summary",
+      "request_id": "imgtask_af17bb40f8a84ffab16ad2f0ad3063c2",
+      "elapsed_ms": "63954",
+      "time": "2026-10-22 16:20:10.454"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_af17bb40f8a84ffab16ad2f0ad3063c2",
+      "stage": "quota_update",
+      "elapsed_ms": "63954",
+      "time": "2026-10-22 16:20:10.454"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_af17bb40f8a84ffab16ad2f0ad3063c2",
+      "stage": "resolve_urls",
+      "elapsed_ms": "63976",
+      "time": "2026-10-22 16:20:10.476"
+    },
+    {
+      "event_name": "chatgpt_web_image_urls_resolved",
+      "request_id": "imgtask_af17bb40f8a84ffab16ad2f0ad3063c2",
+      "time": "2026-10-22 16:20:10.775"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_af17bb40f8a84ffab16ad2f0ad3063c2",
+      "stage": "download",
+      "elapsed_ms": "64275",
+      "time": "2026-10-22 16:20:10.775"
+    },
+    {
+      "event_name": "chatgpt_web_image_download_completed",
+      "request_id": "imgtask_af17bb40f8a84ffab16ad2f0ad3063c2",
+      "time": "2026-10-22 16:20:11.454"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_af17bb40f8a84ffab16ad2f0ad3063c2",
+      "stage": "poll_setup",
+      "elapsed_ms": "64953",
+      "time": "2026-10-22 16:20:11.454"
+    },
+    {
+      "event_name": "chatgpt_web_image_poll_budget",
+      "request_id": "imgtask_af17bb40f8a84ffab16ad2f0ad3063c2",
+      "time": "2026-10-22 16:20:11.454"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_af17bb40f8a84ffab16ad2f0ad3063c2",
+      "stage": "response_build",
+      "elapsed_ms": "64953",
+      "time": "2026-10-22 16:20:11.454"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_finished",
+      "request_id": "imgtask_af17bb40f8a84ffab16ad2f0ad3063c2",
+      "stage": "response_build",
+      "elapsed_ms": "65015",
+      "status_code": "200",
+      "time": "2026-10-22 16:20:11.516"
+    },
+    {
+      "event_name": "http_request_completed",
+      "status_code": "200",
+      "trace_id": "imgtask_af17bb40f8a84ffab16ad2f0ad3063c2",
+      "request_id": "imgtask_af17bb40f8a84ffab16ad2f0ad3063c2",
+      "method": "POST",
+      "path": "/v1/images/generations",
+      "execution_path": "execution_runtime_sync",
+      "local_execution_runtime_miss_reason": "none",
+      "elapsed_ms": "123134",
+      "time": "2026-10-22 16:20:11.651"
+    },
+    {
+      "event_name": "http_request_completed",
+      "status_code": "200",
+      "trace_id": "e6baf200-4cd9-4c54-9a77-aff97aa4143b",
+      "request_id": "-",
+      "method": "GET",
+      "path": "/v1/images/tasks/imgtask_af17bb40f8a84ffab16ad2f0ad3063c2",
+      "execution_path": "local_route",
+      "elapsed_ms": "61",
+      "time": "2026-10-22 16:20:32.317"
+    },
+    {
+      "event_name": "http_request_completed",
+      "status_code": "200",
+      "trace_id": "22db035c-5f80-48e3-ba31-507ad5ed929d",
+      "request_id": "-",
+      "method": "GET",
+      "path": "/api/admin/image-tasks/imgtask_af17bb40f8a84ffab16ad2f0ad3063c2",
+      "execution_path": "public_proxy_passthrough",
+      "local_execution_runtime_miss_reason": "none",
+      "elapsed_ms": "63",
+      "time": "2026-10-22 16:21:02.760"
+    },
+    {
+      "event_name": "http_request_completed",
+      "status_code": "200",
+      "trace_id": "b1e7c064-a6b9-4e94-8e3d-d7d1818bca4c",
+      "request_id": "-",
+      "method": "GET",
+      "path": "/api/admin/image-tasks/imgtask_af17bb40f8a84ffab16ad2f0ad3063c2",
+      "execution_path": "public_proxy_passthrough",
+      "local_execution_runtime_miss_reason": "none",
+      "elapsed_ms": "51",
+      "time": "2026-10-22 16:21:11.037"
+    },
+    {
+      "event_name": "admin_monitoring_request_trace_viewed",
+      "status_code": "200",
+      "trace_id": "3d51deda-73eb-4ea7-b73f-a6908ec33f95",
+      "method": "GET",
+      "path": "/api/admin/monitoring/trace/imgtask_af17bb40f8a84ffab16ad2f0ad3063c2",
+      "time": "2026-10-22 16:21:17.020"
+    },
+    {
+      "event_name": "auth_context_resolved",
+      "trace_id": "e0ae23e3-17be-497a-9566-24412ea60365",
+      "time": "2026-10-23 01:39:53.474"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_started",
+      "trace_id": "e0ae23e3-17be-497a-9566-24412ea60365",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "time": "2026-10-23 01:39:53.474"
+    },
+    {
+      "event_name": "auth_context_resolved",
+      "trace_id": "1465d481-b50c-48c8-96b2-a3ce402d88c3",
+      "time": "2026-10-23 01:39:54.058"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_started",
+      "trace_id": "1465d481-b50c-48c8-96b2-a3ce402d88c3",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "time": "2026-10-23 01:39:54.059"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_completed",
+      "trace_id": "e0ae23e3-17be-497a-9566-24412ea60365",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "elapsed_ms": "4172",
+      "time": "2026-10-23 01:39:57.647"
+    },
+    {
+      "trace_id": "e0ae23e3-17be-497a-9566-24412ea60365",
+      "local_execution_runtime_miss_reason": "unknown",
+      "time": "2026-10-23 01:40:01.264"
+    },
+    {
+      "event_name": "http_request_failed",
+      "status_code": "503",
+      "trace_id": "e0ae23e3-17be-497a-9566-24412ea60365",
+      "request_id": "-",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "execution_path": "local_execution_runtime_miss",
+      "local_execution_runtime_miss_reason": "none",
+      "elapsed_ms": "7879",
+      "time": "2026-10-23 01:40:01.336"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_completed",
+      "trace_id": "1465d481-b50c-48c8-96b2-a3ce402d88c3",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "elapsed_ms": "33356",
+      "time": "2026-10-23 01:40:27.415"
+    },
+    {
+      "trace_id": "1465d481-b50c-48c8-96b2-a3ce402d88c3",
+      "local_execution_runtime_miss_reason": "unknown",
+      "time": "2026-10-23 01:40:31.788"
+    },
+    {
+      "event_name": "http_request_failed",
+      "status_code": "503",
+      "trace_id": "1465d481-b50c-48c8-96b2-a3ce402d88c3",
+      "request_id": "-",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "execution_path": "local_execution_runtime_miss",
+      "local_execution_runtime_miss_reason": "none",
+      "elapsed_ms": "37871",
+      "time": "2026-10-23 01:40:31.929"
+    },
+    {
+      "event_name": "auth_context_resolved",
+      "trace_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "time": "2026-10-23 02:00:29.478"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_started",
+      "trace_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "time": "2026-10-23 02:00:29.478"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_completed",
+      "trace_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "elapsed_ms": "3106",
+      "time": "2026-10-23 02:00:32.584"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "bootstrap",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 02:00:32.642"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "requirements",
+      "elapsed_ms": "104",
+      "time": "2026-10-23 02:00:32.746"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "upload",
+      "elapsed_ms": "969",
+      "time": "2026-10-23 02:00:33.612"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_failed",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "upload",
+      "elapsed_ms": "972",
+      "time": "2026-10-23 02:00:33.615"
+    },
+    {
+      "event_name": "chatgpt_web_image_execution_unavailable",
+      "trace_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "request_id": "2616fad0",
+      "candidate_index": "0",
+      "time": "2026-10-23 02:00:33.615"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "bootstrap",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 02:00:33.620"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "requirements",
+      "elapsed_ms": "117",
+      "time": "2026-10-23 02:00:33.737"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "upload",
+      "elapsed_ms": "511",
+      "time": "2026-10-23 02:00:34.132"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_failed",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "upload",
+      "elapsed_ms": "514",
+      "time": "2026-10-23 02:00:34.134"
+    },
+    {
+      "event_name": "chatgpt_web_image_execution_unavailable",
+      "trace_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "request_id": "2616fad0",
+      "candidate_index": "0",
+      "time": "2026-10-23 02:00:34.134"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "bootstrap",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 02:00:34.146"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "requirements",
+      "elapsed_ms": "156",
+      "time": "2026-10-23 02:00:34.302"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "upload",
+      "elapsed_ms": "467",
+      "time": "2026-10-23 02:00:34.613"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_failed",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "upload",
+      "elapsed_ms": "471",
+      "time": "2026-10-23 02:00:34.618"
+    },
+    {
+      "event_name": "chatgpt_web_image_execution_unavailable",
+      "trace_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "request_id": "2616fad0",
+      "candidate_index": "0",
+      "time": "2026-10-23 02:00:34.618"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "bootstrap",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 02:00:34.632"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "requirements",
+      "elapsed_ms": "117",
+      "time": "2026-10-23 02:00:34.750"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "upload",
+      "elapsed_ms": "452",
+      "time": "2026-10-23 02:00:35.085"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_failed",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "upload",
+      "elapsed_ms": "455",
+      "time": "2026-10-23 02:00:35.087"
+    },
+    {
+      "event_name": "chatgpt_web_image_execution_unavailable",
+      "trace_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "request_id": "2616fad0",
+      "candidate_index": "0",
+      "time": "2026-10-23 02:00:35.087"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "bootstrap",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 02:00:35.095"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "requirements",
+      "elapsed_ms": "99",
+      "time": "2026-10-23 02:00:35.195"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "upload",
+      "elapsed_ms": "401",
+      "time": "2026-10-23 02:00:35.497"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_failed",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "upload",
+      "elapsed_ms": "404",
+      "time": "2026-10-23 02:00:35.499"
+    },
+    {
+      "event_name": "chatgpt_web_image_execution_unavailable",
+      "trace_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "request_id": "2616fad0",
+      "candidate_index": "0",
+      "time": "2026-10-23 02:00:35.499"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "bootstrap",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 02:00:35.514"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "requirements",
+      "elapsed_ms": "131",
+      "time": "2026-10-23 02:00:35.645"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "upload",
+      "elapsed_ms": "619",
+      "time": "2026-10-23 02:00:36.134"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_failed",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "upload",
+      "elapsed_ms": "622",
+      "time": "2026-10-23 02:00:36.137"
+    },
+    {
+      "event_name": "chatgpt_web_image_execution_unavailable",
+      "trace_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "request_id": "2616fad0",
+      "candidate_index": "0",
+      "time": "2026-10-23 02:00:36.137"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "bootstrap",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 02:00:36.148"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "requirements",
+      "elapsed_ms": "104",
+      "time": "2026-10-23 02:00:36.253"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "upload",
+      "elapsed_ms": "464",
+      "time": "2026-10-23 02:00:36.613"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_failed",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "upload",
+      "elapsed_ms": "469",
+      "time": "2026-10-23 02:00:36.618"
+    },
+    {
+      "event_name": "chatgpt_web_image_execution_unavailable",
+      "trace_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "request_id": "2616fad0",
+      "candidate_index": "0",
+      "time": "2026-10-23 02:00:36.618"
+    },
+    {
+      "event_name": "provider_transfer_limit_reached",
+      "trace_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+      "elapsed_ms": "3993",
+      "time": "2026-10-23 02:00:36.627"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "bootstrap",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 02:00:36.658"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "requirements",
+      "elapsed_ms": "99",
+      "time": "2026-10-23 02:00:36.757"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "upload",
+      "elapsed_ms": "395",
+      "time": "2026-10-23 02:00:37.054"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_failed",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "upload",
+      "elapsed_ms": "398",
+      "time": "2026-10-23 02:00:37.057"
+    },
+    {
+      "event_name": "chatgpt_web_image_execution_unavailable",
+      "trace_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "request_id": "2616fad0",
+      "candidate_index": "1",
+      "time": "2026-10-23 02:00:37.057"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "bootstrap",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 02:00:37.071"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "requirements",
+      "elapsed_ms": "108",
+      "time": "2026-10-23 02:00:37.180"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "upload",
+      "elapsed_ms": "864",
+      "time": "2026-10-23 02:00:37.936"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_failed",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "upload",
+      "elapsed_ms": "868",
+      "time": "2026-10-23 02:00:37.940"
+    },
+    {
+      "event_name": "chatgpt_web_image_execution_unavailable",
+      "trace_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "request_id": "2616fad0",
+      "candidate_index": "1",
+      "time": "2026-10-23 02:00:37.940"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "bootstrap",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 02:00:37.956"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "requirements",
+      "elapsed_ms": "117",
+      "time": "2026-10-23 02:00:38.073"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "upload",
+      "elapsed_ms": "1244",
+      "time": "2026-10-23 02:00:39.200"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_failed",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "upload",
+      "elapsed_ms": "1246",
+      "time": "2026-10-23 02:00:39.202"
+    },
+    {
+      "event_name": "chatgpt_web_image_execution_unavailable",
+      "trace_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "request_id": "2616fad0",
+      "candidate_index": "1",
+      "time": "2026-10-23 02:00:39.202"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "bootstrap",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 02:00:39.224"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "requirements",
+      "elapsed_ms": "176",
+      "time": "2026-10-23 02:00:39.400"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "upload",
+      "elapsed_ms": "785",
+      "time": "2026-10-23 02:00:40.009"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_failed",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "upload",
+      "elapsed_ms": "789",
+      "time": "2026-10-23 02:00:40.013"
+    },
+    {
+      "event_name": "chatgpt_web_image_execution_unavailable",
+      "trace_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "request_id": "2616fad0",
+      "candidate_index": "1",
+      "time": "2026-10-23 02:00:40.013"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "bootstrap",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 02:00:40.031"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "requirements",
+      "elapsed_ms": "107",
+      "time": "2026-10-23 02:00:40.139"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "upload",
+      "elapsed_ms": "1566",
+      "time": "2026-10-23 02:00:41.597"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_failed",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "upload",
+      "elapsed_ms": "1569",
+      "time": "2026-10-23 02:00:41.600"
+    },
+    {
+      "event_name": "chatgpt_web_image_execution_unavailable",
+      "trace_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "request_id": "2616fad0",
+      "candidate_index": "1",
+      "time": "2026-10-23 02:00:41.600"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "bootstrap",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 02:00:41.613"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "requirements",
+      "elapsed_ms": "118",
+      "time": "2026-10-23 02:00:41.731"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "upload",
+      "elapsed_ms": "673",
+      "time": "2026-10-23 02:00:42.286"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_failed",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "upload",
+      "elapsed_ms": "676",
+      "time": "2026-10-23 02:00:42.289"
+    },
+    {
+      "event_name": "chatgpt_web_image_execution_unavailable",
+      "trace_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "request_id": "2616fad0",
+      "candidate_index": "1",
+      "time": "2026-10-23 02:00:42.289"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "bootstrap",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 02:00:42.303"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "requirements",
+      "elapsed_ms": "104",
+      "time": "2026-10-23 02:00:42.408"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "upload",
+      "elapsed_ms": "840",
+      "time": "2026-10-23 02:00:43.143"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_failed",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "upload",
+      "elapsed_ms": "844",
+      "time": "2026-10-23 02:00:43.148"
+    },
+    {
+      "event_name": "chatgpt_web_image_execution_unavailable",
+      "trace_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "request_id": "2616fad0",
+      "candidate_index": "1",
+      "time": "2026-10-23 02:00:43.148"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "bootstrap",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 02:00:43.161"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "requirements",
+      "elapsed_ms": "270",
+      "time": "2026-10-23 02:00:43.431"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "upload",
+      "elapsed_ms": "1009",
+      "time": "2026-10-23 02:00:44.170"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_failed",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "upload",
+      "elapsed_ms": "1012",
+      "time": "2026-10-23 02:00:44.173"
+    },
+    {
+      "event_name": "chatgpt_web_image_execution_unavailable",
+      "trace_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "request_id": "2616fad0",
+      "candidate_index": "1",
+      "time": "2026-10-23 02:00:44.173"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "bootstrap",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 02:00:44.187"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "requirements",
+      "elapsed_ms": "124",
+      "time": "2026-10-23 02:00:44.311"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "upload",
+      "elapsed_ms": "887",
+      "time": "2026-10-23 02:00:45.075"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_failed",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "upload",
+      "elapsed_ms": "894",
+      "time": "2026-10-23 02:00:45.082"
+    },
+    {
+      "event_name": "chatgpt_web_image_execution_unavailable",
+      "trace_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "request_id": "2616fad0",
+      "candidate_index": "1",
+      "time": "2026-10-23 02:00:45.082"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "bootstrap",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 02:00:45.095"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "requirements",
+      "elapsed_ms": "103",
+      "time": "2026-10-23 02:00:45.199"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "upload",
+      "elapsed_ms": "447",
+      "time": "2026-10-23 02:00:45.543"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_failed",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "upload",
+      "elapsed_ms": "451",
+      "time": "2026-10-23 02:00:45.546"
+    },
+    {
+      "event_name": "chatgpt_web_image_execution_unavailable",
+      "trace_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "request_id": "2616fad0",
+      "candidate_index": "1",
+      "time": "2026-10-23 02:00:45.547"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "bootstrap",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 02:00:45.558"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "requirements",
+      "elapsed_ms": "124",
+      "time": "2026-10-23 02:00:45.683"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "upload",
+      "elapsed_ms": "490",
+      "time": "2026-10-23 02:00:46.049"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_failed",
+      "request_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "stage": "upload",
+      "elapsed_ms": "496",
+      "time": "2026-10-23 02:00:46.054"
+    },
+    {
+      "event_name": "chatgpt_web_image_execution_unavailable",
+      "trace_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "request_id": "2616fad0",
+      "candidate_index": "1",
+      "time": "2026-10-23 02:00:46.054"
+    },
+    {
+      "event_name": "provider_transfer_limit_reached",
+      "trace_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+      "elapsed_ms": "9407",
+      "time": "2026-10-23 02:00:46.061"
+    },
+    {
+      "event_name": "candidate_loop_exhausted",
+      "trace_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "request_id": "2616fad0",
+      "time": "2026-10-23 02:00:46.062"
+    },
+    {
+      "event_name": "local_openai_image_candidates_exhausted",
+      "trace_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "time": "2026-10-23 02:00:46.086"
+    },
+    {
+      "trace_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "local_execution_runtime_miss_reason": "execution_runtime_candidates_exhausted",
+      "time": "2026-10-23 02:00:46.097"
+    },
+    {
+      "event_name": "http_request_failed",
+      "status_code": "503",
+      "trace_id": "2616fad0-e174-4eef-af9f-3e2a03c31dcc",
+      "request_id": "-",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "execution_path": "local_execution_runtime_miss",
+      "local_execution_runtime_miss_reason": "execution_runtime_candidates_exhausted",
+      "elapsed_ms": "16694",
+      "time": "2026-10-23 02:00:46.172"
+    },
+    {
+      "event_name": "auth_context_resolved",
+      "trace_id": "8d74ef79-397e-4762-827f-fe3444831c31",
+      "time": "2026-10-23 02:02:03.942"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_started",
+      "trace_id": "8d74ef79-397e-4762-827f-fe3444831c31",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "time": "2026-10-23 02:02:03.943"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_completed",
+      "trace_id": "8d74ef79-397e-4762-827f-fe3444831c31",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "elapsed_ms": "16811",
+      "time": "2026-10-23 02:02:20.754"
+    },
+    {
+      "trace_id": "8d74ef79-397e-4762-827f-fe3444831c31",
+      "local_execution_runtime_miss_reason": "unknown",
+      "time": "2026-10-23 02:02:29.278"
+    },
+    {
+      "event_name": "http_request_failed",
+      "status_code": "503",
+      "trace_id": "8d74ef79-397e-4762-827f-fe3444831c31",
+      "request_id": "-",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "execution_path": "local_execution_runtime_miss",
+      "local_execution_runtime_miss_reason": "none",
+      "elapsed_ms": "25429",
+      "time": "2026-10-23 02:02:29.372"
+    },
+    {
+      "event_name": "auth_context_resolved",
+      "trace_id": "4f8f1af8-f1d7-465b-a9e3-1a38ca950b56",
+      "time": "2026-10-23 02:04:59.269"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_started",
+      "trace_id": "4f8f1af8-f1d7-465b-a9e3-1a38ca950b56",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "time": "2026-10-23 02:04:59.269"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_completed",
+      "trace_id": "4f8f1af8-f1d7-465b-a9e3-1a38ca950b56",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "elapsed_ms": "22850",
+      "time": "2026-10-23 02:05:22.119"
+    },
+    {
+      "trace_id": "4f8f1af8-f1d7-465b-a9e3-1a38ca950b56",
+      "local_execution_runtime_miss_reason": "unknown",
+      "time": "2026-10-23 02:05:30.005"
+    },
+    {
+      "event_name": "http_request_failed",
+      "status_code": "503",
+      "trace_id": "4f8f1af8-f1d7-465b-a9e3-1a38ca950b56",
+      "request_id": "-",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "execution_path": "local_execution_runtime_miss",
+      "local_execution_runtime_miss_reason": "none",
+      "elapsed_ms": "30834",
+      "time": "2026-10-23 02:05:30.094"
+    },
+    {
+      "event_name": "auth_context_resolved",
+      "trace_id": "f620d2d2-6aae-4604-9a38-665b5db32c15",
+      "time": "2026-10-23 02:06:44.055"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_started",
+      "trace_id": "f620d2d2-6aae-4604-9a38-665b5db32c15",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "time": "2026-10-23 02:06:44.055"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_completed",
+      "trace_id": "f620d2d2-6aae-4604-9a38-665b5db32c15",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "elapsed_ms": "21591",
+      "time": "2026-10-23 02:07:05.647"
+    },
+    {
+      "trace_id": "f620d2d2-6aae-4604-9a38-665b5db32c15",
+      "local_execution_runtime_miss_reason": "unknown",
+      "time": "2026-10-23 02:07:14.625"
+    },
+    {
+      "event_name": "http_request_failed",
+      "status_code": "503",
+      "trace_id": "f620d2d2-6aae-4604-9a38-665b5db32c15",
+      "request_id": "-",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "execution_path": "local_execution_runtime_miss",
+      "local_execution_runtime_miss_reason": "none",
+      "elapsed_ms": "30657",
+      "time": "2026-10-23 02:07:14.712"
+    },
+    {
+      "event_name": "auth_context_resolved",
+      "trace_id": "2a522fcf-dfc4-41fd-89fe-b5b528e7207e",
+      "time": "2026-10-23 02:07:28.845"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_started",
+      "trace_id": "2a522fcf-dfc4-41fd-89fe-b5b528e7207e",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "time": "2026-10-23 02:07:28.845"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_completed",
+      "trace_id": "2a522fcf-dfc4-41fd-89fe-b5b528e7207e",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "elapsed_ms": "9298",
+      "time": "2026-10-23 02:07:38.144"
+    },
+    {
+      "trace_id": "2a522fcf-dfc4-41fd-89fe-b5b528e7207e",
+      "local_execution_runtime_miss_reason": "unknown",
+      "time": "2026-10-23 02:07:45.383"
+    },
+    {
+      "event_name": "http_request_failed",
+      "status_code": "503",
+      "trace_id": "2a522fcf-dfc4-41fd-89fe-b5b528e7207e",
+      "request_id": "-",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "execution_path": "local_execution_runtime_miss",
+      "local_execution_runtime_miss_reason": "none",
+      "elapsed_ms": "16606",
+      "time": "2026-10-23 02:07:45.451"
+    },
+    {
+      "event_name": "auth_context_resolved",
+      "trace_id": "97de52c9-4c0a-4250-a1b1-fe355a5289cf",
+      "time": "2026-10-23 02:08:13.857"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_started",
+      "trace_id": "97de52c9-4c0a-4250-a1b1-fe355a5289cf",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "time": "2026-10-23 02:08:13.858"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_completed",
+      "trace_id": "97de52c9-4c0a-4250-a1b1-fe355a5289cf",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "elapsed_ms": "6401",
+      "time": "2026-10-23 02:08:20.259"
+    },
+    {
+      "trace_id": "97de52c9-4c0a-4250-a1b1-fe355a5289cf",
+      "local_execution_runtime_miss_reason": "unknown",
+      "time": "2026-10-23 02:08:27.584"
+    },
+    {
+      "event_name": "http_request_failed",
+      "status_code": "503",
+      "trace_id": "97de52c9-4c0a-4250-a1b1-fe355a5289cf",
+      "request_id": "-",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "execution_path": "local_execution_runtime_miss",
+      "local_execution_runtime_miss_reason": "none",
+      "elapsed_ms": "13812",
+      "time": "2026-10-23 02:08:27.669"
+    },
+    {
+      "event_name": "auth_context_resolved",
+      "trace_id": "897f4162-104e-4098-a768-5c7c1e899d4a",
+      "time": "2026-10-23 02:09:44.646"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_started",
+      "trace_id": "897f4162-104e-4098-a768-5c7c1e899d4a",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "time": "2026-10-23 02:09:44.646"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_completed",
+      "trace_id": "897f4162-104e-4098-a768-5c7c1e899d4a",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "elapsed_ms": "15128",
+      "time": "2026-10-23 02:09:59.775"
+    },
+    {
+      "trace_id": "897f4162-104e-4098-a768-5c7c1e899d4a",
+      "local_execution_runtime_miss_reason": "unknown",
+      "time": "2026-10-23 02:10:08.784"
+    },
+    {
+      "event_name": "http_request_failed",
+      "status_code": "503",
+      "trace_id": "897f4162-104e-4098-a768-5c7c1e899d4a",
+      "request_id": "-",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "execution_path": "local_execution_runtime_miss",
+      "local_execution_runtime_miss_reason": "none",
+      "elapsed_ms": "24226",
+      "time": "2026-10-23 02:10:08.872"
+    },
+    {
+      "event_name": "auth_context_resolved",
+      "trace_id": "3a39f9cf-6018-4c03-bc57-0211011f7d27",
+      "time": "2026-10-23 02:11:59.157"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_started",
+      "trace_id": "3a39f9cf-6018-4c03-bc57-0211011f7d27",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "time": "2026-10-23 02:11:59.158"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_completed",
+      "trace_id": "3a39f9cf-6018-4c03-bc57-0211011f7d27",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "elapsed_ms": "13869",
+      "time": "2026-10-23 02:12:13.027"
+    },
+    {
+      "trace_id": "3a39f9cf-6018-4c03-bc57-0211011f7d27",
+      "local_execution_runtime_miss_reason": "unknown",
+      "time": "2026-10-23 02:12:21.285"
+    },
+    {
+      "event_name": "http_request_failed",
+      "status_code": "503",
+      "trace_id": "3a39f9cf-6018-4c03-bc57-0211011f7d27",
+      "request_id": "-",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "execution_path": "local_execution_runtime_miss",
+      "local_execution_runtime_miss_reason": "none",
+      "elapsed_ms": "22215",
+      "time": "2026-10-23 02:12:21.372"
+    },
+    {
+      "event_name": "auth_context_resolved",
+      "trace_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "time": "2026-10-23 02:18:54.904"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_started",
+      "trace_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "time": "2026-10-23 02:18:54.904"
+    },
+    {
+      "event_name": "auth_context_resolved",
+      "trace_id": "eac587f1-0492-4fbb-a0d2-60a4284bc55d",
+      "time": "2026-10-23 02:19:14.288"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_started",
+      "trace_id": "eac587f1-0492-4fbb-a0d2-60a4284bc55d",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "time": "2026-10-23 02:19:14.288"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_completed",
+      "trace_id": "eac587f1-0492-4fbb-a0d2-60a4284bc55d",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "elapsed_ms": "14915",
+      "time": "2026-10-23 02:19:29.204"
+    },
+    {
+      "trace_id": "eac587f1-0492-4fbb-a0d2-60a4284bc55d",
+      "local_execution_runtime_miss_reason": "unknown",
+      "time": "2026-10-23 02:19:38.867"
+    },
+    {
+      "event_name": "http_request_failed",
+      "status_code": "503",
+      "trace_id": "eac587f1-0492-4fbb-a0d2-60a4284bc55d",
+      "request_id": "-",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "execution_path": "local_execution_runtime_miss",
+      "local_execution_runtime_miss_reason": "none",
+      "elapsed_ms": "24653",
+      "time": "2026-10-23 02:19:38.942"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_completed",
+      "trace_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "elapsed_ms": "57011",
+      "time": "2026-10-23 02:19:51.916"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "bootstrap",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 02:19:52.014"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "requirements",
+      "elapsed_ms": "148",
+      "time": "2026-10-23 02:19:52.162"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "upload",
+      "elapsed_ms": "472",
+      "time": "2026-10-23 02:19:52.486"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_failed",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "upload",
+      "elapsed_ms": "482",
+      "time": "2026-10-23 02:19:52.496"
+    },
+    {
+      "event_name": "chatgpt_web_image_execution_unavailable",
+      "trace_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "request_id": "10824bf3",
+      "candidate_index": "0",
+      "time": "2026-10-23 02:19:52.496"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "bootstrap",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 02:19:52.515"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "requirements",
+      "elapsed_ms": "141",
+      "time": "2026-10-23 02:19:52.656"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "upload",
+      "elapsed_ms": "463",
+      "time": "2026-10-23 02:19:52.978"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_failed",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "upload",
+      "elapsed_ms": "474",
+      "time": "2026-10-23 02:19:52.989"
+    },
+    {
+      "event_name": "chatgpt_web_image_execution_unavailable",
+      "trace_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "request_id": "10824bf3",
+      "candidate_index": "0",
+      "time": "2026-10-23 02:19:52.989"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "bootstrap",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 02:19:53.016"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "requirements",
+      "elapsed_ms": "111",
+      "time": "2026-10-23 02:19:53.127"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "upload",
+      "elapsed_ms": "578",
+      "time": "2026-10-23 02:19:53.594"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_failed",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "upload",
+      "elapsed_ms": "590",
+      "time": "2026-10-23 02:19:53.606"
+    },
+    {
+      "event_name": "chatgpt_web_image_execution_unavailable",
+      "trace_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "request_id": "10824bf3",
+      "candidate_index": "0",
+      "time": "2026-10-23 02:19:53.606"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "bootstrap",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 02:19:53.648"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "requirements",
+      "elapsed_ms": "173",
+      "time": "2026-10-23 02:19:53.820"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "upload",
+      "elapsed_ms": "627",
+      "time": "2026-10-23 02:19:54.275"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_failed",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "upload",
+      "elapsed_ms": "638",
+      "time": "2026-10-23 02:19:54.286"
+    },
+    {
+      "event_name": "chatgpt_web_image_execution_unavailable",
+      "trace_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "request_id": "10824bf3",
+      "candidate_index": "0",
+      "time": "2026-10-23 02:19:54.287"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "bootstrap",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 02:19:54.331"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "requirements",
+      "elapsed_ms": "125",
+      "time": "2026-10-23 02:19:54.456"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "upload",
+      "elapsed_ms": "672",
+      "time": "2026-10-23 02:19:55.003"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_failed",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "upload",
+      "elapsed_ms": "684",
+      "time": "2026-10-23 02:19:55.015"
+    },
+    {
+      "event_name": "chatgpt_web_image_execution_unavailable",
+      "trace_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "request_id": "10824bf3",
+      "candidate_index": "0",
+      "time": "2026-10-23 02:19:55.016"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "bootstrap",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 02:19:55.050"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "requirements",
+      "elapsed_ms": "313",
+      "time": "2026-10-23 02:19:55.364"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "upload",
+      "elapsed_ms": "653",
+      "time": "2026-10-23 02:19:55.704"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_failed",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "upload",
+      "elapsed_ms": "661",
+      "time": "2026-10-23 02:19:55.712"
+    },
+    {
+      "event_name": "chatgpt_web_image_execution_unavailable",
+      "trace_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "request_id": "10824bf3",
+      "candidate_index": "0",
+      "time": "2026-10-23 02:19:55.712"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "bootstrap",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 02:19:55.747"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "requirements",
+      "elapsed_ms": "118",
+      "time": "2026-10-23 02:19:55.864"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "upload",
+      "elapsed_ms": "532",
+      "time": "2026-10-23 02:19:56.279"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_failed",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "upload",
+      "elapsed_ms": "540",
+      "time": "2026-10-23 02:19:56.287"
+    },
+    {
+      "event_name": "chatgpt_web_image_execution_unavailable",
+      "trace_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "request_id": "10824bf3",
+      "candidate_index": "0",
+      "time": "2026-10-23 02:19:56.287"
+    },
+    {
+      "event_name": "provider_transfer_limit_reached",
+      "trace_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+      "elapsed_ms": "4298",
+      "time": "2026-10-23 02:19:56.302"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "bootstrap",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 02:19:56.477"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "requirements",
+      "elapsed_ms": "106",
+      "time": "2026-10-23 02:19:56.583"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "upload",
+      "elapsed_ms": "459",
+      "time": "2026-10-23 02:19:56.936"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_failed",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "upload",
+      "elapsed_ms": "467",
+      "time": "2026-10-23 02:19:56.944"
+    },
+    {
+      "event_name": "chatgpt_web_image_execution_unavailable",
+      "trace_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "request_id": "10824bf3",
+      "candidate_index": "1",
+      "time": "2026-10-23 02:19:56.944"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "bootstrap",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 02:19:56.970"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "requirements",
+      "elapsed_ms": "148",
+      "time": "2026-10-23 02:19:57.118"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "upload",
+      "elapsed_ms": "876",
+      "time": "2026-10-23 02:19:57.846"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_failed",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "upload",
+      "elapsed_ms": "884",
+      "time": "2026-10-23 02:19:57.854"
+    },
+    {
+      "event_name": "chatgpt_web_image_execution_unavailable",
+      "trace_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "request_id": "10824bf3",
+      "candidate_index": "1",
+      "time": "2026-10-23 02:19:57.854"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "bootstrap",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 02:19:57.885"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "requirements",
+      "elapsed_ms": "167",
+      "time": "2026-10-23 02:19:58.052"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "upload",
+      "elapsed_ms": "665",
+      "time": "2026-10-23 02:19:58.550"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_failed",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "upload",
+      "elapsed_ms": "675",
+      "time": "2026-10-23 02:19:58.560"
+    },
+    {
+      "event_name": "chatgpt_web_image_execution_unavailable",
+      "trace_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "request_id": "10824bf3",
+      "candidate_index": "1",
+      "time": "2026-10-23 02:19:58.560"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "bootstrap",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 02:19:58.584"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "requirements",
+      "elapsed_ms": "215",
+      "time": "2026-10-23 02:19:58.799"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "upload",
+      "elapsed_ms": "834",
+      "time": "2026-10-23 02:19:59.418"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_failed",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "upload",
+      "elapsed_ms": "842",
+      "time": "2026-10-23 02:19:59.426"
+    },
+    {
+      "event_name": "chatgpt_web_image_execution_unavailable",
+      "trace_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "request_id": "10824bf3",
+      "candidate_index": "1",
+      "time": "2026-10-23 02:19:59.426"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "bootstrap",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 02:19:59.447"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "requirements",
+      "elapsed_ms": "104",
+      "time": "2026-10-23 02:19:59.551"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "upload",
+      "elapsed_ms": "772",
+      "time": "2026-10-23 02:20:00.220"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_failed",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "upload",
+      "elapsed_ms": "779",
+      "time": "2026-10-23 02:20:00.227"
+    },
+    {
+      "event_name": "chatgpt_web_image_execution_unavailable",
+      "trace_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "request_id": "10824bf3",
+      "candidate_index": "1",
+      "time": "2026-10-23 02:20:00.227"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "bootstrap",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 02:20:00.260"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "requirements",
+      "elapsed_ms": "131",
+      "time": "2026-10-23 02:20:00.391"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "upload",
+      "elapsed_ms": "1452",
+      "time": "2026-10-23 02:20:01.712"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_failed",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "upload",
+      "elapsed_ms": "1460",
+      "time": "2026-10-23 02:20:01.720"
+    },
+    {
+      "event_name": "chatgpt_web_image_execution_unavailable",
+      "trace_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "request_id": "10824bf3",
+      "candidate_index": "1",
+      "time": "2026-10-23 02:20:01.720"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "bootstrap",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 02:20:01.761"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "requirements",
+      "elapsed_ms": "118",
+      "time": "2026-10-23 02:20:01.879"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "upload",
+      "elapsed_ms": "1321",
+      "time": "2026-10-23 02:20:03.082"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_failed",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "upload",
+      "elapsed_ms": "1330",
+      "time": "2026-10-23 02:20:03.092"
+    },
+    {
+      "event_name": "chatgpt_web_image_execution_unavailable",
+      "trace_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "request_id": "10824bf3",
+      "candidate_index": "1",
+      "time": "2026-10-23 02:20:03.092"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "bootstrap",
+      "elapsed_ms": "1",
+      "time": "2026-10-23 02:20:03.119"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "requirements",
+      "elapsed_ms": "109",
+      "time": "2026-10-23 02:20:03.227"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "upload",
+      "elapsed_ms": "1030",
+      "time": "2026-10-23 02:20:04.148"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_failed",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "upload",
+      "elapsed_ms": "1038",
+      "time": "2026-10-23 02:20:04.156"
+    },
+    {
+      "event_name": "chatgpt_web_image_execution_unavailable",
+      "trace_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "request_id": "10824bf3",
+      "candidate_index": "1",
+      "time": "2026-10-23 02:20:04.156"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "bootstrap",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 02:20:04.189"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "requirements",
+      "elapsed_ms": "156",
+      "time": "2026-10-23 02:20:04.345"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "upload",
+      "elapsed_ms": "844",
+      "time": "2026-10-23 02:20:05.033"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_failed",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "upload",
+      "elapsed_ms": "852",
+      "time": "2026-10-23 02:20:05.041"
+    },
+    {
+      "event_name": "chatgpt_web_image_execution_unavailable",
+      "trace_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "request_id": "10824bf3",
+      "candidate_index": "1",
+      "time": "2026-10-23 02:20:05.041"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "bootstrap",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 02:20:05.067"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "requirements",
+      "elapsed_ms": "140",
+      "time": "2026-10-23 02:20:05.207"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "upload",
+      "elapsed_ms": "1197",
+      "time": "2026-10-23 02:20:06.265"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_failed",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "upload",
+      "elapsed_ms": "1207",
+      "time": "2026-10-23 02:20:06.274"
+    },
+    {
+      "event_name": "chatgpt_web_image_execution_unavailable",
+      "trace_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "request_id": "10824bf3",
+      "candidate_index": "1",
+      "time": "2026-10-23 02:20:06.274"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "bootstrap",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 02:20:06.301"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "requirements",
+      "elapsed_ms": "114",
+      "time": "2026-10-23 02:20:06.416"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "upload",
+      "elapsed_ms": "961",
+      "time": "2026-10-23 02:20:07.262"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_failed",
+      "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "stage": "upload",
+      "elapsed_ms": "969",
+      "time": "2026-10-23 02:20:07.270"
+    },
+    {
+      "event_name": "chatgpt_web_image_execution_unavailable",
+      "trace_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "request_id": "10824bf3",
+      "candidate_index": "1",
+      "time": "2026-10-23 02:20:07.270"
+    },
+    {
+      "event_name": "provider_transfer_limit_reached",
+      "trace_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+      "elapsed_ms": "10822",
+      "time": "2026-10-23 02:20:07.288"
+    },
+    {
+      "event_name": "candidate_loop_exhausted",
+      "trace_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "request_id": "10824bf3",
+      "time": "2026-10-23 02:20:07.289"
+    },
+    {
+      "event_name": "local_openai_image_candidates_exhausted",
+      "trace_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "time": "2026-10-23 02:20:07.294"
+    },
+    {
+      "trace_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "local_execution_runtime_miss_reason": "execution_runtime_candidates_exhausted",
+      "time": "2026-10-23 02:20:07.306"
+    },
+    {
+      "event_name": "http_request_failed",
+      "status_code": "503",
+      "trace_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+      "request_id": "-",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "execution_path": "local_execution_runtime_miss",
+      "local_execution_runtime_miss_reason": "execution_runtime_candidates_exhausted",
+      "elapsed_ms": "72535",
+      "time": "2026-10-23 02:20:07.438"
+    },
+    {
+      "event_name": "auth_context_resolved",
+      "trace_id": "6f83c71b-45f5-4753-957c-639efae32c59",
+      "time": "2026-10-23 02:20:28.009"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_started",
+      "trace_id": "6f83c71b-45f5-4753-957c-639efae32c59",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "time": "2026-10-23 02:20:28.009"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_completed",
+      "trace_id": "6f83c71b-45f5-4753-957c-639efae32c59",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "elapsed_ms": "25066",
+      "time": "2026-10-23 02:20:53.076"
+    },
+    {
+      "trace_id": "6f83c71b-45f5-4753-957c-639efae32c59",
+      "local_execution_runtime_miss_reason": "unknown",
+      "time": "2026-10-23 02:21:03.069"
+    },
+    {
+      "event_name": "http_request_failed",
+      "status_code": "503",
+      "trace_id": "6f83c71b-45f5-4753-957c-639efae32c59",
+      "request_id": "-",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "execution_path": "local_execution_runtime_miss",
+      "local_execution_runtime_miss_reason": "none",
+      "elapsed_ms": "35153",
+      "time": "2026-10-23 02:21:03.163"
+    },
+    {
+      "event_name": "admin_monitoring_request_trace_viewed",
+      "status_code": "200",
+      "trace_id": "b0495519-03fe-47e6-b174-eefbed1777c8",
+      "method": "GET",
+      "path": "/api/admin/monitoring/trace/6f83c71b-45f5-4753-957c-639efae32c59",
+      "time": "2026-10-23 02:21:51.572"
+    },
+    {
+      "event_name": "auth_context_resolved",
+      "trace_id": "df70b8c3-07fa-4f21-b1f2-ae5072ca9a2f",
+      "time": "2026-10-23 06:25:27.087"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_started",
+      "trace_id": "df70b8c3-07fa-4f21-b1f2-ae5072ca9a2f",
+      "method": "POST",
+      "path": "/v1/responses",
+      "time": "2026-10-23 06:25:27.087"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_completed",
+      "trace_id": "df70b8c3-07fa-4f21-b1f2-ae5072ca9a2f",
+      "method": "POST",
+      "path": "/v1/responses",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 06:25:27.087"
+    },
+    {
+      "trace_id": "df70b8c3-07fa-4f21-b1f2-ae5072ca9a2f",
+      "local_execution_runtime_miss_reason": "candidate_list_empty",
+      "time": "2026-10-23 06:25:27.420"
+    },
+    {
+      "event_name": "http_request_failed",
+      "status_code": "503",
+      "trace_id": "df70b8c3-07fa-4f21-b1f2-ae5072ca9a2f",
+      "request_id": "-",
+      "method": "POST",
+      "path": "/v1/responses",
+      "execution_path": "local_execution_runtime_miss",
+      "local_execution_runtime_miss_reason": "candidate_list_empty",
+      "elapsed_ms": "926",
+      "time": "2026-10-23 06:25:27.485"
+    },
+    {
+      "event_name": "auth_context_resolved",
+      "trace_id": "84ecd70e-1556-4182-860c-fe1a2dc3a033",
+      "time": "2026-10-23 06:27:29.197"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_started",
+      "trace_id": "84ecd70e-1556-4182-860c-fe1a2dc3a033",
+      "method": "POST",
+      "path": "/v1/responses",
+      "time": "2026-10-23 06:27:29.199"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_completed",
+      "trace_id": "84ecd70e-1556-4182-860c-fe1a2dc3a033",
+      "method": "POST",
+      "path": "/v1/responses",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 06:27:29.199"
+    },
+    {
+      "trace_id": "84ecd70e-1556-4182-860c-fe1a2dc3a033",
+      "local_execution_runtime_miss_reason": "candidate_list_empty",
+      "time": "2026-10-23 06:27:29.699"
+    },
+    {
+      "event_name": "http_request_failed",
+      "status_code": "503",
+      "trace_id": "84ecd70e-1556-4182-860c-fe1a2dc3a033",
+      "request_id": "-",
+      "method": "POST",
+      "path": "/v1/responses",
+      "execution_path": "local_execution_runtime_miss",
+      "local_execution_runtime_miss_reason": "candidate_list_empty",
+      "elapsed_ms": "667",
+      "time": "2026-10-23 06:27:29.794"
+    },
+    {
+      "event_name": "auth_context_resolved",
+      "trace_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "time": "2026-10-23 06:29:38.880"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_started",
+      "trace_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "time": "2026-10-23 06:29:38.880"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_completed",
+      "trace_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 06:29:38.881"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "bootstrap",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 06:29:39.603"
+    },
+    {
+      "event_name": "http_request_completed",
+      "status_code": "200",
+      "trace_id": "5f380e57-856b-4cf0-a0d5-7b16c631e131",
+      "request_id": "-",
+      "method": "GET",
+      "path": "/v1/images/tasks/imgtask_a89dca2d6b384f019f9c038196886794",
+      "execution_path": "local_route",
+      "elapsed_ms": "4",
+      "time": "2026-10-23 06:29:39.672"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "requirements",
+      "elapsed_ms": "146",
+      "time": "2026-10-23 06:29:39.750"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "upload",
+      "elapsed_ms": "467",
+      "time": "2026-10-23 06:29:40.070"
+    },
+    {
+      "event_name": "http_request_completed",
+      "status_code": "200",
+      "trace_id": "44690231-c40f-457a-9893-c7ad6b304e14",
+      "request_id": "-",
+      "method": "GET",
+      "path": "/v1/images/tasks/imgtask_a89dca2d6b384f019f9c038196886794",
+      "execution_path": "local_route",
+      "elapsed_ms": "15",
+      "time": "2026-10-23 06:29:46.643"
+    },
+    {
+      "event_name": "http_request_completed",
+      "status_code": "200",
+      "trace_id": "6301ffdb-5781-4e6e-a6c8-fa5734b8aee2",
+      "request_id": "-",
+      "method": "GET",
+      "path": "/v1/images/tasks/imgtask_a89dca2d6b384f019f9c038196886794",
+      "execution_path": "local_route",
+      "elapsed_ms": "71",
+      "time": "2026-10-23 06:29:52.969"
+    },
+    {
+      "event_name": "http_request_completed",
+      "status_code": "200",
+      "trace_id": "e15f0819-5615-41cf-8e0d-fa3183653393",
+      "request_id": "-",
+      "method": "GET",
+      "path": "/v1/images/tasks/imgtask_a89dca2d6b384f019f9c038196886794",
+      "execution_path": "local_route",
+      "elapsed_ms": "15",
+      "time": "2026-10-23 06:29:58.808"
+    },
+    {
+      "event_name": "http_request_completed",
+      "status_code": "200",
+      "trace_id": "4dae3033-520b-4537-b8ac-857a6fb1971e",
+      "request_id": "-",
+      "method": "GET",
+      "path": "/v1/images/tasks/imgtask_a89dca2d6b384f019f9c038196886794",
+      "execution_path": "local_route",
+      "elapsed_ms": "69",
+      "time": "2026-10-23 06:30:05.138"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "upload",
+      "elapsed_ms": "30921",
+      "time": "2026-10-23 06:30:10.525"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_failed",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "upload",
+      "elapsed_ms": "30997",
+      "time": "2026-10-23 06:30:10.601"
+    },
+    {
+      "event_name": "chatgpt_web_image_execution_unavailable",
+      "trace_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "request_id": "imgtas...6794",
+      "candidate_index": "0",
+      "time": "2026-10-23 06:30:10.601"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "bootstrap",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 06:30:10.635"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "requirements",
+      "elapsed_ms": "115",
+      "time": "2026-10-23 06:30:10.751"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "upload",
+      "elapsed_ms": "472",
+      "time": "2026-10-23 06:30:11.108"
+    },
+    {
+      "event_name": "http_request_completed",
+      "status_code": "200",
+      "trace_id": "2d17e786-04be-409a-8db0-861ac15be94b",
+      "request_id": "-",
+      "method": "GET",
+      "path": "/v1/images/tasks/imgtask_a89dca2d6b384f019f9c038196886794",
+      "execution_path": "local_route",
+      "elapsed_ms": "9",
+      "time": "2026-10-23 06:30:12.175"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "upload",
+      "elapsed_ms": "5282",
+      "time": "2026-10-23 06:30:15.918"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_failed",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "upload",
+      "elapsed_ms": "5330",
+      "time": "2026-10-23 06:30:15.965"
+    },
+    {
+      "event_name": "chatgpt_web_image_execution_unavailable",
+      "trace_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "request_id": "imgtas...6794",
+      "candidate_index": "0",
+      "time": "2026-10-23 06:30:15.966"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "bootstrap",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 06:30:16.052"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "requirements",
+      "elapsed_ms": "207",
+      "time": "2026-10-23 06:30:16.260"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "upload",
+      "elapsed_ms": "682",
+      "time": "2026-10-23 06:30:16.735"
+    },
+    {
+      "event_name": "http_request_completed",
+      "status_code": "200",
+      "trace_id": "225d71c8-4c09-4bae-8593-668ef3c881ee",
+      "request_id": "-",
+      "method": "GET",
+      "path": "/v1/images/tasks/imgtask_a89dca2d6b384f019f9c038196886794",
+      "execution_path": "local_route",
+      "elapsed_ms": "80",
+      "time": "2026-10-23 06:30:17.736"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "upload",
+      "elapsed_ms": "2342",
+      "time": "2026-10-23 06:30:18.395"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_failed",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "upload",
+      "elapsed_ms": "2411",
+      "time": "2026-10-23 06:30:18.464"
+    },
+    {
+      "event_name": "chatgpt_web_image_execution_unavailable",
+      "trace_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "request_id": "imgtas...6794",
+      "candidate_index": "0",
+      "time": "2026-10-23 06:30:18.464"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "bootstrap",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 06:30:18.518"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "requirements",
+      "elapsed_ms": "164",
+      "time": "2026-10-23 06:30:18.682"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "upload",
+      "elapsed_ms": "595",
+      "time": "2026-10-23 06:30:19.113"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "upload",
+      "elapsed_ms": "1930",
+      "time": "2026-10-23 06:30:20.449"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_failed",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "upload",
+      "elapsed_ms": "1975",
+      "time": "2026-10-23 06:30:20.493"
+    },
+    {
+      "event_name": "chatgpt_web_image_execution_unavailable",
+      "trace_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "request_id": "imgtas...6794",
+      "candidate_index": "0",
+      "time": "2026-10-23 06:30:20.494"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "bootstrap",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 06:30:20.548"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "requirements",
+      "elapsed_ms": "226",
+      "time": "2026-10-23 06:30:20.774"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "upload",
+      "elapsed_ms": "592",
+      "time": "2026-10-23 06:30:21.140"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "upload",
+      "elapsed_ms": "2510",
+      "time": "2026-10-23 06:30:23.058"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_failed",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "upload",
+      "elapsed_ms": "2562",
+      "time": "2026-10-23 06:30:23.111"
+    },
+    {
+      "event_name": "chatgpt_web_image_execution_unavailable",
+      "trace_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "request_id": "imgtas...6794",
+      "candidate_index": "0",
+      "time": "2026-10-23 06:30:23.111"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "bootstrap",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 06:30:23.182"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "requirements",
+      "elapsed_ms": "179",
+      "time": "2026-10-23 06:30:23.361"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "upload",
+      "elapsed_ms": "605",
+      "time": "2026-10-23 06:30:23.787"
+    },
+    {
+      "event_name": "http_request_completed",
+      "status_code": "200",
+      "trace_id": "8edc9b64-535b-4106-93bf-51880728196e",
+      "request_id": "-",
+      "method": "GET",
+      "path": "/v1/images/tasks/imgtask_a89dca2d6b384f019f9c038196886794",
+      "execution_path": "local_route",
+      "elapsed_ms": "55",
+      "time": "2026-10-23 06:30:23.923"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "upload",
+      "elapsed_ms": "1921",
+      "time": "2026-10-23 06:30:25.104"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_failed",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "upload",
+      "elapsed_ms": "1963",
+      "time": "2026-10-23 06:30:25.145"
+    },
+    {
+      "event_name": "chatgpt_web_image_execution_unavailable",
+      "trace_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "request_id": "imgtas...6794",
+      "candidate_index": "0",
+      "time": "2026-10-23 06:30:25.146"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "bootstrap",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 06:30:25.188"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "requirements",
+      "elapsed_ms": "151",
+      "time": "2026-10-23 06:30:25.339"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "upload",
+      "elapsed_ms": "500",
+      "time": "2026-10-23 06:30:25.688"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "upload",
+      "elapsed_ms": "2164",
+      "time": "2026-10-23 06:30:27.353"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_failed",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "upload",
+      "elapsed_ms": "2217",
+      "time": "2026-10-23 06:30:27.406"
+    },
+    {
+      "event_name": "chatgpt_web_image_execution_unavailable",
+      "trace_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "request_id": "imgtas...6794",
+      "candidate_index": "0",
+      "time": "2026-10-23 06:30:27.406"
+    },
+    {
+      "event_name": "provider_transfer_limit_reached",
+      "trace_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+      "elapsed_ms": "47889",
+      "time": "2026-10-23 06:30:27.425"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "bootstrap",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 06:30:28.068"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "requirements",
+      "elapsed_ms": "164",
+      "time": "2026-10-23 06:30:28.232"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "upload",
+      "elapsed_ms": "539",
+      "time": "2026-10-23 06:30:28.607"
+    },
+    {
+      "event_name": "http_request_completed",
+      "status_code": "200",
+      "trace_id": "c244b546-22fa-4fd7-b135-8a555bec3cf1",
+      "request_id": "-",
+      "method": "GET",
+      "path": "/v1/images/tasks/imgtask_a89dca2d6b384f019f9c038196886794",
+      "execution_path": "local_route",
+      "elapsed_ms": "87",
+      "time": "2026-10-23 06:30:29.737"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "upload",
+      "elapsed_ms": "2232",
+      "time": "2026-10-23 06:30:30.300"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_failed",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "upload",
+      "elapsed_ms": "2264",
+      "time": "2026-10-23 06:30:30.332"
+    },
+    {
+      "event_name": "chatgpt_web_image_execution_unavailable",
+      "trace_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "request_id": "imgtas...6794",
+      "candidate_index": "1",
+      "time": "2026-10-23 06:30:30.332"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "bootstrap",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 06:30:30.385"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "requirements",
+      "elapsed_ms": "141",
+      "time": "2026-10-23 06:30:30.526"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "upload",
+      "elapsed_ms": "530",
+      "time": "2026-10-23 06:30:30.915"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "upload",
+      "elapsed_ms": "1714",
+      "time": "2026-10-23 06:30:32.099"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_failed",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "upload",
+      "elapsed_ms": "1749",
+      "time": "2026-10-23 06:30:32.134"
+    },
+    {
+      "event_name": "chatgpt_web_image_execution_unavailable",
+      "trace_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "request_id": "imgtas...6794",
+      "candidate_index": "1",
+      "time": "2026-10-23 06:30:32.134"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "bootstrap",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 06:30:32.181"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "requirements",
+      "elapsed_ms": "163",
+      "time": "2026-10-23 06:30:32.345"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "upload",
+      "elapsed_ms": "1441",
+      "time": "2026-10-23 06:30:33.622"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "upload",
+      "elapsed_ms": "3023",
+      "time": "2026-10-23 06:30:35.204"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_failed",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "upload",
+      "elapsed_ms": "3045",
+      "time": "2026-10-23 06:30:35.226"
+    },
+    {
+      "event_name": "chatgpt_web_image_execution_unavailable",
+      "trace_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "request_id": "imgtas...6794",
+      "candidate_index": "1",
+      "time": "2026-10-23 06:30:35.226"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "bootstrap",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 06:30:35.278"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "requirements",
+      "elapsed_ms": "168",
+      "time": "2026-10-23 06:30:35.447"
+    },
+    {
+      "event_name": "http_request_completed",
+      "status_code": "200",
+      "trace_id": "1f5c28af-0b3e-4cfb-b9f2-f5c59aa8f481",
+      "request_id": "-",
+      "method": "GET",
+      "path": "/v1/images/tasks/imgtask_a89dca2d6b384f019f9c038196886794",
+      "execution_path": "local_route",
+      "elapsed_ms": "7",
+      "time": "2026-10-23 06:30:36.090"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "upload",
+      "elapsed_ms": "1050",
+      "time": "2026-10-23 06:30:36.329"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "upload",
+      "elapsed_ms": "2887",
+      "time": "2026-10-23 06:30:38.166"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_failed",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "upload",
+      "elapsed_ms": "2915",
+      "time": "2026-10-23 06:30:38.194"
+    },
+    {
+      "event_name": "chatgpt_web_image_execution_unavailable",
+      "trace_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "request_id": "imgtas...6794",
+      "candidate_index": "1",
+      "time": "2026-10-23 06:30:38.194"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "bootstrap",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 06:30:38.251"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "requirements",
+      "elapsed_ms": "110",
+      "time": "2026-10-23 06:30:38.361"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "upload",
+      "elapsed_ms": "929",
+      "time": "2026-10-23 06:30:39.180"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "upload",
+      "elapsed_ms": "2806",
+      "time": "2026-10-23 06:30:41.057"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_failed",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "upload",
+      "elapsed_ms": "2830",
+      "time": "2026-10-23 06:30:41.082"
+    },
+    {
+      "event_name": "chatgpt_web_image_execution_unavailable",
+      "trace_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "request_id": "imgtas...6794",
+      "candidate_index": "1",
+      "time": "2026-10-23 06:30:41.083"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "bootstrap",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 06:30:41.108"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "requirements",
+      "elapsed_ms": "108",
+      "time": "2026-10-23 06:30:41.216"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_failed",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "requirements",
+      "elapsed_ms": "175",
+      "time": "2026-10-23 06:30:41.283"
+    },
+    {
+      "event_name": "local_oauth_retry_refresh_failed",
+      "trace_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+      "status_code": "401",
+      "time": "2026-10-23 06:30:41.434"
+    },
+    {
+      "event_name": "local_sync_candidate_retry_scheduled",
+      "trace_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "request_id": "imgtas...6794",
+      "status_code": "401",
+      "candidate_index": "1",
+      "time": "2026-10-23 06:30:41.617"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "bootstrap",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 06:30:41.631"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "requirements",
+      "elapsed_ms": "131",
+      "time": "2026-10-23 06:30:41.762"
+    },
+    {
+      "event_name": "http_request_completed",
+      "status_code": "200",
+      "trace_id": "23a657b9-9b61-4316-a07d-1542c1fd13df",
+      "request_id": "-",
+      "method": "GET",
+      "path": "/v1/images/tasks/imgtask_a89dca2d6b384f019f9c038196886794",
+      "execution_path": "local_route",
+      "elapsed_ms": "20",
+      "time": "2026-10-23 06:30:41.874"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "upload",
+      "elapsed_ms": "840",
+      "time": "2026-10-23 06:30:42.472"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "upload",
+      "elapsed_ms": "1900",
+      "time": "2026-10-23 06:30:43.532"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_failed",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "upload",
+      "elapsed_ms": "1920",
+      "time": "2026-10-23 06:30:43.551"
+    },
+    {
+      "event_name": "chatgpt_web_image_execution_unavailable",
+      "trace_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "request_id": "imgtas...6794",
+      "candidate_index": "1",
+      "time": "2026-10-23 06:30:43.551"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "bootstrap",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 06:30:43.575"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "requirements",
+      "elapsed_ms": "123",
+      "time": "2026-10-23 06:30:43.698"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "upload",
+      "elapsed_ms": "576",
+      "time": "2026-10-23 06:30:44.151"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "upload",
+      "elapsed_ms": "1890",
+      "time": "2026-10-23 06:30:45.466"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_failed",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "upload",
+      "elapsed_ms": "1905",
+      "time": "2026-10-23 06:30:45.481"
+    },
+    {
+      "event_name": "chatgpt_web_image_execution_unavailable",
+      "trace_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "request_id": "imgtas...6794",
+      "candidate_index": "1",
+      "time": "2026-10-23 06:30:45.481"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "bootstrap",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 06:30:45.495"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "requirements",
+      "elapsed_ms": "134",
+      "time": "2026-10-23 06:30:45.629"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "upload",
+      "elapsed_ms": "702",
+      "time": "2026-10-23 06:30:46.197"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "upload",
+      "elapsed_ms": "2084",
+      "time": "2026-10-23 06:30:47.580"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_failed",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "upload",
+      "elapsed_ms": "2099",
+      "time": "2026-10-23 06:30:47.594"
+    },
+    {
+      "event_name": "chatgpt_web_image_execution_unavailable",
+      "trace_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "request_id": "imgtas...6794",
+      "candidate_index": "1",
+      "time": "2026-10-23 06:30:47.594"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "bootstrap",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 06:30:47.607"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "requirements",
+      "elapsed_ms": "94",
+      "time": "2026-10-23 06:30:47.701"
+    },
+    {
+      "event_name": "http_request_completed",
+      "status_code": "200",
+      "trace_id": "68c93c37-07c4-4e5f-ae99-310574823553",
+      "request_id": "-",
+      "method": "GET",
+      "path": "/v1/images/tasks/imgtask_a89dca2d6b384f019f9c038196886794",
+      "execution_path": "local_route",
+      "elapsed_ms": "6",
+      "time": "2026-10-23 06:30:47.861"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "upload",
+      "elapsed_ms": "1277",
+      "time": "2026-10-23 06:30:48.884"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "upload",
+      "elapsed_ms": "3296",
+      "time": "2026-10-23 06:30:50.903"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_failed",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "upload",
+      "elapsed_ms": "3312",
+      "time": "2026-10-23 06:30:50.920"
+    },
+    {
+      "event_name": "chatgpt_web_image_execution_unavailable",
+      "trace_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "request_id": "imgtas...6794",
+      "candidate_index": "1",
+      "time": "2026-10-23 06:30:50.920"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "bootstrap",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 06:30:50.934"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "requirements",
+      "elapsed_ms": "93",
+      "time": "2026-10-23 06:30:51.028"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "upload",
+      "elapsed_ms": "787",
+      "time": "2026-10-23 06:30:51.722"
+    },
+    {
+      "event_name": "chatgpt_web_image_stage",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "upload",
+      "elapsed_ms": "2691",
+      "time": "2026-10-23 06:30:53.625"
+    },
+    {
+      "event_name": "chatgpt_web_image_attempt_failed",
+      "request_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "stage": "upload",
+      "elapsed_ms": "2708",
+      "time": "2026-10-23 06:30:53.643"
+    },
+    {
+      "event_name": "chatgpt_web_image_execution_unavailable",
+      "trace_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "request_id": "imgtas...6794",
+      "candidate_index": "1",
+      "time": "2026-10-23 06:30:53.643"
+    },
+    {
+      "event_name": "provider_transfer_limit_reached",
+      "trace_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+      "elapsed_ms": "25644",
+      "time": "2026-10-23 06:30:53.648"
+    },
+    {
+      "event_name": "candidate_loop_exhausted",
+      "trace_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "request_id": "imgtas...6794",
+      "time": "2026-10-23 06:30:53.649"
+    },
+    {
+      "event_name": "local_openai_image_candidates_exhausted",
+      "trace_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "time": "2026-10-23 06:30:53.659"
+    },
+    {
+      "trace_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "local_execution_runtime_miss_reason": "execution_runtime_candidates_exhausted",
+      "time": "2026-10-23 06:30:53.681"
+    },
+    {
+      "event_name": "http_request_failed",
+      "status_code": "503",
+      "trace_id": "imgtask_a89dca2d6b384f019f9c038196886794",
+      "request_id": "-",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "execution_path": "local_execution_runtime_miss",
+      "local_execution_runtime_miss_reason": "execution_runtime_candidates_exhausted",
+      "elapsed_ms": "74863",
+      "time": "2026-10-23 06:30:53.741"
+    },
+    {
+      "event_name": "http_request_completed",
+      "status_code": "200",
+      "trace_id": "b1678942-a0b0-437c-a831-3091a9f470be",
+      "request_id": "-",
+      "method": "GET",
+      "path": "/v1/images/tasks/imgtask_a89dca2d6b384f019f9c038196886794",
+      "execution_path": "local_route",
+      "elapsed_ms": "12",
+      "time": "2026-10-23 06:30:55.095"
+    },
+    {
+      "event_name": "auth_context_resolved",
+      "trace_id": "93f8c53d-a98f-4b4a-8582-0b7528cd3162",
+      "time": "2026-10-23 06:34:57.526"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_started",
+      "trace_id": "93f8c53d-a98f-4b4a-8582-0b7528cd3162",
+      "method": "POST",
+      "path": "/v1/responses",
+      "time": "2026-10-23 06:34:57.526"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_completed",
+      "trace_id": "93f8c53d-a98f-4b4a-8582-0b7528cd3162",
+      "method": "POST",
+      "path": "/v1/responses",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 06:34:57.526"
+    },
+    {
+      "trace_id": "93f8c53d-a98f-4b4a-8582-0b7528cd3162",
+      "local_execution_runtime_miss_reason": "candidate_list_empty",
+      "time": "2026-10-23 06:34:57.719"
+    },
+    {
+      "event_name": "http_request_failed",
+      "status_code": "503",
+      "trace_id": "93f8c53d-a98f-4b4a-8582-0b7528cd3162",
+      "request_id": "-",
+      "method": "POST",
+      "path": "/v1/responses",
+      "execution_path": "local_execution_runtime_miss",
+      "local_execution_runtime_miss_reason": "candidate_list_empty",
+      "elapsed_ms": "255",
+      "time": "2026-10-23 06:34:57.757"
+    },
+    {
+      "event_name": "auth_context_resolved",
+      "trace_id": "221b26d0-6782-4f2a-a1be-64882079bc7f",
+      "time": "2026-10-23 06:35:30.728"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_started",
+      "trace_id": "221b26d0-6782-4f2a-a1be-64882079bc7f",
+      "method": "POST",
+      "path": "/v1/responses",
+      "time": "2026-10-23 06:35:30.728"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_completed",
+      "trace_id": "221b26d0-6782-4f2a-a1be-64882079bc7f",
+      "method": "POST",
+      "path": "/v1/responses",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 06:35:30.729"
+    },
+    {
+      "trace_id": "221b26d0-6782-4f2a-a1be-64882079bc7f",
+      "local_execution_runtime_miss_reason": "candidate_list_empty",
+      "time": "2026-10-23 06:35:31.406"
+    },
+    {
+      "event_name": "http_request_failed",
+      "status_code": "503",
+      "trace_id": "221b26d0-6782-4f2a-a1be-64882079bc7f",
+      "request_id": "-",
+      "method": "POST",
+      "path": "/v1/responses",
+      "execution_path": "local_execution_runtime_miss",
+      "local_execution_runtime_miss_reason": "candidate_list_empty",
+      "elapsed_ms": "830",
+      "time": "2026-10-23 06:35:31.481"
+    },
+    {
+      "event_name": "auth_context_resolved",
+      "trace_id": "e2706b9c-aa01-4b20-a358-beecbb2ac752",
+      "time": "2026-10-23 06:37:37.077"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_started",
+      "trace_id": "e2706b9c-aa01-4b20-a358-beecbb2ac752",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "time": "2026-10-23 06:37:37.078"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_completed",
+      "trace_id": "e2706b9c-aa01-4b20-a358-beecbb2ac752",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "elapsed_ms": "171",
+      "time": "2026-10-23 06:37:37.250"
+    },
+    {
+      "event_name": "auth_context_resolved",
+      "trace_id": "ebdfcd6f-d3c4-4b4d-a207-c282e987626a",
+      "time": "2026-10-23 06:37:47.085"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_started",
+      "trace_id": "ebdfcd6f-d3c4-4b4d-a207-c282e987626a",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "time": "2026-10-23 06:37:47.085"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_completed",
+      "trace_id": "ebdfcd6f-d3c4-4b4d-a207-c282e987626a",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "elapsed_ms": "189",
+      "time": "2026-10-23 06:37:47.275"
+    },
+    {
+      "trace_id": "e2706b9c-aa01-4b20-a358-beecbb2ac752",
+      "local_execution_runtime_miss_reason": "unknown",
+      "time": "2026-10-23 06:37:52.189"
+    },
+    {
+      "event_name": "http_request_failed",
+      "status_code": "503",
+      "trace_id": "e2706b9c-aa01-4b20-a358-beecbb2ac752",
+      "request_id": "-",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "execution_path": "local_execution_runtime_miss",
+      "local_execution_runtime_miss_reason": "none",
+      "elapsed_ms": "15179",
+      "time": "2026-10-23 06:37:52.253"
+    },
+    {
+      "trace_id": "ebdfcd6f-d3c4-4b4d-a207-c282e987626a",
+      "local_execution_runtime_miss_reason": "unknown",
+      "time": "2026-10-23 06:37:58.423"
+    },
+    {
+      "event_name": "http_request_failed",
+      "status_code": "503",
+      "trace_id": "ebdfcd6f-d3c4-4b4d-a207-c282e987626a",
+      "request_id": "-",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "execution_path": "local_execution_runtime_miss",
+      "local_execution_runtime_miss_reason": "none",
+      "elapsed_ms": "11425",
+      "time": "2026-10-23 06:37:58.508"
+    },
+    {
+      "event_name": "admin_monitoring_request_trace_viewed",
+      "status_code": "200",
+      "trace_id": "92fd832d-5b57-4721-bb9b-05ea84b19ed4",
+      "method": "GET",
+      "path": "/api/admin/monitoring/trace/ebdfcd6f-d3c4-4b4d-a207-c282e987626a",
+      "time": "2026-10-23 06:38:23.935"
+    },
+    {
+      "event_name": "auth_context_resolved",
+      "trace_id": "9d009778-8110-4c42-90a2-e20d8401b9b2",
+      "time": "2026-10-23 06:41:12.143"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_started",
+      "trace_id": "9d009778-8110-4c42-90a2-e20d8401b9b2",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "time": "2026-10-23 06:41:12.144"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_completed",
+      "trace_id": "9d009778-8110-4c42-90a2-e20d8401b9b2",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "elapsed_ms": "171",
+      "time": "2026-10-23 06:41:12.315"
+    },
+    {
+      "trace_id": "9d009778-8110-4c42-90a2-e20d8401b9b2",
+      "local_execution_runtime_miss_reason": "unknown",
+      "time": "2026-10-23 06:41:20.829"
+    },
+    {
+      "event_name": "http_request_failed",
+      "status_code": "503",
+      "trace_id": "9d009778-8110-4c42-90a2-e20d8401b9b2",
+      "request_id": "-",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "execution_path": "local_execution_runtime_miss",
+      "local_execution_runtime_miss_reason": "none",
+      "elapsed_ms": "8733",
+      "time": "2026-10-23 06:41:20.868"
+    },
+    {
+      "event_name": "auth_context_resolved",
+      "trace_id": "3731efdb-d230-489e-a353-e879ce4a37d7",
+      "time": "2026-10-23 06:42:35.050"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_started",
+      "trace_id": "3731efdb-d230-489e-a353-e879ce4a37d7",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "time": "2026-10-23 06:42:35.050"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_completed",
+      "trace_id": "3731efdb-d230-489e-a353-e879ce4a37d7",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "elapsed_ms": "173",
+      "time": "2026-10-23 06:42:35.224"
+    },
+    {
+      "trace_id": "3731efdb-d230-489e-a353-e879ce4a37d7",
+      "local_execution_runtime_miss_reason": "unknown",
+      "time": "2026-10-23 06:42:36.325"
+    },
+    {
+      "event_name": "http_request_failed",
+      "status_code": "503",
+      "trace_id": "3731efdb-d230-489e-a353-e879ce4a37d7",
+      "request_id": "-",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "execution_path": "local_execution_runtime_miss",
+      "local_execution_runtime_miss_reason": "none",
+      "elapsed_ms": "5423",
+      "time": "2026-10-23 06:42:40.472"
+    },
+    {
+      "event_name": "admin_monitoring_request_trace_viewed",
+      "status_code": "200",
+      "trace_id": "acd17850-3577-47a4-a5c4-ae1580bf90f5",
+      "method": "GET",
+      "path": "/api/admin/monitoring/trace/3731efdb-d230-489e-a353-e879ce4a37d7",
+      "time": "2026-10-23 06:42:43.840"
+    },
+    {
+      "event_name": "auth_context_resolved",
+      "trace_id": "64b024a8-8f0c-44df-829e-ae08066be815",
+      "time": "2026-10-23 06:42:48.247"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_started",
+      "trace_id": "64b024a8-8f0c-44df-829e-ae08066be815",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "time": "2026-10-23 06:42:48.247"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_completed",
+      "trace_id": "64b024a8-8f0c-44df-829e-ae08066be815",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "elapsed_ms": "113",
+      "time": "2026-10-23 06:42:48.361"
+    },
+    {
+      "trace_id": "64b024a8-8f0c-44df-829e-ae08066be815",
+      "local_execution_runtime_miss_reason": "unknown",
+      "time": "2026-10-23 06:42:49.617"
+    },
+    {
+      "event_name": "http_request_failed",
+      "status_code": "503",
+      "trace_id": "64b024a8-8f0c-44df-829e-ae08066be815",
+      "request_id": "-",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "execution_path": "local_execution_runtime_miss",
+      "local_execution_runtime_miss_reason": "none",
+      "elapsed_ms": "5742",
+      "time": "2026-10-23 06:42:53.975"
+    },
+    {
+      "event_name": "auth_context_resolved",
+      "trace_id": "57eb0fcf-50ba-4a72-bf14-e13191a7ba8c",
+      "time": "2026-10-23 06:46:08.964"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_started",
+      "trace_id": "57eb0fcf-50ba-4a72-bf14-e13191a7ba8c",
+      "method": "POST",
+      "path": "/v1/responses",
+      "time": "2026-10-23 06:46:08.964"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_completed",
+      "trace_id": "57eb0fcf-50ba-4a72-bf14-e13191a7ba8c",
+      "method": "POST",
+      "path": "/v1/responses",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 06:46:08.964"
+    },
+    {
+      "trace_id": "57eb0fcf-50ba-4a72-bf14-e13191a7ba8c",
+      "local_execution_runtime_miss_reason": "candidate_list_empty",
+      "time": "2026-10-23 06:46:09.163"
+    },
+    {
+      "event_name": "http_request_failed",
+      "status_code": "503",
+      "trace_id": "57eb0fcf-50ba-4a72-bf14-e13191a7ba8c",
+      "request_id": "-",
+      "method": "POST",
+      "path": "/v1/responses",
+      "execution_path": "local_execution_runtime_miss",
+      "local_execution_runtime_miss_reason": "candidate_list_empty",
+      "elapsed_ms": "404",
+      "time": "2026-10-23 06:46:09.331"
+    },
+    {
+      "event_name": "admin_monitoring_request_trace_viewed",
+      "status_code": "200",
+      "trace_id": "8cd5be53-7b0f-4535-8dab-4f5ab1aeba3c",
+      "method": "GET",
+      "path": "/api/admin/monitoring/trace/57eb0fcf-50ba-4a72-bf14-e13191a7ba8c",
+      "time": "2026-10-23 06:46:25.751"
+    },
+    {
+      "event_name": "auth_context_resolved",
+      "trace_id": "5074f517-2309-467a-a360-6915f1799520",
+      "time": "2026-10-23 06:47:52.960"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_started",
+      "trace_id": "5074f517-2309-467a-a360-6915f1799520",
+      "method": "POST",
+      "path": "/v1/responses",
+      "time": "2026-10-23 06:47:52.961"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_completed",
+      "trace_id": "5074f517-2309-467a-a360-6915f1799520",
+      "method": "POST",
+      "path": "/v1/responses",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 06:47:52.961"
+    },
+    {
+      "trace_id": "5074f517-2309-467a-a360-6915f1799520",
+      "local_execution_runtime_miss_reason": "candidate_list_empty",
+      "time": "2026-10-23 06:47:53.229"
+    },
+    {
+      "event_name": "http_request_failed",
+      "status_code": "503",
+      "trace_id": "5074f517-2309-467a-a360-6915f1799520",
+      "request_id": "-",
+      "method": "POST",
+      "path": "/v1/responses",
+      "execution_path": "local_execution_runtime_miss",
+      "local_execution_runtime_miss_reason": "candidate_list_empty",
+      "elapsed_ms": "633",
+      "time": "2026-10-23 06:47:53.550"
+    },
+    {
+      "event_name": "auth_context_resolved",
+      "trace_id": "5ef50029-06bf-4fc5-b02a-0acb4d50e6a7",
+      "time": "2026-10-23 06:48:14.569"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_started",
+      "trace_id": "5ef50029-06bf-4fc5-b02a-0acb4d50e6a7",
+      "method": "POST",
+      "path": "/v1/responses",
+      "time": "2026-10-23 06:48:14.569"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_completed",
+      "trace_id": "5ef50029-06bf-4fc5-b02a-0acb4d50e6a7",
+      "method": "POST",
+      "path": "/v1/responses",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 06:48:14.569"
+    },
+    {
+      "trace_id": "5ef50029-06bf-4fc5-b02a-0acb4d50e6a7",
+      "local_execution_runtime_miss_reason": "candidate_list_empty",
+      "time": "2026-10-23 06:48:14.668"
+    },
+    {
+      "event_name": "http_request_failed",
+      "status_code": "503",
+      "trace_id": "5ef50029-06bf-4fc5-b02a-0acb4d50e6a7",
+      "request_id": "-",
+      "method": "POST",
+      "path": "/v1/responses",
+      "execution_path": "local_execution_runtime_miss",
+      "local_execution_runtime_miss_reason": "candidate_list_empty",
+      "elapsed_ms": "232",
+      "time": "2026-10-23 06:48:14.741"
+    },
+    {
+      "event_name": "auth_context_resolved",
+      "trace_id": "722aa949-5651-40cb-addc-97811dbdef96",
+      "time": "2026-10-23 06:49:14.197"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_started",
+      "trace_id": "722aa949-5651-40cb-addc-97811dbdef96",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "time": "2026-10-23 06:49:14.198"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_completed",
+      "trace_id": "722aa949-5651-40cb-addc-97811dbdef96",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 06:49:14.198"
+    },
+    {
+      "trace_id": "722aa949-5651-40cb-addc-97811dbdef96",
+      "local_execution_runtime_miss_reason": "unknown",
+      "time": "2026-10-23 06:49:27.222"
+    },
+    {
+      "event_name": "http_request_failed",
+      "status_code": "503",
+      "trace_id": "722aa949-5651-40cb-addc-97811dbdef96",
+      "request_id": "-",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "execution_path": "local_execution_runtime_miss",
+      "local_execution_runtime_miss_reason": "none",
+      "elapsed_ms": "13105",
+      "time": "2026-10-23 06:49:27.301"
+    },
+    {
+      "event_name": "auth_context_resolved",
+      "trace_id": "562ce25b-70b1-434c-9740-a8a8bb158db2",
+      "time": "2026-10-23 06:52:43.124"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_started",
+      "trace_id": "562ce25b-70b1-434c-9740-a8a8bb158db2",
+      "method": "POST",
+      "path": "/v1/responses",
+      "time": "2026-10-23 06:52:43.124"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_completed",
+      "trace_id": "562ce25b-70b1-434c-9740-a8a8bb158db2",
+      "method": "POST",
+      "path": "/v1/responses",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 06:52:43.124"
+    },
+    {
+      "trace_id": "562ce25b-70b1-434c-9740-a8a8bb158db2",
+      "local_execution_runtime_miss_reason": "candidate_list_empty",
+      "time": "2026-10-23 06:52:43.270"
+    },
+    {
+      "event_name": "http_request_failed",
+      "status_code": "503",
+      "trace_id": "562ce25b-70b1-434c-9740-a8a8bb158db2",
+      "request_id": "-",
+      "method": "POST",
+      "path": "/v1/responses",
+      "execution_path": "local_execution_runtime_miss",
+      "local_execution_runtime_miss_reason": "candidate_list_empty",
+      "elapsed_ms": "202",
+      "time": "2026-10-23 06:52:43.318"
+    },
+    {
+      "event_name": "auth_context_resolved",
+      "trace_id": "60c96d01-fb34-4300-8136-9b50d7209b5a",
+      "time": "2026-10-23 06:54:00.607"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_started",
+      "trace_id": "60c96d01-fb34-4300-8136-9b50d7209b5a",
+      "method": "POST",
+      "path": "/v1/responses",
+      "time": "2026-10-23 06:54:00.607"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_completed",
+      "trace_id": "60c96d01-fb34-4300-8136-9b50d7209b5a",
+      "method": "POST",
+      "path": "/v1/responses",
+      "elapsed_ms": "0",
+      "time": "2026-10-23 06:54:00.607"
+    },
+    {
+      "trace_id": "60c96d01-fb34-4300-8136-9b50d7209b5a",
+      "local_execution_runtime_miss_reason": "candidate_list_empty",
+      "time": "2026-10-23 06:54:00.790"
+    },
+    {
+      "event_name": "http_request_failed",
+      "status_code": "503",
+      "trace_id": "60c96d01-fb34-4300-8136-9b50d7209b5a",
+      "request_id": "-",
+      "method": "POST",
+      "path": "/v1/responses",
+      "execution_path": "local_execution_runtime_miss",
+      "local_execution_runtime_miss_reason": "candidate_list_empty",
+      "elapsed_ms": "277",
+      "time": "2026-10-23 06:54:00.840"
+    },
+    {
+      "event_name": "admin_monitoring_request_trace_viewed",
+      "status_code": "200",
+      "trace_id": "e5cd0784-11ff-4ceb-a669-3959c7b670aa",
+      "method": "GET",
+      "path": "/api/admin/monitoring/trace/562ce25b-70b1-434c-9740-a8a8bb158db2",
+      "time": "2026-10-23 06:57:54.279"
+    },
+    {
+      "event_name": "auth_context_resolved",
+      "trace_id": "5540bd89-009a-44eb-bec9-d1e6c585c0b0",
+      "time": "2026-10-23 07:07:28.036"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_started",
+      "trace_id": "5540bd89-009a-44eb-bec9-d1e6c585c0b0",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "time": "2026-10-23 07:07:28.036"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_completed",
+      "trace_id": "5540bd89-009a-44eb-bec9-d1e6c585c0b0",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "elapsed_ms": "107",
+      "time": "2026-10-23 07:07:28.143"
+    },
+    {
+      "trace_id": "5540bd89-009a-44eb-bec9-d1e6c585c0b0",
+      "local_execution_runtime_miss_reason": "unknown",
+      "time": "2026-10-23 07:07:29.319"
+    },
+    {
+      "event_name": "http_request_failed",
+      "status_code": "503",
+      "trace_id": "5540bd89-009a-44eb-bec9-d1e6c585c0b0",
+      "request_id": "-",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "execution_path": "local_execution_runtime_miss",
+      "local_execution_runtime_miss_reason": "none",
+      "elapsed_ms": "5061",
+      "time": "2026-10-23 07:07:33.096"
+    },
+    {
+      "event_name": "auth_context_resolved",
+      "trace_id": "1db6e452-c685-47f7-9989-9ecc13562cdc",
+      "time": "2026-10-23 07:07:40.485"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_started",
+      "trace_id": "1db6e452-c685-47f7-9989-9ecc13562cdc",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "time": "2026-10-23 07:07:40.485"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_completed",
+      "trace_id": "1db6e452-c685-47f7-9989-9ecc13562cdc",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "elapsed_ms": "181",
+      "time": "2026-10-23 07:07:40.667"
+    },
+    {
+      "trace_id": "1db6e452-c685-47f7-9989-9ecc13562cdc",
+      "local_execution_runtime_miss_reason": "unknown",
+      "time": "2026-10-23 07:07:41.771"
+    },
+    {
+      "event_name": "http_request_failed",
+      "status_code": "503",
+      "trace_id": "1db6e452-c685-47f7-9989-9ecc13562cdc",
+      "request_id": "-",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "execution_path": "local_execution_runtime_miss",
+      "local_execution_runtime_miss_reason": "none",
+      "elapsed_ms": "5155",
+      "time": "2026-10-23 07:07:45.592"
+    },
+    {
+      "event_name": "auth_context_resolved",
+      "trace_id": "ed92f8ca-cc8d-43e2-9682-18dbb4adcc0d",
+      "time": "2026-10-23 07:07:54.161"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_started",
+      "trace_id": "ed92f8ca-cc8d-43e2-9682-18dbb4adcc0d",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "time": "2026-10-23 07:07:54.165"
+    },
+    {
+      "event_name": "frontdoor_request_body_buffer_completed",
+      "trace_id": "ed92f8ca-cc8d-43e2-9682-18dbb4adcc0d",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "elapsed_ms": "213",
+      "time": "2026-10-23 07:07:54.378"
+    },
+    {
+      "trace_id": "ed92f8ca-cc8d-43e2-9682-18dbb4adcc0d",
+      "local_execution_runtime_miss_reason": "unknown",
+      "time": "2026-10-23 07:07:55.700"
+    },
+    {
+      "event_name": "http_request_failed",
+      "status_code": "503",
+      "trace_id": "ed92f8ca-cc8d-43e2-9682-18dbb4adcc0d",
+      "request_id": "-",
+      "method": "POST",
+      "path": "/v1/images/edits",
+      "execution_path": "local_execution_runtime_miss",
+      "local_execution_runtime_miss_reason": "none",
+      "elapsed_ms": "5390",
+      "time": "2026-10-23 07:07:59.509"
+    }
+  ]
+}

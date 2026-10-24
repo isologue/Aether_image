@@ -416,7 +416,11 @@ pub(crate) async fn record_failed_usage_for_exhausted_request(
         None,
         None,
     );
-    data.request_metadata = Some(Value::Object(request_metadata));
+    data.request_metadata =
+        crate::request_diagnostics::attach_current_request_diagnostics_to_report_context(Some(
+            &Value::Object(request_metadata.clone()),
+        ))
+        .or(Some(Value::Object(request_metadata)));
 
     state
         .usage_runtime
@@ -459,9 +463,19 @@ pub(crate) async fn record_failed_usage_for_runtime_miss_request(
         .and_then(|value| value.provider_name.clone())
         .or_else(|| routing_candidate.and_then(|value| value.candidate.provider_id.clone()))
         .unwrap_or_else(|| "unknown".to_string());
+    let original_request_body =
+        runtime_miss_original_request_body_json(request_headers, request_body);
     let model = trimmed_non_empty(diagnostic.and_then(|value| value.requested_model.as_deref()))
         .or_else(|| routing_candidate.and_then(|value| value.global_model_name.clone()))
         .or_else(|| routing_candidate.and_then(|value| value.selected_provider_model_name.clone()))
+        .or_else(|| {
+            trimmed_non_empty(
+                original_request_body
+                    .as_ref()
+                    .and_then(|body| body.get("model"))
+                    .and_then(Value::as_str),
+            )
+        })
         .unwrap_or_else(|| "unknown".to_string());
     let target_model = routing_candidate
         .and_then(|value| value.selected_provider_model_name.clone())
@@ -536,7 +550,7 @@ pub(crate) async fn record_failed_usage_for_runtime_miss_request(
         error_category: error_category_for_failed_status(status_code),
         response_time_ms: Some(started_at.elapsed().as_millis() as u64),
         request_headers: Some(runtime_miss_original_headers_json(request_headers)),
-        request_body: runtime_miss_original_request_body_json(request_headers, request_body),
+        request_body: original_request_body,
         response_headers: Some(json_header_map()),
         response_body: Some(client_body.clone()),
         client_response_headers: Some(Value::Object(client_headers)),

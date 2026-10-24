@@ -49,6 +49,14 @@ pub(crate) async fn maybe_execute_via_sync_decision_path(
     };
 
     let Some((body_json, body_base64)) = parse_local_request_body(parts, body_bytes) else {
+        crate::ai_serving::set_local_runtime_miss_diagnostic_reason(
+            state,
+            trace_id,
+            decision,
+            plan_kind,
+            None,
+            "request_body_parse_failed",
+        );
         return Ok(LocalExecutionRequestOutcome::NoPath);
     };
 
@@ -77,6 +85,14 @@ pub(crate) async fn maybe_execute_via_sync_decision_path(
     let bypass_cache_key =
         build_direct_plan_bypass_cache_key(plan_kind, parts, body_bytes, decision);
     if should_skip_direct_plan(state, &bypass_cache_key) {
+        crate::ai_serving::set_local_runtime_miss_diagnostic_reason(
+            state,
+            trace_id,
+            decision,
+            plan_kind,
+            body_json.get("model").and_then(serde_json::Value::as_str),
+            "direct_plan_recent_miss",
+        );
         return Ok(LocalExecutionRequestOutcome::NoPath);
     }
 

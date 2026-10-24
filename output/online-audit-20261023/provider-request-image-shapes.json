@@ -1,0 +1,509 @@
+[
+  {
+    "request_id": "051b664e-6c71-4775-a716-3e0ad0b8159a",
+    "body_field": "request_body",
+    "keys": [
+      "body_bytes_b64"
+    ],
+    "files": [
+      {
+        "content_type": "image/jpeg",
+        "bytes": 90951,
+        "magic_hex": "ffd8ffdb004300060405060504060605",
+        "tail_hex": "5cdaa05b20a108c91010522d2dafffd9"
+      },
+      {
+        "content_type": "image/jpeg",
+        "bytes": 127239,
+        "magic_hex": "ffd8ffdb004300060405060504060605",
+        "tail_hex": "9e7c343055b9538345ea7918a649ffd9"
+      },
+      {
+        "content_type": "image/jpeg",
+        "bytes": 106445,
+        "magic_hex": "ffd8ffdb004300060405060504060605",
+        "tail_hex": "88e8af3294ab2f48f7f1dbcdd72fffd9"
+      }
+    ]
+  },
+  {
+    "request_id": "051b664e-6c71-4775-a716-3e0ad0b8159a",
+    "body_field": "provider_request_body",
+    "keys": [
+      "operation",
+      "model",
+      "web_model",
+      "prompt",
+      "size",
+      "ratio",
+      "size_best_effort",
+      "images",
+      "count"
+    ],
+    "prompt_utf8_bytes": 59716,
+    "images": [
+      {
+        "chars": 121291,
+        "header": "data:image/jpeg;base64",
+        "bytes": 90951,
+        "magic_hex": "ffd8ffdb004300060405060504060605",
+        "tail_hex": "5cdaa05b20a108c91010522d2dafffd9",
+        "detected": "jpeg"
+      },
+      {
+        "chars": 169675,
+        "header": "data:image/jpeg;base64",
+        "bytes": 127239,
+        "magic_hex": "ffd8ffdb004300060405060504060605",
+        "tail_hex": "9e7c343055b9538345ea7918a649ffd9",
+        "detected": "jpeg"
+      },
+      {
+        "chars": 141951,
+        "header": "data:image/jpeg;base64",
+        "bytes": 106445,
+        "magic_hex": "ffd8ffdb004300060405060504060605",
+        "tail_hex": "88e8af3294ab2f48f7f1dbcdd72fffd9",
+        "detected": "jpeg"
+      }
+    ]
+  },
+  {
+    "request_id": "0d96d4f9-3877-4857-993a-3755ff516a87",
+    "body_field": "request_body",
+    "keys": [
+      "images",
+      "model",
+      "n",
+      "prompt"
+    ],
+    "prompt_utf8_bytes": 60563,
+    "images": [
+      {
+        "type": "dict"
+      },
+      {
+        "type": "dict"
+      },
+      {
+        "type": "dict"
+      }
+    ]
+  },
+  {
+    "request_id": "0d96d4f9-3877-4857-993a-3755ff516a87",
+    "body_field": "provider_request_body",
+    "keys": [
+      "operation",
+      "model",
+      "web_model",
+      "prompt",
+      "size",
+      "ratio",
+      "size_best_effort",
+      "images",
+      "count"
+    ],
+    "prompt_utf8_bytes": 60563,
+    "images": [
+      {
+        "chars": 94,
+        "scheme": "https"
+      },
+      {
+        "chars": 94,
+        "scheme": "https"
+      },
+      {
+        "chars": 94,
+        "scheme": "https"
+      }
+    ]
+  },
+  {
+    "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+    "body_field": "request_body",
+    "keys": [
+      "body_bytes_b64"
+    ],
+    "files": [
+      {
+        "content_type": "image/png",
+        "bytes": 382173,
+        "magic_hex": "ffd8ffe000104a464946000101000001",
+        "tail_hex": "665b2c684eec1b5c26a4cb77c5d2a177"
+      }
+    ]
+  },
+  {
+    "request_id": "10824bf3-d2c3-4f01-93f2-3bbd480a3c7a",
+    "body_field": "provider_request_body",
+    "keys": [
+      "operation",
+      "model",
+      "web_model",
+      "prompt",
+      "size",
+      "ratio",
+      "size_best_effort",
+      "images",
+      "count"
+    ],
+    "prompt_utf8_bytes": 96,
+    "images": [
+      {
+        "chars": 509586,
+        "header": "data:image/png;base64",
+        "bytes": 382173,
+        "magic_hex": "ffd8ffe000104a464946000101000001",
+        "tail_hex": "665b2c684eec1b5c26a4cb77c5d2a177",
+        "detected": "jpeg"
+      }
+    ]
+  },
+  {
+    "request_id": "02b5a394-b72b-4761-9fa6-5b8a2b6cb1d0",
+    "body_field": "request_body",
+    "keys": [
+      "body_bytes_b64"
+    ],
+    "files": [
+      {
+        "content_type": "application/octet-stream",
+        "bytes": 115111,
+        "magic_hex": "ffd8ffdb004300060405060504060605",
+        "tail_hex": "655b2b65d592f8b8eb1ea55c7a23ffd9"
+      },
+      {
+        "content_type": "application/octet-stream",
+        "bytes": 115454,
+        "magic_hex": "ffd8ffdb004300060405060504060605",
+        "tail_hex": "3939c9c99736d6f1b6a4a9c7647fffd9"
+      },
+      {
+        "content_type": "application/octet-stream",
+        "bytes": 115513,
+        "magic_hex": "ffd8ffdb004300060405060504060605",
+        "tail_hex": "3b0b3858dbc2953e515830b79793ffd9"
+      }
+    ]
+  },
+  {
+    "request_id": "02b5a394-b72b-4761-9fa6-5b8a2b6cb1d0",
+    "body_field": "provider_request_body",
+    "keys": [
+      "operation",
+      "model",
+      "web_model",
+      "prompt",
+      "size",
+      "ratio",
+      "size_best_effort",
+      "images",
+      "count"
+    ],
+    "prompt_utf8_bytes": 27992,
+    "images": [
+      {
+        "chars": 153521,
+        "header": "data:application/octet-stream;base64",
+        "bytes": 115111,
+        "magic_hex": "ffd8ffdb004300060405060504060605",
+        "tail_hex": "655b2b65d592f8b8eb1ea55c7a23ffd9",
+        "detected": "jpeg"
+      },
+      {
+        "chars": 153977,
+        "header": "data:application/octet-stream;base64",
+        "bytes": 115454,
+        "magic_hex": "ffd8ffdb004300060405060504060605",
+        "tail_hex": "3939c9c99736d6f1b6a4a9c7647fffd9",
+        "detected": "jpeg"
+      },
+      {
+        "chars": 154057,
+        "header": "data:application/octet-stream;base64",
+        "bytes": 115513,
+        "magic_hex": "ffd8ffdb004300060405060504060605",
+        "tail_hex": "3b0b3858dbc2953e515830b79793ffd9",
+        "detected": "jpeg"
+      }
+    ]
+  },
+  {
+    "request_id": "088b3e69-590e-4cd4-85c9-535c8dbfcec4",
+    "body_field": "request_body",
+    "keys": [
+      "body_bytes_b64"
+    ],
+    "files": [
+      {
+        "content_type": "application/octet-stream",
+        "bytes": 118634,
+        "magic_hex": "ffd8ffdb004300060405060504060605",
+        "tail_hex": "a3207d3bf6af0575907302306b18ffd9"
+      },
+      {
+        "content_type": "application/octet-stream",
+        "bytes": 171110,
+        "magic_hex": "ffd8ffe000104a464946000101010048",
+        "tail_hex": "26c8c0dedb8d796f990e1318a697ffd9"
+      },
+      {
+        "content_type": "application/octet-stream",
+        "bytes": 160968,
+        "magic_hex": "ffd8ffdb004300060405060504060605",
+        "tail_hex": "9e64f03c69a878554f9e0256259fffd9"
+      }
+    ]
+  },
+  {
+    "request_id": "088b3e69-590e-4cd4-85c9-535c8dbfcec4",
+    "body_field": "provider_request_body",
+    "keys": [
+      "operation",
+      "model",
+      "web_model",
+      "prompt",
+      "size",
+      "ratio",
+      "size_best_effort",
+      "images",
+      "count"
+    ],
+    "prompt_utf8_bytes": 39181,
+    "images": [
+      {
+        "chars": 158217,
+        "header": "data:application/octet-stream;base64",
+        "bytes": 118634,
+        "magic_hex": "ffd8ffdb004300060405060504060605",
+        "tail_hex": "a3207d3bf6af0575907302306b18ffd9",
+        "detected": "jpeg"
+      },
+      {
+        "chars": 228185,
+        "header": "data:application/octet-stream;base64",
+        "bytes": 171110,
+        "magic_hex": "ffd8ffe000104a464946000101010048",
+        "tail_hex": "26c8c0dedb8d796f990e1318a697ffd9",
+        "detected": "jpeg"
+      },
+      {
+        "chars": 214661,
+        "header": "data:application/octet-stream;base64",
+        "bytes": 160968,
+        "magic_hex": "ffd8ffdb004300060405060504060605",
+        "tail_hex": "9e64f03c69a878554f9e0256259fffd9",
+        "detected": "jpeg"
+      }
+    ]
+  },
+  {
+    "request_id": "02a2f970-c7ae-4712-87c0-90a43e3a9816",
+    "body_field": "request_body",
+    "keys": [
+      "body_bytes_b64"
+    ],
+    "files": [
+      {
+        "content_type": "application/octet-stream",
+        "bytes": 118634,
+        "magic_hex": "ffd8ffdb004300060405060504060605",
+        "tail_hex": "a3207d3bf6af0575907302306b18ffd9"
+      },
+      {
+        "content_type": "application/octet-stream",
+        "bytes": 171110,
+        "magic_hex": "ffd8ffe000104a464946000101010048",
+        "tail_hex": "26c8c0dedb8d796f990e1318a697ffd9"
+      },
+      {
+        "content_type": "application/octet-stream",
+        "bytes": 160968,
+        "magic_hex": "ffd8ffdb004300060405060504060605",
+        "tail_hex": "9e64f03c69a878554f9e0256259fffd9"
+      }
+    ]
+  },
+  {
+    "request_id": "02a2f970-c7ae-4712-87c0-90a43e3a9816",
+    "body_field": "provider_request_body",
+    "keys": [
+      "operation",
+      "model",
+      "web_model",
+      "prompt",
+      "size",
+      "ratio",
+      "size_best_effort",
+      "images",
+      "count"
+    ],
+    "prompt_utf8_bytes": 39184,
+    "images": [
+      {
+        "chars": 158217,
+        "header": "data:application/octet-stream;base64",
+        "bytes": 118634,
+        "magic_hex": "ffd8ffdb004300060405060504060605",
+        "tail_hex": "a3207d3bf6af0575907302306b18ffd9",
+        "detected": "jpeg"
+      },
+      {
+        "chars": 228185,
+        "header": "data:application/octet-stream;base64",
+        "bytes": 171110,
+        "magic_hex": "ffd8ffe000104a464946000101010048",
+        "tail_hex": "26c8c0dedb8d796f990e1318a697ffd9",
+        "detected": "jpeg"
+      },
+      {
+        "chars": 214661,
+        "header": "data:application/octet-stream;base64",
+        "bytes": 160968,
+        "magic_hex": "ffd8ffdb004300060405060504060605",
+        "tail_hex": "9e64f03c69a878554f9e0256259fffd9",
+        "detected": "jpeg"
+      }
+    ]
+  },
+  {
+    "request_id": "1180b920-9191-456b-a2e7-9139df142b12",
+    "body_field": "request_body",
+    "keys": [
+      "body_bytes_b64"
+    ],
+    "files": [
+      {
+        "content_type": "application/octet-stream",
+        "bytes": 135442,
+        "magic_hex": "ffd8ffdb004300060405060504060605",
+        "tail_hex": "1450051451401451450051451407ffd9"
+      },
+      {
+        "content_type": "application/octet-stream",
+        "bytes": 132856,
+        "magic_hex": "ffd8ffdb004300060405060504060605",
+        "tail_hex": "8ddd10268b84ac3d126eca33ba0fffd9"
+      },
+      {
+        "content_type": "application/octet-stream",
+        "bytes": 168867,
+        "magic_hex": "ffd8ffdb004300060405060504060605",
+        "tail_hex": "3d29503053918352c1a4bcea541fffd9"
+      }
+    ]
+  },
+  {
+    "request_id": "1180b920-9191-456b-a2e7-9139df142b12",
+    "body_field": "provider_request_body",
+    "keys": [
+      "operation",
+      "model",
+      "web_model",
+      "prompt",
+      "size",
+      "ratio",
+      "size_best_effort",
+      "images",
+      "count"
+    ],
+    "prompt_utf8_bytes": 24709,
+    "images": [
+      {
+        "chars": 180629,
+        "header": "data:application/octet-stream;base64",
+        "bytes": 135442,
+        "magic_hex": "ffd8ffdb004300060405060504060605",
+        "tail_hex": "1450051451401451450051451407ffd9",
+        "detected": "jpeg"
+      },
+      {
+        "chars": 177181,
+        "header": "data:application/octet-stream;base64",
+        "bytes": 132856,
+        "magic_hex": "ffd8ffdb004300060405060504060605",
+        "tail_hex": "8ddd10268b84ac3d126eca33ba0fffd9",
+        "detected": "jpeg"
+      },
+      {
+        "chars": 225193,
+        "header": "data:application/octet-stream;base64",
+        "bytes": 168867,
+        "magic_hex": "ffd8ffdb004300060405060504060605",
+        "tail_hex": "3d29503053918352c1a4bcea541fffd9",
+        "detected": "jpeg"
+      }
+    ]
+  },
+  {
+    "request_id": "0fdfa21b-dc44-4ec3-83d4-9d1c4d06989f",
+    "body_field": "request_body",
+    "keys": [
+      "body_bytes_b64"
+    ],
+    "files": [
+      {
+        "content_type": "application/octet-stream",
+        "bytes": 115111,
+        "magic_hex": "ffd8ffdb004300060405060504060605",
+        "tail_hex": "655b2b65d592f8b8eb1ea55c7a23ffd9"
+      },
+      {
+        "content_type": "application/octet-stream",
+        "bytes": 115454,
+        "magic_hex": "ffd8ffdb004300060405060504060605",
+        "tail_hex": "3939c9c99736d6f1b6a4a9c7647fffd9"
+      },
+      {
+        "content_type": "application/octet-stream",
+        "bytes": 115513,
+        "magic_hex": "ffd8ffdb004300060405060504060605",
+        "tail_hex": "3b0b3858dbc2953e515830b79793ffd9"
+      }
+    ]
+  },
+  {
+    "request_id": "0fdfa21b-dc44-4ec3-83d4-9d1c4d06989f",
+    "body_field": "provider_request_body",
+    "keys": [
+      "operation",
+      "model",
+      "web_model",
+      "prompt",
+      "size",
+      "ratio",
+      "size_best_effort",
+      "images",
+      "count"
+    ],
+    "prompt_utf8_bytes": 24721,
+    "images": [
+      {
+        "chars": 153521,
+        "header": "data:application/octet-stream;base64",
+        "bytes": 115111,
+        "magic_hex": "ffd8ffdb004300060405060504060605",
+        "tail_hex": "655b2b65d592f8b8eb1ea55c7a23ffd9",
+        "detected": "jpeg"
+      },
+      {
+        "chars": 153977,
+        "header": "data:application/octet-stream;base64",
+        "bytes": 115454,
+        "magic_hex": "ffd8ffdb004300060405060504060605",
+        "tail_hex": "3939c9c99736d6f1b6a4a9c7647fffd9",
+        "detected": "jpeg"
+      },
+      {
+        "chars": 154057,
+        "header": "data:application/octet-stream;base64",
+        "bytes": 115513,
+        "magic_hex": "ffd8ffdb004300060405060504060605",
+        "tail_hex": "3b0b3858dbc2953e515830b79793ffd9",
+        "detected": "jpeg"
+      }
+    ]
+  }
+]

@@ -13,6 +13,26 @@ afterEach(() => {
 })
 
 describe('Checkbox', () => {
+  it('uses modelValue when no checked override is provided', async () => {
+    const checked = ref(true)
+    const root = document.createElement('div')
+    document.body.appendChild(root)
+    const app = createApp({
+      render: () => h(Checkbox, { modelValue: checked.value }),
+    })
+
+    app.mount(root)
+    mountedApps.push({ app, root })
+
+    const input = root.querySelector<HTMLInputElement>('input[type="checkbox"]')
+    expect(input?.checked).toBe(true)
+
+    checked.value = false
+    await nextTick()
+
+    expect(input?.checked).toBe(false)
+  })
+
   it('applies and clears the native indeterminate state', async () => {
     const indeterminate = ref(true)
     const root = document.createElement('div')

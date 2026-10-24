@@ -198,6 +198,10 @@ describe('UsageRecordsTable', () => {
     expect([...root.querySelectorAll('[data-usage-async]')].map(el => el.textContent?.trim()))
       .toEqual(['是', '否', '是', '否'])
     expect([...root.querySelectorAll('th')].some(el => el.textContent?.trim() === '是否异步')).toBe(true)
+    const asyncHeader = [...root.querySelectorAll('th')].find(el => el.textContent?.trim() === '是否异步')
+    expect(asyncHeader?.firstElementChild?.className).toContain('justify-center')
+    const desktopAsyncValues = [...root.querySelectorAll('td [data-usage-async]')]
+    expect(desktopAsyncValues.map(el => el.textContent?.trim())).toEqual(['是', '否'])
   })
 
   it('adds the async column once to saved layouts and respects hiding it afterwards', async () => {
