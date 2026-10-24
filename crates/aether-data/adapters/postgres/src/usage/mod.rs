@@ -3357,6 +3357,13 @@ ORDER BY request_count DESC, "usage".provider_name ASC
             &mut has_where,
             query.exclude_unknown_model_or_provider,
         );
+        if let Some(response_outcome) = query.response_outcome.as_deref() {
+            builder.push(if has_where { " AND " } else { " WHERE " });
+            has_where = true;
+            builder
+                .push("\"usage\".request_metadata ->> 'response_outcome' = ")
+                .push_bind(response_outcome.to_string());
+        }
         if let Some(statuses) = query.statuses.as_deref() {
             if !statuses.is_empty() {
                 builder.push(if has_where { " AND " } else { " WHERE " });
@@ -3485,6 +3492,13 @@ OR (\"usage\".error_message IS NOT NULL AND BTRIM(\"usage\".error_message) <> ''
             &mut has_where,
             query.exclude_unknown_model_or_provider,
         );
+        if let Some(response_outcome) = query.response_outcome.as_deref() {
+            builder.push(if has_where { " AND " } else { " WHERE " });
+            has_where = true;
+            builder
+                .push("\"usage\".request_metadata ->> 'response_outcome' = ")
+                .push_bind(response_outcome.to_string());
+        }
         if let Some(statuses) = query.statuses.as_deref() {
             if !statuses.is_empty() {
                 builder.push(if has_where { " AND " } else { " WHERE " });
@@ -3694,6 +3708,13 @@ OR (\"usage\".error_message IS NOT NULL AND BTRIM(\"usage\".error_message) <> ''
             &mut has_where,
             query.exclude_unknown_model_or_provider,
         );
+        if let Some(response_outcome) = query.response_outcome.as_deref() {
+            builder.push(if has_where { " AND " } else { " WHERE " });
+            has_where = true;
+            builder
+                .push("\"usage\".request_metadata ->> 'response_outcome' = ")
+                .push_bind(response_outcome.to_string());
+        }
         if let Some(statuses) = query.statuses.as_deref() {
             if !statuses.is_empty() {
                 builder.push(if has_where { " AND " } else { " WHERE " });
@@ -3811,6 +3832,13 @@ OR (\"usage\".error_message IS NOT NULL AND BTRIM(\"usage\".error_message) <> ''
             &mut has_where,
             query.exclude_unknown_model_or_provider,
         );
+        if let Some(response_outcome) = query.response_outcome.as_deref() {
+            builder.push(if has_where { " AND " } else { " WHERE " });
+            has_where = true;
+            builder
+                .push("\"usage\".request_metadata ->> 'response_outcome' = ")
+                .push_bind(response_outcome.to_string());
+        }
         if let Some(statuses) = query.statuses.as_deref() {
             if !statuses.is_empty() {
                 builder.push(if has_where { " AND " } else { " WHERE " });

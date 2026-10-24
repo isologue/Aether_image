@@ -1,0 +1,44 @@
+[
+  {
+    "label": "proxy_refused_response",
+    "request_id": "1d34907b-ed95-4d15-8cc4-f946d6ad4907",
+    "proxy": true,
+    "http": 200,
+    "ttfb_seconds": 0.857,
+    "transfer_encoding": "chunked",
+    "body_encoding": "gzip",
+    "decoded_bytes": 481,
+    "json_valid": true,
+    "top_level_keys": [
+      "created",
+      "data",
+      "status",
+      "outcome",
+      "refusal",
+      "message",
+      "usage"
+    ],
+    "total_seconds": 0.857,
+    "received_bytes": 294
+  },
+  {
+    "label": "proxy_refused_request",
+    "request_id": "1d34907b-ed95-4d15-8cc4-f946d6ad4907",
+    "proxy": true,
+    "http": 200,
+    "ttfb_seconds": 0.951,
+    "transfer_encoding": "chunked",
+    "body_encoding": "gzip",
+    "decoded_bytes": 1394901,
+    "json_valid": true,
+    "top_level_keys": [
+      "images",
+      "model",
+      "n",
+      "prompt",
+      "size"
+    ],
+    "total_seconds": 1.679,
+    "received_bytes": 1048584
+  }
+]

@@ -77,6 +77,7 @@ fn apply_admin_usage_status_filter(query: &mut UsageAuditListQuery, status: Opti
         }
         "websocket" | "ws" => query.is_websocket = Some(true),
         "error" | "failed" => query.error_only = true,
+        "content_refused" => query.response_outcome = Some(status),
         "success" => query.statuses = Some(vec!["completed".to_string()]),
         "active" => {
             query.statuses = Some(vec!["pending".to_string(), "streaming".to_string()]);
@@ -818,6 +819,7 @@ fn build_admin_usage_keyword_search_query(
         client_family: base_query.client_family.clone(),
         exclude_unknown_model_or_provider: base_query.exclude_unknown_model_or_provider,
         statuses: base_query.statuses.clone(),
+        response_outcome: base_query.response_outcome.clone(),
         exclude_status_codes: base_query.exclude_status_codes.clone(),
         is_stream: base_query.is_stream,
         is_websocket: base_query.is_websocket,
@@ -1590,6 +1592,27 @@ mod tests {
             })
         );
         assert!(!progress.to_string().contains("candidate-secret"));
+    }
+
+    #[test]
+    fn admin_usage_content_refusal_filter_reaches_list_and_keyword_queries() {
+        let query =
+            build_admin_usage_records_query(100, 200, Some("status=content_refused"), None, None)
+                .unwrap();
+        assert_eq!(query.response_outcome.as_deref(), Some("content_refused"));
+        assert_eq!(query.statuses, None);
+        assert!(!query.error_only);
+        let keyword = build_admin_usage_keyword_search_query(
+            &query,
+            vec!["image".into()],
+            None,
+            AdminUsageSearchContext::default(),
+            false,
+            false,
+            None,
+            None,
+        );
+        assert_eq!(keyword.response_outcome, query.response_outcome);
     }
 
     #[test]

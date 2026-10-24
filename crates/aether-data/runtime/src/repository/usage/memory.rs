@@ -364,6 +364,17 @@ fn usage_matches_list_query(
     if query.exclude_unknown_model_or_provider && usage_has_admin_unknown_model_or_provider(item) {
         return false;
     }
+    if let Some(response_outcome) = query.response_outcome.as_deref() {
+        if item
+            .request_metadata
+            .as_ref()
+            .and_then(|metadata| metadata.get("response_outcome"))
+            .and_then(serde_json::Value::as_str)
+            != Some(response_outcome)
+        {
+            return false;
+        }
+    }
     if let Some(statuses) = query.statuses.as_ref() {
         if !statuses.iter().any(|status| status == &item.status) {
             return false;
@@ -487,6 +498,17 @@ fn usage_matches_keyword_search_query(
     }
     if query.exclude_unknown_model_or_provider && usage_has_admin_unknown_model_or_provider(item) {
         return false;
+    }
+    if let Some(response_outcome) = query.response_outcome.as_deref() {
+        if item
+            .request_metadata
+            .as_ref()
+            .and_then(|metadata| metadata.get("response_outcome"))
+            .and_then(serde_json::Value::as_str)
+            != Some(response_outcome)
+        {
+            return false;
+        }
     }
     if let Some(statuses) = query.statuses.as_ref() {
         if !statuses.iter().any(|status| status == &item.status) {

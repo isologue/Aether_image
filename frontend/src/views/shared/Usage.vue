@@ -508,6 +508,8 @@ const filteredRecords = computed(() => {
         records = records.filter(record => isUsageRecordFailed(record))
       } else if (filterStatus.value === 'cancelled') {
         records = records.filter(record => record.status === 'cancelled')
+      } else if (filterStatus.value === 'content_refused') {
+        records = records.filter(record => record.response_outcome === 'content_refused')
       } else if (filterStatus.value === 'has_fallback') {
         records = records.filter(record => hasUsageFallback(record))
       } else if (filterStatus.value === 'has_retry') {

@@ -100,6 +100,7 @@ export type FilterStatusValue =
   'websocket' |
   'active' |
   'failed' |
+  'content_refused' |
   'cancelled' |
   'has_fallback' |
   'has_retry' |

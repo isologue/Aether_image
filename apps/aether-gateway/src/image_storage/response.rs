@@ -207,6 +207,24 @@ fn multipart_text_field(
     }
     None
 }
+// Only a completed, explicitly refused result without images is non-billable.
+// Keep this separate from HTTP errors so async workers retain a successful task.
+pub(crate) fn is_content_refusal(value: &Value) -> bool {
+    value["status"] == "completed"
+        && value["outcome"] == "content_refused"
+        && value["refusal"]
+            .as_str()
+            .is_some_and(|s| !s.trim().is_empty())
+        && value["data"]
+            .as_array()
+            .is_some_and(|items| items.is_empty())
+        && value.get("url").is_none()
+        && value.get("b64_json").is_none()
+        && (value.get("error").is_none_or(Value::is_null)
+            || (value["error"]["type"] == "image_generation_user_error"
+                && value["error"]["code"] == "content_policy_violation"))
+}
+
 fn error_json(message: &str) -> Value {
     json!({"error":{"type":"image_storage_error", "code":"image_storage_error", "message":message}})
 }
@@ -262,21 +280,29 @@ async fn transform_response_inner(
         parts.status = StatusCode::BAD_GATEWAY;
         value = error_json(&error);
     }
+    let refused = is_content_refusal(&value);
     if parts.status.is_success()
-        && (value.get("error").is_some_and(|e| !e.is_null())
-            || (!complete_images(&value)
-                && !(value["outcome"] == "content_refused"
-                    && value["refusal"].as_str().is_some_and(|s| !s.is_empty()))))
+        && !refused
+        && (value.get("error").is_some_and(|e| !e.is_null()) || !complete_images(&value))
     {
         parts.status = StatusCode::BAD_GATEWAY;
         if value.get("error").is_none_or(Value::is_null) {
             value = error_json("Upstream returned no completed image");
         }
     }
-    if parts.status.is_success() && value["outcome"] == "content_refused" {
-        if let Some(reason) = value["refusal"].as_str().filter(|s| !s.is_empty()) {
-            crate::image_tasks::flow::content_refusal(reason);
-        }
+    if parts.status.is_success() && refused {
+        let reason = value["refusal"].as_str().expect("validated refusal");
+        crate::image_tasks::flow::content_refusal(reason);
+        // Some OpenAI-compatible relays bill every successful image response,
+        // even data=[] with usage=0. Their existing error parser refunds the
+        // reservation and does not retry HTTP 200. Preserve Aether's completed
+        // outcome and the original refusal while exposing that standard shape.
+        value["error"] = json!({
+            "type": "image_generation_user_error",
+            "code": "content_policy_violation",
+            "message": reason,
+            "param": null,
+        });
     }
     let bytes = serde_json::to_vec(&value)
         .map_err(|_| GatewayError::Internal("图片响应序列化失败".into()))?;

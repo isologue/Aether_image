@@ -1302,6 +1302,8 @@ pub struct UsageAuditListQuery {
     pub client_family: Option<String>,
     pub exclude_unknown_model_or_provider: bool,
     pub statuses: Option<Vec<String>>,
+    #[serde(default)]
+    pub response_outcome: Option<String>,
     pub exclude_status_codes: Vec<u16>,
     pub is_stream: Option<bool>,
     pub is_websocket: Option<bool>,
@@ -1340,6 +1342,8 @@ pub struct UsageAuditKeywordSearchQuery {
     pub client_family: Option<String>,
     pub exclude_unknown_model_or_provider: bool,
     pub statuses: Option<Vec<String>>,
+    #[serde(default)]
+    pub response_outcome: Option<String>,
     pub exclude_status_codes: Vec<u16>,
     pub is_stream: Option<bool>,
     pub is_websocket: Option<bool>,

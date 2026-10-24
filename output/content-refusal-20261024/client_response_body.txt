@@ -1,0 +1,1 @@
+{"created":1792833349,"data":[],"status":"completed","outcome":"content_refused","refusal":"非常抱歉，生成的图片可能违反了关于与第三方内容相似性的防护限制。如果你认为此判断有误，请重试或修改提示语。","message":"非常抱歉，生成的图片可能违反了关于与第三方内容相似性的防护限制。如果你认为此判断有误，请重试或修改提示语。","usage":{"input_tokens":0,"output_tokens":0,"total_tokens":0}}

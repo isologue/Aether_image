@@ -182,7 +182,9 @@ async fn run(state: &AppState, task: &Value) -> Result<(bool, Value), String> {
     let result =
         serde_json::from_slice::<Value>(&bytes).map_err(|_| "Image response was not JSON")?;
     Ok((
-        success && result.get("error").is_none_or(Value::is_null),
+        success
+            && (result.get("error").is_none_or(Value::is_null)
+                || crate::image_storage::is_content_refusal(&result)),
         result,
     ))
 }
@@ -241,10 +243,7 @@ async fn execute(state: AppState, owner: String, task: Value) {
             s.request_id.clone(),
         )
     };
-    let refused = body["outcome"] == "content_refused"
-        && body["refusal"]
-            .as_str()
-            .is_some_and(|s| !s.trim().is_empty());
+    let refused = crate::image_storage::is_content_refusal(&body);
     if success
         && !refused
         && !body["data"].as_array().is_some_and(|items| {

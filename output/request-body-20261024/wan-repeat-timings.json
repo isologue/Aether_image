@@ -1,0 +1,14 @@
+[
+  {
+    "label": "refused_request_repeat",
+    "request_id": "1d34907b-ed95-4d15-8cc4-f946d6ad4907",
+    "proxy": false,
+    "http": 200,
+    "ttfb_seconds": 1.572,
+    "transfer_encoding": "chunked",
+    "body_encoding": "gzip",
+    "deadline_exceeded": true,
+    "total_seconds": 35.097,
+    "received_bytes": 524288
+  }
+]

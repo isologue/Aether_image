@@ -978,6 +978,15 @@ describe('UsageRecordsTable', () => {
 })
 
 
+describe('content refusal filter', () => {
+  it.each([true, false])('offers content refusal in the type filter (admin=%s)', (isAdmin) => {
+    const root = mountUsageRecordsTable([], { isAdmin })
+    const options = [...root.querySelectorAll('[data-filter-value="content_refused"]')]
+    expect(options.length).toBeGreaterThan(0)
+    expect(options.every(option => option.textContent === '内容拒绝')).toBe(true)
+  })
+})
+
 describe('successful content refusal', () => {
   it('shows only the classification in the list and keeps the reason out of the list', () => {
     const reason = '非常抱歉，该提示可能违反了我们的内容政策。请修改提示语。'

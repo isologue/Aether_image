@@ -1350,6 +1350,7 @@ const statusFilterOptions: FilterOption[] = [
   { value: 'websocket', label: 'WebSocket (WS)' },
   { value: 'active', label: '活跃' },
   { value: 'failed', label: '失败' },
+  { value: 'content_refused', label: '内容拒绝' },
   { value: 'cancelled', label: '已取消' },
   { value: 'has_retry', label: '发生重试' },
   { value: 'has_fallback', label: '发生转移' },

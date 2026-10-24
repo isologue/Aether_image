@@ -2775,6 +2775,67 @@ async fn list_usage_audits_applies_second_based_time_filters() {
 }
 
 #[tokio::test]
+async fn content_refusal_filter_applies_before_pagination_and_counts_keyword_matches() {
+    let mut refusal = sample_usage("refusal-old", 1);
+    refusal.request_metadata = Some(json!({"response_outcome":"content_refused"}));
+    let mut second = refusal.clone();
+    second.request_id = "refusal-new".into();
+    second.created_at_unix_ms = 3;
+    let mut normal = sample_usage("normal", 2);
+    normal.request_metadata = Some(json!({"response_outcome":"image_generated"}));
+    let repository =
+        InMemoryUsageReadRepository::seed([refusal, normal, second, sample_usage("legacy", 4)]);
+    let query = UsageAuditListQuery {
+        response_outcome: Some("content_refused".into()),
+        newest_first: true,
+        limit: Some(1),
+        offset: Some(1),
+        ..Default::default()
+    };
+    let listed = repository.list_usage_audits(&query).await.unwrap();
+    assert_eq!(listed.len(), 1);
+    assert_eq!(listed[0].request_id, "refusal-old");
+    assert_eq!(repository.count_usage_audits(&query).await.unwrap(), 2);
+    let keyword = UsageAuditKeywordSearchQuery {
+        response_outcome: query.response_outcome,
+        keywords: vec!["gpt-4.1".into()],
+        newest_first: true,
+        limit: Some(1),
+        offset: Some(1),
+        ..Default::default()
+    };
+    let listed = repository
+        .list_usage_audits_by_keyword_search(&keyword)
+        .await
+        .unwrap();
+    assert_eq!(listed.len(), 1);
+    assert_eq!(listed[0].request_id, "refusal-old");
+    assert_eq!(
+        repository
+            .count_usage_audits_by_keyword_search(&keyword)
+            .await
+            .unwrap(),
+        2
+    );
+    let none = UsageAuditKeywordSearchQuery {
+        keywords: vec!["nonexistent".into()],
+        ..keyword
+    };
+    assert!(repository
+        .list_usage_audits_by_keyword_search(&none)
+        .await
+        .unwrap()
+        .is_empty());
+    assert_eq!(
+        repository
+            .count_usage_audits_by_keyword_search(&none)
+            .await
+            .unwrap(),
+        0
+    );
+}
+
+#[tokio::test]
 async fn usage_audit_websocket_filter_applies_to_list_count_and_keyword_search() {
     let mut websocket = sample_usage("req-ws", 2);
     websocket.request_metadata = Some(json!({

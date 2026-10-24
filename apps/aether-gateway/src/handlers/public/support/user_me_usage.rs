@@ -102,6 +102,7 @@ fn parse_users_me_usage_offset(query: Option<&str>) -> Result<usize, String> {
 struct UsersMeUsageRecordFilter {
     api_format: Option<String>,
     statuses: Option<Vec<String>>,
+    response_outcome: Option<String>,
     is_stream: Option<bool>,
     is_websocket: Option<bool>,
     error_only: bool,
@@ -132,6 +133,7 @@ fn parse_users_me_usage_record_filter(query: Option<&str>) -> UsersMeUsageRecord
         }
         "websocket" | "ws" => filter.is_websocket = Some(true),
         "error" | "failed" => filter.error_only = true,
+        "content_refused" => filter.response_outcome = Some(status),
         "active" => {
             filter.statuses = Some(vec!["pending".to_string(), "streaming".to_string()]);
         }
@@ -1329,6 +1331,7 @@ pub(super) async fn handle_users_me_usage_get(
                 client_family: None,
                 exclude_unknown_model_or_provider: false,
                 statuses: record_filter.statuses.clone(),
+                response_outcome: record_filter.response_outcome.clone(),
                 exclude_status_codes: Vec::new(),
                 is_stream: record_filter.is_stream,
                 is_websocket: record_filter.is_websocket,
@@ -1387,6 +1390,7 @@ pub(super) async fn handle_users_me_usage_get(
                     client_family: None,
                     exclude_unknown_model_or_provider: false,
                     statuses: record_filter.statuses.clone(),
+                    response_outcome: record_filter.response_outcome.clone(),
                     exclude_status_codes: Vec::new(),
                     is_stream: record_filter.is_stream,
                     is_websocket: record_filter.is_websocket,
@@ -1418,6 +1422,7 @@ pub(super) async fn handle_users_me_usage_get(
                     client_family: None,
                     exclude_unknown_model_or_provider: false,
                     statuses: record_filter.statuses.clone(),
+                    response_outcome: record_filter.response_outcome.clone(),
                     exclude_status_codes: Vec::new(),
                     is_stream: record_filter.is_stream,
                     is_websocket: record_filter.is_websocket,
@@ -1871,6 +1876,14 @@ mod tests {
 
         let oversized = "x".repeat(MAX_USERS_ME_USAGE_ID_BYTES + 1);
         assert!(parse_users_me_usage_ids(Some(&format!("ids={oversized}"))).is_err());
+    }
+
+    #[test]
+    fn users_me_usage_content_refusal_filter_does_not_require_failed_status() {
+        let filter = parse_users_me_usage_record_filter(Some("status=content_refused"));
+        assert_eq!(filter.response_outcome.as_deref(), Some("content_refused"));
+        assert_eq!(filter.statuses, None);
+        assert!(!filter.error_only);
     }
 
     #[test]

@@ -1,0 +1,63 @@
+[
+  {
+    "label": "refused_detail",
+    "request_id": "1d34907b-ed95-4d15-8cc4-f946d6ad4907",
+    "proxy": false,
+    "http": 200,
+    "ttfb_seconds": 0.623,
+    "transfer_encoding": "chunked",
+    "body_encoding": null,
+    "total_seconds": 0.624,
+    "received_bytes": 7902
+  },
+  {
+    "label": "refused_response",
+    "request_id": "1d34907b-ed95-4d15-8cc4-f946d6ad4907",
+    "proxy": false,
+    "http": 200,
+    "ttfb_seconds": 0.554,
+    "transfer_encoding": "chunked",
+    "body_encoding": "gzip",
+    "decoded_bytes": 481,
+    "json_valid": true,
+    "top_level_keys": [
+      "created",
+      "data",
+      "status",
+      "outcome",
+      "refusal",
+      "message",
+      "usage"
+    ],
+    "total_seconds": 0.564,
+    "received_bytes": 294
+  },
+  {
+    "label": "normal_request",
+    "request_id": "a5f633d2-4565-4238-bbb7-8073ee880116",
+    "proxy": false,
+    "http": 200,
+    "ttfb_seconds": 0.528,
+    "transfer_encoding": "chunked",
+    "body_encoding": "gzip",
+    "decoded_bytes": 67421,
+    "json_valid": true,
+    "top_level_keys": [
+      "body_bytes_b64"
+    ],
+    "total_seconds": 0.949,
+    "received_bytes": 49516
+  },
+  {
+    "label": "refused_request",
+    "request_id": "1d34907b-ed95-4d15-8cc4-f946d6ad4907",
+    "proxy": false,
+    "http": 200,
+    "ttfb_seconds": 0.829,
+    "transfer_encoding": "chunked",
+    "body_encoding": "gzip",
+    "deadline_exceeded": true,
+    "total_seconds": 43.37,
+    "received_bytes": 524288
+  }
+]

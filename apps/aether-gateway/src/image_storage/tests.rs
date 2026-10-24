@@ -32,7 +32,7 @@ async fn successful_http_status_requires_complete_images_or_explicit_refusal() {
             StatusCode::BAD_GATEWAY,
         ),
         (
-            json!({"data":[],"outcome":"content_refused","refusal":"Content policy refusal"}),
+            json!({"data":[],"status":"completed","outcome":"content_refused","refusal":"Content policy refusal"}),
             StatusCode::OK,
         ),
         (json!({"data":[{"b64_json":PNG}]}), StatusCode::OK),
@@ -51,6 +51,59 @@ async fn successful_http_status_requires_complete_images_or_explicit_refusal() {
         assert_eq!(response.status(), expected, "{value}");
     }
 }
+#[tokio::test]
+async fn content_refusal_exposes_standard_error_without_failing_the_internal_task() {
+    let temp = TempDir::new();
+    let config = ImageConfig::default();
+    let state = app(&temp.0, &config);
+    let reason = "上游内容审核拒绝了该请求，请修改提示词。";
+    let value = json!({"status":"completed", "outcome":"content_refused",
+        "data":[], "refusal":reason, "message":reason,
+        "usage":{"input_tokens":0,"output_tokens":0,"total_tokens":0}});
+    let slot = ImageRequestSlot(Arc::new(Mutex::new(Some(request_config(config, false)))));
+    let flow = crate::image_tasks::flow::ImageFlow::default();
+    let response = Response::builder()
+        .header("content-type", "application/json")
+        .body(Body::from(value.to_string()))
+        .unwrap();
+    let response = crate::image_tasks::flow::scope(
+        Some(flow.clone()),
+        transform_response(state, slot, response),
+    )
+    .await
+    .unwrap();
+    assert_eq!(response.status(), StatusCode::OK);
+    assert_eq!(response.headers()["content-type"], "application/json");
+    let value: Value =
+        serde_json::from_slice(&to_bytes(response.into_body(), 8192).await.unwrap()).unwrap();
+    assert_eq!(value["error"]["type"], "image_generation_user_error");
+    assert_eq!(value["error"]["code"], "content_policy_violation");
+    assert_eq!(value["error"]["message"], reason);
+    assert_eq!(value["refusal"], reason);
+    assert_eq!(value["status"], "completed");
+    assert_eq!(value["usage"]["total_tokens"], 0);
+    assert!(
+        is_content_refusal(&value),
+        "async worker must retain successful refusal"
+    );
+    assert_eq!(flow.0.lock().unwrap().refusal.as_deref(), Some(reason));
+
+    let mut with_image = value.clone();
+    with_image["data"] = json!([{"b64_json":PNG}]);
+    let mut empty_reason = value.clone();
+    empty_reason["refusal"] = json!(" ");
+    let mut failed = value.clone();
+    failed["error"] = json!({"code":"execution_failed"});
+    for invalid in [
+        json!({"outcome":"content_refused", "data":[], "refusal":reason}),
+        with_image,
+        empty_reason,
+        failed,
+    ] {
+        assert!(!is_content_refusal(&invalid), "{invalid}");
+    }
+}
+
 fn png() -> Vec<u8> {
     base64::engine::general_purpose::STANDARD
         .decode(PNG)

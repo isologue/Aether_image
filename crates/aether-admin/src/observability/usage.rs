@@ -308,6 +308,9 @@ pub fn admin_usage_matches_status(item: &StoredRequestUsageAudit, status: Option
         "pending" | "streaming" | "completed" | "cancelled" => item.status == status,
         "failed" => admin_usage_is_failed(item),
         "active" => matches!(item.status.as_str(), "pending" | "streaming"),
+        "content_refused" => {
+            admin_usage_metadata_string(item, "response_outcome") == Some("content_refused")
+        }
         "has_fallback" => admin_usage_has_fallback(item),
         _ => true,
     }
@@ -4490,6 +4493,11 @@ mod tests {
             None,
         );
         let active = admin_usage_active_request_json(&item, None, None, None);
+        assert!(admin_usage_matches_status(&item, Some("content_refused")));
+        assert!(!admin_usage_matches_status(
+            &sample_usage("completed", Some(200), None),
+            Some("content_refused"),
+        ));
         for payload in [record, active] {
             assert_eq!(payload["response_outcome"], "content_refused");
             assert_eq!(payload["content_refusal_reason"], reason);

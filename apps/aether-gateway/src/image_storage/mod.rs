@@ -11,7 +11,9 @@ mod webdav;
 pub(crate) use admin::admin_response;
 pub(crate) use config::{parse_config, ImageConfig, CONFIG_KEY, PASSWORD_KEY};
 pub(crate) use response::ImageRequest;
-pub(crate) use response::{is_image_path, transform_response, ImageRequestSlot};
+pub(crate) use response::{
+    is_content_refusal, is_image_path, transform_response, ImageRequestSlot,
+};
 pub(crate) use storage::{atomic_write, ImageStorage};
 mod task_results;
 pub(crate) use task_results::{read_task_result, ResultReadError};

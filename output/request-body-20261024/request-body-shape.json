@@ -1,0 +1,1 @@
+{"valid_gzip_json": true, "decoded_bytes": 1394901, "shape": {"images": {"items": 4, "first": {"type": "string", "characters": 290683, "data_url": true}}, "model": {"type": "string", "characters": 11, "data_url": false}, "n": {"type": "int"}, "prompt": {"type": "string", "characters": 3213, "data_url": false}, "size": {"type": "string", "characters": 9, "data_url": false}}}

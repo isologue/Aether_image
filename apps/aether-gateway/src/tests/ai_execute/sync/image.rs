@@ -1537,7 +1537,16 @@ async fn run_chatgpt_web_image_plan_scenario(
         assert_eq!(response_json["refusal"], REFUSAL);
         assert_eq!(response_json["message"], REFUSAL);
         assert_eq!(response_json["data"], json!([]));
-        assert!(response_json.get("error").is_none());
+        assert_eq!(
+            response_json["error"],
+            json!({
+                "type": "image_generation_user_error",
+                "code": "content_policy_violation",
+                "message": REFUSAL,
+                "param": null,
+            })
+        );
+        assert_eq!(response_json["usage"]["total_tokens"], 0);
         assert_eq!(attempts.load(Ordering::SeqCst), 1);
         let candidates = request_candidates
             .list_by_request_id("trace-chatgpt-web-image-plan-123")
