@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 const { getMock } = vi.hoisted(() => ({ getMock: vi.fn() }))
 vi.mock('@/api/client', () => ({ default: { get: getMock } }))
 
-import { dashboardApi } from '@/api/dashboard'
+import { dashboardApi, REQUEST_BODY_TIMEOUT_MS } from '@/api/dashboard'
 import { requestTraceApi } from '@/api/requestTrace'
 import { cache } from '@/utils/cache'
 
@@ -33,10 +33,36 @@ describe('dashboard body loading', () => {
     const controller = new AbortController()
     getMock.mockResolvedValue({ data: bytes, headers: { 'x-aether-body-encoding': 'gzip', 'x-aether-usage-id': 'usage-1', 'x-aether-body-field': 'request_body' } })
     await expect(dashboardApi.getRequestBody('usage-1', 'request_body', controller.signal)).resolves.toEqual({ bytes, encoding: 'gzip' })
-    expect(getMock).toHaveBeenCalledWith('/api/admin/usage/usage-1', { params: { include_bodies: true, body_field: 'request_body', body_format: 'raw' }, responseType: 'arraybuffer', signal: controller.signal })
+    expect(getMock).toHaveBeenCalledWith('/api/admin/usage/usage-1', { params: { include_bodies: true, body_field: 'request_body', body_format: 'raw' }, responseType: 'arraybuffer', signal: controller.signal, timeout: REQUEST_BODY_TIMEOUT_MS })
+  })
+
+  it('loads a bound preview and exposes omission metadata separately from the body', async () => {
+    const bytes = new ArrayBuffer(100)
+    getMock.mockResolvedValue({ data: bytes, headers: {
+      'x-aether-body-encoding': 'json', 'x-aether-usage-id': 'usage-1', 'x-aether-body-field': 'request_body',
+      'x-aether-body-format': 'preview', 'x-aether-body-preview-omitted': '4', 'x-aether-body-original-bytes': '1394901',
+    } })
+    await expect(dashboardApi.getRequestBody('usage-1', 'request_body', undefined, undefined, 'preview'))
+      .resolves.toEqual({ bytes, encoding: 'json', preview: { omittedValues: 4, originalBytes: 1394901 } })
+    expect(getMock).toHaveBeenCalledWith('/api/admin/usage/usage-1', expect.objectContaining({
+      params: { include_bodies: true, body_field: 'request_body', body_format: 'preview' }, timeout: 120_000,
+    }))
+  })
+
+  it.each([{}, { 'x-aether-body-format': 'raw' }, {
+    'x-aether-body-format': 'preview', 'x-aether-body-preview-omitted': '-1', 'x-aether-body-original-bytes': '123',
+  }, {
+    'x-aether-body-format': 'preview', 'x-aether-body-preview-omitted': '1', 'x-aether-body-original-bytes': 'NaN',
+  }])('rejects preview responses without trustworthy completeness metadata', async extra => {
+    getMock.mockResolvedValue({ data: new ArrayBuffer(10), headers: {
+      'x-aether-body-encoding': 'json', 'x-aether-usage-id': 'usage-1', 'x-aether-body-field': 'request_body', ...extra,
+    } })
+    await expect(dashboardApi.getRequestBody('usage-1', 'request_body', undefined, undefined, 'preview'))
+      .rejects.toThrow('Invalid body response')
   })
 
   it.each([
+    { 'x-aether-body-encoding': 'json', 'x-aether-usage-id': 'usage-1', 'x-aether-body-field': 'request_body', 'x-aether-body-format': 'preview' },
     { 'x-aether-body-encoding': 'br', 'x-aether-usage-id': 'usage-1', 'x-aether-body-field': 'request_body' },
     { 'x-aether-body-encoding': 'gzip', 'x-aether-usage-id': 'usage-other', 'x-aether-body-field': 'request_body' },
     { 'x-aether-body-encoding': 'gzip', 'x-aether-usage-id': 'usage-1', 'x-aether-body-field': 'response_body' },
@@ -44,6 +70,11 @@ describe('dashboard body loading', () => {
   ])('rejects mismatched or invalid body response headers', async headers => {
     getMock.mockResolvedValue({ data: new ArrayBuffer(10), headers })
     await expect(dashboardApi.getRequestBody('usage-1', 'request_body')).rejects.toThrow('Invalid body response')
+  })
+
+  it('allows extra download time for cURL containing the full original request', async () => {
+    await dashboardApi.getCurlData('usage-1')
+    expect(getMock).toHaveBeenCalledWith('/api/admin/usage/usage-1/curl', { timeout: 120_000 })
   })
 
   it('defaults to shallow details and isolates cached records', async () => {

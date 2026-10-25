@@ -659,7 +659,7 @@
                       :copied="Boolean(copiedStates[activeTab])"
                       :custom-copy="true"
                       :expand-disabled="viewMode === 'compare' || (supportsConversationView && contentViewMode === 'conversation')"
-                      :copy-disabled="viewMode === 'compare' || bodyCopying || (supportsConversationView && !hasValidConversation)"
+                      :copy-disabled="viewMode === 'compare' || bodyActionDisabled || (supportsConversationView && !hasValidConversation)"
                       max-height="500px"
                       @update:expand-depth="currentExpandDepth = $event"
                       @copy="copyContent(activeTab)"
@@ -741,9 +741,61 @@
                           </button>
                         </template>
 
+                        <button
+                          v-if="activeBodyField"
+                          title="下载完整正文"
+                          class="p-1 rounded text-muted-foreground hover:bg-muted disabled:opacity-40"
+                          :disabled="bodyActionDisabled"
+                          @click="downloadBodyContent"
+                        >
+                          <Download class="w-3.5 h-3.5" />
+                        </button>
+
                         <!-- 区域3：常驻按钮（展开/收缩、复制） -->
                         <div class="w-px h-3.5 bg-border mx-0.5" />
                       </template>
+                      <div
+                        v-if="activeBodyField && (bodyLoading || activeBodyPreview)"
+                        class="flex flex-wrap items-center justify-between gap-2 border-b bg-muted/30 px-4 py-2 text-xs text-muted-foreground"
+                        role="status"
+                        aria-live="polite"
+                        data-testid="body-load-status"
+                      >
+                        <span v-if="bodyLoading">
+                          {{ bodyLoadStage === 'parsing' ? '正在解析正文' : loadingFullBody ? '正在加载完整正文' : '正在加载正文预览' }}
+                          · 已下载 {{ formatByteSize(bodyDownloadedBytes) }}
+                        </span>
+                        <span v-else-if="activeBodyPreview">
+                          当前为预览：已省略 {{ activeBodyPreview.omittedValues }} 处大段 Base64，完整正文 {{ formatByteSize(activeBodyPreview.originalBytes) }}。复制或下载会读取完整内容。
+                        </span>
+                        <Button
+                          v-if="activeBodyPreview && !bodyLoading && !bodyLoadError"
+                          variant="outline"
+                          size="sm"
+                          class="h-7 text-xs"
+                          :disabled="bodyCopying"
+                          @click="ensureBodyContentLoaded(true)"
+                        >
+                          加载完整正文
+                        </Button>
+                      </div>
+                      <div
+                        v-if="activeBodyPreview && bodyLoadError"
+                        class="border-b border-destructive/30 bg-destructive/5 px-4 py-2 text-xs text-destructive"
+                        role="alert"
+                      >
+                        {{ bodyLoadErrorMessage }} 仍可查看已加载的预览。
+                        <Button
+                          v-if="canRetryBodyContentLoad"
+                          variant="outline"
+                          size="sm"
+                          class="ml-2 h-7 text-xs"
+                          :disabled="bodyLoading"
+                          @click="retryBodyContentLoad"
+                        >
+                          重试完整正文
+                        </Button>
+                      </div>
                       <TabsContent
                         v-if="activeTab === 'request-headers'"
                         value="request-headers"
@@ -934,8 +986,8 @@ import Separator from '@/components/ui/separator.vue'
 import Skeleton from '@/components/ui/skeleton.vue'
 import Tabs from '@/components/ui/tabs.vue'
 import TabsContent from '@/components/ui/tabs-content.vue'
-import { AlertTriangle, Check, Columns2, RefreshCw, X, Monitor, Server, MessageSquareText, Code2, Terminal, Play, ShieldCheck } from 'lucide-vue-next'
-import { dashboardApi, type RequestBodyField, type RequestDetail } from '@/api/dashboard'
+import { AlertTriangle, Check, Columns2, RefreshCw, X, Monitor, Server, MessageSquareText, Code2, Terminal, Play, ShieldCheck, Download } from 'lucide-vue-next'
+import { dashboardApi, type RequestBodyField, type RequestBodyPreview, type RequestDetail } from '@/api/dashboard'
 import { formatRequestBodyLoadError, formatStoredBodyLoadError } from '../utils/body-load-error'
 import type { ImageProgress, RequestTrace } from '@/api/requestTrace'
 import type { UsageRecord } from '../types'
@@ -1469,7 +1521,11 @@ const bodyLoading = ref(false)
 const bodyLoadError = ref<string | null>(null)
 const bodyDocuments = shallowRef(new Map<RequestBodyField, BodyDocument>())
 const bodyCopying = ref(false)
-const bodyLoadFailures = new Map<RequestBodyField, string>()
+const bodyPreviews = shallowRef(new Map<RequestBodyField, RequestBodyPreview>())
+const bodyDownloadedBytes = ref(0)
+const bodyLoadStage = ref<'downloading' | 'parsing'>('downloading')
+const loadingFullBody = ref(false)
+const bodyLoadFailures = new Map<RequestBodyField, { message: string, full: boolean }>()
 let bodyLoadController: AbortController | null = null
 const showTimeline = ref(false)
 const AUTO_REFRESH_INTERVAL_MS = 1000
@@ -1748,6 +1804,10 @@ const activeBodyField = computed(() => {
   if (activeTab.value === 'response-body') return responseBodyField.value
   return null
 })
+
+const activeBodyPreview = computed(() => activeBodyField.value ? bodyPreviews.value.get(activeBodyField.value) : undefined)
+const bodyActionDisabled = computed(() => bodyCopying.value || bodyLoading.value
+  || Boolean(activeBodyField.value && !bodyDocuments.value.has(activeBodyField.value)))
 
 watch([activeBodyField, () => props.isOpen, () => detail.value?.id], () => {
   cancelBodyContentLoad()
@@ -2651,33 +2711,41 @@ function detailMatchesRequestId(
   return candidate.id === requestId || candidate.request_id === requestId
 }
 
-async function ensureBodyContentLoaded() {
+async function ensureBodyContentLoaded(full = false): Promise<BodyDocument | undefined> {
   const field = activeBodyField.value
   const usageId = props.requestId
   if (!props.isOpen || !usageId || !field || !detailMatchesRequestId(detail.value, usageId)) return
   if (!detail.value || bodyLoading.value) return
+  const previousFailure = bodyLoadFailures.get(field)
+  if (previousFailure && !full) {
+    bodyLoadError.value = previousFailure.message
+    return
+  }
   const cached = bodyDocuments.value.get(field)
-  if (cached) {
+  if (cached && (!full || !bodyPreviews.value.has(field))) {
     const documents = new Map(bodyDocuments.value)
     documents.delete(field)
     documents.set(field, cached)
     bodyDocuments.value = documents
-    return
+    return cached
   }
   if (!hasBodyContent(detail.value[`has_${field}`], detail.value[field])) return
-  const previousFailure = bodyLoadFailures.get(field)
-  if (previousFailure) {
-    bodyLoadError.value = previousFailure
-    return
-  }
 
   const requestId = ++bodyLoadRequestId
   const controller = new AbortController()
   bodyLoadController = controller
   bodyLoading.value = true
   bodyLoadError.value = null
+  bodyDownloadedBytes.value = 0
+  bodyLoadStage.value = 'downloading'
+  loadingFullBody.value = full
   try {
-    const response = await dashboardApi.getRequestBody(detail.value.id, field, controller.signal)
+    const response = await dashboardApi.getRequestBody(detail.value.id, field, controller.signal, loaded => {
+      if (requestId === bodyLoadRequestId && !controller.signal.aborted) bodyDownloadedBytes.value = loaded
+    }, full ? 'raw' : 'preview')
+    if (requestId !== bodyLoadRequestId || controller.signal.aborted) return
+    bodyDownloadedBytes.value = response.bytes.byteLength
+    bodyLoadStage.value = 'parsing'
     const document = await BodyDocument.load(response.bytes, response.encoding, controller.signal)
     if (requestId !== bodyLoadRequestId || controller.signal.aborted || !detail.value ||
       !props.isOpen || !detailMatchesRequestId(detail.value, usageId)) {
@@ -2685,22 +2753,31 @@ async function ensureBodyContentLoaded() {
       return
     }
     const documents = new Map(bodyDocuments.value)
+    const previews = new Map(bodyPreviews.value)
+    documents.get(field)?.dispose()
+    documents.delete(field)
+    previews.delete(field)
     let cachedBytes = document.byteLength
     for (const existing of documents.values()) cachedBytes += existing.byteLength
     for (const [cachedField, existing] of documents) {
       if (documents.size < 2 && cachedBytes <= MAX_BODY_BYTES) break
       existing.dispose()
       documents.delete(cachedField)
+      previews.delete(cachedField)
       cachedBytes -= existing.byteLength
     }
     documents.set(field, document)
+    if (response.preview && response.preview.omittedValues > 0) previews.set(field, response.preview)
+    bodyPreviews.value = previews
     bodyDocuments.value = documents
+    bodyLoadFailures.delete(field)
     detail.value = { ...detail.value, body_load_errors: { ...detail.value.body_load_errors, [field]: false }, body_load_error_codes: { ...detail.value.body_load_error_codes, [field]: undefined } }
+    return document
   } catch (err) {
     if (requestId !== bodyLoadRequestId || controller.signal.aborted || axios.isCancel(err)) return
     log.error('Failed to load request bodies:', err)
     bodyLoadError.value = formatRequestBodyLoadError(err)
-    bodyLoadFailures.set(field, bodyLoadError.value)
+    bodyLoadFailures.set(field, { message: bodyLoadError.value, full })
     const code = err instanceof BodyDocumentError ? err.code : axios.isAxiosError(err) ? err.response?.headers?.['x-aether-body-error'] : undefined
     if ((code === 'too_large' || code === 'decode_failed') && detail.value) {
       detail.value = { ...detail.value, body_load_error_codes: { ...detail.value.body_load_error_codes, [field]: code } }
@@ -2720,14 +2797,19 @@ function handleBodyDocumentError(error: unknown) {
   documents.get(field)?.dispose()
   documents.delete(field)
   bodyDocuments.value = documents
+  const previews = new Map(bodyPreviews.value)
+  previews.delete(field)
+  bodyPreviews.value = previews
   bodyLoadError.value = formatRequestBodyLoadError(error)
-  bodyLoadFailures.set(field, bodyLoadError.value)
+  bodyLoadFailures.set(field, { message: bodyLoadError.value, full: false })
 }
 
 function retryBodyContentLoad() {
-  if (activeBodyField.value) bodyLoadFailures.delete(activeBodyField.value)
+  const field = activeBodyField.value
+  const full = field ? bodyLoadFailures.get(field)?.full ?? false : false
+  if (field) bodyLoadFailures.delete(field)
   bodyLoadError.value = null
-  void ensureBodyContentLoaded()
+  void ensureBodyContentLoaded(full)
 }
 
 function cancelBodyContentLoad() {
@@ -2736,12 +2818,16 @@ function cancelBodyContentLoad() {
   bodyLoadController = null
   bodyLoading.value = false
   bodyLoadError.value = null
+  bodyDownloadedBytes.value = 0
+  bodyLoadStage.value = 'downloading'
+  loadingFullBody.value = false
 }
 
 function resetBodyContentState() {
   cancelBodyContentLoad()
   for (const document of bodyDocuments.value.values()) document.dispose()
   bodyDocuments.value = new Map()
+  bodyPreviews.value = new Map()
   bodyLoadFailures.clear()
 }
 
@@ -2821,7 +2907,7 @@ async function loadDetail(id: string, silent = false) {
 
     // 根据当前 Tab 的数据可用性自动选择默认数据源
     if (!silent || !sameRequest) dataSource.value = getDefaultDataSourceForTab(activeTab.value)
-    if (bodySnapshotChanged) void nextTick().then(ensureBodyContentLoaded)
+    if (bodySnapshotChanged) void nextTick().then(() => ensureBodyContentLoaded())
 
     // 使用请求记录中保存的历史价格
     if (detail.value.input_price_per_1m || detail.value.output_price_per_1m || detail.value.price_per_request) {
@@ -3041,13 +3127,14 @@ function getTierRangeText(tier: { up_to?: number | null }, index: number, tiers:
 }
 
 async function copyContent(tabName: string) {
-  if (!detail.value || viewMode.value === 'compare' || bodyCopying.value) return
+  if (!detail.value || viewMode.value === 'compare' || bodyActionDisabled.value) return
   const usageId = detail.value.id
-  const document = tabName === 'request-body' ? currentRequestBody.value
-    : tabName === 'response-body' ? currentResponseBody.value : null
+  const field = activeBodyField.value
   bodyCopying.value = true
   try {
     let text: string
+    const document = field ? await ensureBodyContentLoaded(true) : null
+    if (field && (!document || !isCurrentBody(usageId, field))) return
     if (document) {
       text = await document.copy(contentViewMode.value === 'conversation' ? {
         kind: tabName === 'request-body' ? 'request' : 'response',
@@ -3060,7 +3147,7 @@ async function copyContent(tabName: string) {
       if (data == null) return
       text = JSON.stringify(data, null, 2)
     }
-    if (!props.isOpen || detail.value?.id !== usageId) return
+    if (!props.isOpen || detail.value?.id !== usageId || (field && !isCurrentBody(usageId, field))) return
     if (await copyToClipboard(text, false)) {
       copiedStates.value[tabName] = true
       setTimeout(() => { copiedStates.value[tabName] = false }, 2000)
@@ -3068,7 +3155,34 @@ async function copyContent(tabName: string) {
       showBodyError('复制失败，请检查剪贴板权限后重试。')
     }
   } catch (error) {
-    if (props.isOpen && detail.value?.id === usageId) showBodyError(formatRequestBodyLoadError(error))
+    if (props.isOpen && detail.value?.id === usageId && (!field || isCurrentBody(usageId, field))) showBodyError(formatRequestBodyLoadError(error))
+  } finally {
+    bodyCopying.value = false
+  }
+}
+
+function isCurrentBody(usageId: string, field: RequestBodyField): boolean {
+  return props.isOpen && detail.value?.id === usageId && activeBodyField.value === field
+}
+
+async function downloadBodyContent() {
+  const field = activeBodyField.value
+  const usageId = detail.value?.id
+  if (!field || !usageId || bodyActionDisabled.value) return
+  bodyCopying.value = true
+  try {
+    const document = await ensureBodyContentLoaded(true)
+    if (!document || !isCurrentBody(usageId, field)) return
+    const text = await document.copy()
+    if (!isCurrentBody(usageId, field)) return
+    const url = URL.createObjectURL(new Blob([text], { type: 'application/json;charset=utf-8' }))
+    const link = window.document.createElement('a')
+    link.href = url
+    link.download = `${usageId}-${field}.json`
+    link.click()
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000)
+  } catch (error) {
+    if (isCurrentBody(usageId, field)) showBodyError(formatRequestBodyLoadError(error))
   } finally {
     bodyCopying.value = false
   }

@@ -1,0 +1,26 @@
+[
+  {
+    "key": "chatgpt_web_image_no_asset_grace_seconds",
+    "value": 0
+  },
+  {
+    "key": "proxy_node_metrics_1h_retention_days",
+    "value": 3
+  },
+  {
+    "key": "proxy_node_metrics_1m_retention_days",
+    "value": 3
+  },
+  {
+    "key": "proxy_node_metrics_cleanup_batch_size",
+    "value": 5000
+  },
+  {
+    "key": "chatgpt_web_image_max_count",
+    "value": 2
+  },
+  {
+    "key": "chatgpt_web_image_max_prompt_chars",
+    "value": 0
+  }
+]

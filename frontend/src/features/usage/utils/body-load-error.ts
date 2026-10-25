@@ -1,6 +1,5 @@
 import axios from 'axios'
-import { RequestBodyProtocolError, type RequestBodyLoadErrorCode } from '@/api/dashboard'
-import { NETWORK_CONFIG } from '@/config/constants'
+import { RequestBodyProtocolError, REQUEST_BODY_TIMEOUT_MS, type RequestBodyLoadErrorCode } from '@/api/dashboard'
 import { BodyDocumentError } from './body-document-protocol'
 
 export function formatStoredBodyLoadError(code?: RequestBodyLoadErrorCode): string {
@@ -26,9 +25,9 @@ export function formatRequestBodyLoadError(error: unknown): string {
   }
   if (axios.isAxiosError(error)) {
     const bodyCode = error.response?.headers?.['x-aether-body-error']
-    if (bodyCode === 'too_large' || bodyCode === 'missing' || bodyCode === 'storage_unavailable') return formatStoredBodyLoadError(bodyCode)
+    if (bodyCode === 'too_large' || bodyCode === 'decode_failed' || bodyCode === 'missing' || bodyCode === 'storage_unavailable') return formatStoredBodyLoadError(bodyCode)
     if (error.code === 'ECONNABORTED' || error.code === 'ETIMEDOUT') {
-      const seconds = Math.ceil((error.config?.timeout || NETWORK_CONFIG.API_TIMEOUT) / 1000)
+      const seconds = Math.ceil((error.config?.timeout || REQUEST_BODY_TIMEOUT_MS) / 1000)
       return `正文加载超时（${seconds} 秒），请检查网络后重试。`
     }
     if (error.response?.status === 403) return '没有权限查看该正文。'

@@ -1,0 +1,50 @@
+[
+  {
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "invalid_reason": "[OAUTH_EXPIRED] ChatGPT Web Token 无效或已过期",
+    "is_active": true,
+    "count": 18,
+    "earliest": "2026-10-24T19:19:02+08:00",
+    "latest": "2026-10-24T21:03:47+08:00"
+  },
+  {
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "invalid_reason": null,
+    "is_active": true,
+    "count": 7784,
+    "earliest": null,
+    "latest": null
+  },
+  {
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "invalid_reason": "[OAUTH_EXPIRED] ChatGPT Web Token 无效或已过期",
+    "is_active": true,
+    "count": 175,
+    "earliest": "2026-10-24T19:17:56+08:00",
+    "latest": "2026-10-24T21:04:06+08:00"
+  },
+  {
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "invalid_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "is_active": true,
+    "count": 1101,
+    "earliest": "2026-10-24T20:50:43+08:00",
+    "latest": "2026-10-24T20:55:52+08:00"
+  },
+  {
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "invalid_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "is_active": true,
+    "count": 1129,
+    "earliest": "2026-10-24T20:50:37+08:00",
+    "latest": "2026-10-24T20:56:57+08:00"
+  },
+  {
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "invalid_reason": null,
+    "is_active": true,
+    "count": 2336,
+    "earliest": null,
+    "latest": null
+  }
+]

@@ -1,0 +1,128 @@
+[
+  {
+    "id": "0a4cb985-3d93-4a4c-bb95-508f96264d06",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "is_active": true,
+    "oauth_invalid_at": "2026-10-24T20:51:38+08:00",
+    "oauth_invalid_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "expires_at": "2026-10-31T11:04:49+08:00",
+    "last_error_at": null,
+    "last_error_msg": null,
+    "health_by_format": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:46:52Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit_breaker_by_format": null,
+    "account_state": null,
+    "first_attempt": "2026-10-24T22:01:22.784+08:00",
+    "attempts": 30
+  },
+  {
+    "id": "058ef397-5a1f-40c3-862f-488b310530c1",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "is_active": true,
+    "oauth_invalid_at": "2026-10-24T20:51:35+08:00",
+    "oauth_invalid_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "expires_at": "2026-10-31T10:19:28+08:00",
+    "last_error_at": null,
+    "last_error_msg": null,
+    "health_by_format": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:47:19Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit_breaker_by_format": null,
+    "account_state": null,
+    "first_attempt": "2026-10-24T22:01:22.324+08:00",
+    "attempts": 25
+  },
+  {
+    "id": "0a4c9ef2-4a4c-43bf-9a5f-40ff80b4f2ad",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "is_active": true,
+    "oauth_invalid_at": "2026-10-24T20:51:38+08:00",
+    "oauth_invalid_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "expires_at": "2026-10-30T01:33:47+08:00",
+    "last_error_at": null,
+    "last_error_msg": null,
+    "health_by_format": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:46:51Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit_breaker_by_format": null,
+    "account_state": null,
+    "first_attempt": "2026-10-24T22:01:22.717+08:00",
+    "attempts": 23
+  },
+  {
+    "id": "09c7cdea-65ed-4655-8c01-b80f587ba070",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "is_active": true,
+    "oauth_invalid_at": "2026-10-24T20:51:38+08:00",
+    "oauth_invalid_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "expires_at": "2026-10-31T10:13:47+08:00",
+    "last_error_at": null,
+    "last_error_msg": null,
+    "health_by_format": {
+      "openai:image": {
+        "health_score": 1.0,
+        "last_failure_at": null,
+        "consecutive_failures": 0
+      }
+    },
+    "circuit_breaker_by_format": null,
+    "account_state": null,
+    "first_attempt": "2026-10-24T22:01:42.049+08:00",
+    "attempts": 22
+  },
+  {
+    "id": "0a4dffee-364a-44d4-81e7-297d53bd227a",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "is_active": true,
+    "oauth_invalid_at": "2026-10-24T20:51:38+08:00",
+    "oauth_invalid_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "expires_at": "2026-10-31T14:05:24+08:00",
+    "last_error_at": null,
+    "last_error_msg": null,
+    "health_by_format": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:46:52Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit_breaker_by_format": null,
+    "account_state": null,
+    "first_attempt": "2026-10-24T22:01:34.548+08:00",
+    "attempts": 21
+  },
+  {
+    "id": "0a0ce007-3865-4800-a576-b0b844f54ed8",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "is_active": true,
+    "oauth_invalid_at": "2026-10-24T20:51:38+08:00",
+    "oauth_invalid_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "expires_at": "2026-10-31T13:52:10+08:00",
+    "last_error_at": null,
+    "last_error_msg": null,
+    "health_by_format": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:46:48Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit_breaker_by_format": null,
+    "account_state": null,
+    "first_attempt": "2026-10-24T22:01:42.738+08:00",
+    "attempts": 20
+  }
+]

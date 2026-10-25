@@ -1,0 +1,44 @@
+[
+  {
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "format": "openai:image",
+    "base_url": "https://chatgpt.com",
+    "retries": 2,
+    "proxy": null,
+    "config": {
+      "upstream_stream_policy": "force_stream",
+      "_aether_fixed_provider_template": {
+        "managed": true,
+        "retired": false,
+        "version": 1,
+        "item_key": "openai:image",
+        "overrides": [],
+        "config_keys": [
+          "upstream_stream_policy"
+        ],
+        "provider_type": "chatgpt_web"
+      }
+    }
+  },
+  {
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "format": "openai:image",
+    "base_url": "https://chatgpt.com",
+    "retries": 2,
+    "proxy": null,
+    "config": {
+      "upstream_stream_policy": "force_stream",
+      "_aether_fixed_provider_template": {
+        "managed": true,
+        "retired": false,
+        "version": 1,
+        "item_key": "openai:image",
+        "overrides": [],
+        "config_keys": [
+          "upstream_stream_policy"
+        ],
+        "provider_type": "chatgpt_web"
+      }
+    }
+  }
+]

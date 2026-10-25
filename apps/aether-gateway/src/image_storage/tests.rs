@@ -17,7 +17,7 @@ const PNG: &str =
     "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aD1sAAAAASUVORK5CYII=";
 
 #[tokio::test]
-async fn successful_http_status_requires_complete_images_or_explicit_refusal() {
+async fn image_response_status_distinguishes_complete_images_refusal_and_failure() {
     let dir = TempDir::new();
     let config = ImageConfig::default();
     let state = app(&dir.0, &config);
@@ -33,7 +33,7 @@ async fn successful_http_status_requires_complete_images_or_explicit_refusal() {
         ),
         (
             json!({"data":[],"status":"completed","outcome":"content_refused","refusal":"Content policy refusal"}),
-            StatusCode::OK,
+            StatusCode::BAD_REQUEST,
         ),
         (json!({"data":[{"b64_json":PNG}]}), StatusCode::OK),
     ] {
@@ -72,7 +72,13 @@ async fn content_refusal_exposes_standard_error_without_failing_the_internal_tas
     )
     .await
     .unwrap();
-    assert_eq!(response.status(), StatusCode::OK);
+    assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+    assert!(is_completed_image_response(&response));
+    let ordinary_bad_request = Response::builder()
+        .status(StatusCode::BAD_REQUEST)
+        .body(Body::empty())
+        .unwrap();
+    assert!(!is_completed_image_response(&ordinary_bad_request));
     assert_eq!(response.headers()["content-type"], "application/json");
     let value: Value =
         serde_json::from_slice(&to_bytes(response.into_body(), 8192).await.unwrap()).unwrap();

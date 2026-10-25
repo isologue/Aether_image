@@ -208,7 +208,7 @@ fn multipart_text_field(
     None
 }
 // Only a completed, explicitly refused result without images is non-billable.
-// Keep this separate from HTTP errors so async workers retain a successful task.
+// A refusal is a completed task even though its client response uses HTTP 400.
 pub(crate) fn is_content_refusal(value: &Value) -> bool {
     value["status"] == "completed"
         && value["outcome"] == "content_refused"
@@ -223,6 +223,18 @@ pub(crate) fn is_content_refusal(value: &Value) -> bool {
         && (value.get("error").is_none_or(Value::is_null)
             || (value["error"]["type"] == "image_generation_user_error"
                 && value["error"]["code"] == "content_policy_violation"))
+}
+
+#[derive(Clone, Copy)]
+struct ContentRefusalResponse;
+
+pub(crate) fn is_completed_image_response(response: &Response<Body>) -> bool {
+    response.status().is_success()
+        || (response.status() == StatusCode::BAD_REQUEST
+            && response
+                .extensions()
+                .get::<ContentRefusalResponse>()
+                .is_some())
 }
 
 fn error_json(message: &str) -> Value {
@@ -293,10 +305,11 @@ async fn transform_response_inner(
     if parts.status.is_success() && refused {
         let reason = value["refusal"].as_str().expect("validated refusal");
         crate::image_tasks::flow::content_refusal(reason);
-        // Some OpenAI-compatible relays bill every successful image response,
-        // even data=[] with usage=0. Their existing error parser refunds the
-        // reservation and does not retry HTTP 200. Preserve Aether's completed
-        // outcome and the original refusal while exposing that standard shape.
+        // Report policy violations to clients as HTTP 400 while preserving the
+        // completed, non-billable outcome for usage settlement and async tasks.
+        // Provider execution already succeeded; this does not penalize the key.
+        parts.status = StatusCode::BAD_REQUEST;
+        parts.extensions.insert(ContentRefusalResponse);
         value["error"] = json!({
             "type": "image_generation_user_error",
             "code": "content_policy_violation",

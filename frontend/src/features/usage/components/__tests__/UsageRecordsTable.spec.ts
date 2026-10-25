@@ -988,11 +988,11 @@ describe('content refusal filter', () => {
 })
 
 describe('successful content refusal', () => {
-  it('shows only the classification in the list and keeps the reason out of the list', () => {
+  it.each([200, 400])('shows only content refusal with HTTP %s and keeps the reason out of the list', (statusCode) => {
     const reason = '非常抱歉，该提示可能违反了我们的内容政策。请修改提示语。'
     for (const isAdmin of [true, false]) {
       const root = mountUsageRecordsTable([buildRecord({
-        status: 'completed', status_code: 200,
+        status: 'completed', status_code: statusCode,
         response_outcome: 'content_refused', content_refusal_reason: reason,
       })], { isAdmin })
       expect(root.querySelectorAll('[data-usage-outcome="content-refused"]')).toHaveLength(2)

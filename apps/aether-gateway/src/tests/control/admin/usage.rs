@@ -2450,6 +2450,8 @@ async fn gateway_admin_usage_detail_validates_body_field_selection() {
         "body_field=",
         "include_bodies=false&body_field=request_body",
         "body_format=raw",
+        "body_format=preview",
+        "body_format=preview&include_bodies=false&body_field=request_body",
         "body_format=unknown&body_field=request_body",
         "body_format=&body_field=request_body",
     ] {
@@ -2516,6 +2518,62 @@ async fn gateway_admin_usage_detail_raw_reads_only_selected_body_and_is_not_cach
 }
 
 #[tokio::test]
+async fn gateway_admin_usage_detail_preview_summarizes_only_selected_body_without_mutating_capture()
+{
+    let mut usage = sample_selective_body_usage();
+    let full = json!({"prompt": "keep the full prompt", "images": [format!("data:image/png;base64,{}", "a".repeat(10000))], "n": 2});
+    usage.request_body = Some(full.clone());
+    let state = AppState::new().unwrap().with_data_state_for_tests(
+        GatewayDataState::with_usage_reader_for_tests(Arc::new(
+            InMemoryUsageReadRepository::seed_with_detached_bodies(vec![usage]),
+        )),
+    );
+    for (field, omitted) in [("request_body", "1"), ("response_body", "0")] {
+        let response = local_admin_usage_response(
+            &state,
+            http::Method::GET,
+            &format!("/api/admin/usage/usage-selected-body?body_field={field}&body_format=preview"),
+            None,
+        )
+        .await;
+        assert_eq!(response.status(), StatusCode::OK);
+        assert_eq!(
+            response.headers()["cache-control"],
+            "no-store, no-transform"
+        );
+        assert_eq!(
+            response.headers()["x-aether-usage-id"],
+            "usage-selected-body"
+        );
+        assert_eq!(response.headers()["x-aether-body-field"], field);
+        assert_eq!(response.headers()["x-aether-body-format"], "preview");
+        assert_eq!(response.headers()["x-aether-body-preview-omitted"], omitted);
+        assert!(response.extensions().get::<AdminAuditEvent>().is_some());
+        let bytes = to_bytes(response.into_body(), 4096).await.unwrap();
+        let value: serde_json::Value = serde_json::from_slice(&bytes).unwrap();
+        if field == "request_body" {
+            assert_eq!(value["prompt"], full["prompt"]);
+            assert_eq!(value["n"], 2);
+            assert!(value["images"][0].as_str().unwrap().contains("已省略"));
+        } else {
+            assert_eq!(value, json!({"marker": field}));
+        }
+    }
+    let response = local_admin_usage_response(
+        &state,
+        http::Method::GET,
+        "/api/admin/usage/usage-selected-body?body_field=request_body&body_format=raw",
+        None,
+    )
+    .await;
+    let bytes = to_bytes(response.into_body(), 20000).await.unwrap();
+    assert_eq!(
+        serde_json::from_slice::<serde_json::Value>(&bytes).unwrap(),
+        full
+    );
+}
+
+#[tokio::test]
 async fn gateway_admin_usage_detail_raw_rejects_foreign_refs_and_disabled_capture() {
     for body_state in [
         UsageBodyCaptureState::Reference,
@@ -2561,31 +2619,33 @@ async fn gateway_admin_usage_detail_raw_preserves_authorization_and_binary_heade
         build_router_with_state(state).layer(tower_http::compression::CompressionLayer::new());
     let (url, server) = start_server(gateway).await;
     let client = reqwest::Client::new();
-    let endpoint = format!(
-        "{url}/api/admin/usage/usage-selected-body?body_field=response_body&body_format=raw"
+    for format in ["raw", "preview"] {
+        let endpoint = format!(
+        "{url}/api/admin/usage/usage-selected-body?body_field=response_body&body_format={format}"
     );
-    let unauthorized = client.get(&endpoint).send().await.unwrap();
-    assert!(matches!(
-        unauthorized.status(),
-        StatusCode::UNAUTHORIZED | StatusCode::FORBIDDEN
-    ));
-    let response = admin_request(client.get(&endpoint))
-        .header("accept-encoding", "gzip")
-        .send()
-        .await
-        .unwrap();
-    assert_eq!(response.status(), StatusCode::OK);
-    assert_eq!(response.headers()["content-encoding"], "identity");
-    assert_eq!(response.headers()["x-aether-body-encoding"], "json");
-    assert_eq!(
-        response.headers()["cache-control"],
-        "no-store, no-transform"
-    );
-    let bytes = response.bytes().await.unwrap();
-    assert_eq!(
-        serde_json::from_slice::<serde_json::Value>(&bytes).unwrap(),
-        json!({ "marker": "response_body" })
-    );
+        let unauthorized = client.get(&endpoint).send().await.unwrap();
+        assert!(matches!(
+            unauthorized.status(),
+            StatusCode::UNAUTHORIZED | StatusCode::FORBIDDEN
+        ));
+        let response = admin_request(client.get(&endpoint))
+            .header("accept-encoding", "gzip")
+            .send()
+            .await
+            .unwrap();
+        assert_eq!(response.status(), StatusCode::OK);
+        assert_eq!(response.headers()["content-encoding"], "identity");
+        assert_eq!(response.headers()["x-aether-body-encoding"], "json");
+        assert_eq!(
+            response.headers()["cache-control"],
+            "no-store, no-transform"
+        );
+        let bytes = response.bytes().await.unwrap();
+        assert_eq!(
+            serde_json::from_slice::<serde_json::Value>(&bytes).unwrap(),
+            json!({ "marker": "response_body" })
+        );
+    }
     server.abort();
 }
 

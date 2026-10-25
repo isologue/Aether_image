@@ -1,0 +1,45 @@
+{
+  "timezone": "Asia/Shanghai",
+  "failure_window_start": "2026-10-24T21:57:26+08:00",
+  "failure_window_end": "2026-10-24T22:05:05+08:00",
+  "failed_requests": 84,
+  "candidate_attempts": 10434,
+  "candidate_errors_by_status": {
+    "400": 3,
+    "403": 3485,
+    "409": 6946
+  },
+  "unavailable_distinct_keys": 940,
+  "unavailable_already_invalid_before_attempt": 940,
+  "failure_duration_ms": {
+    "min": 7638,
+    "max": 218571,
+    "average": 41698
+  },
+  "all_failed_requests_void": true,
+  "previous_batch": {
+    "failed_503": 14,
+    "failure_time_start": "2026-10-24T20:37:29+08:00",
+    "failure_time_end": "2026-10-24T20:46:42+08:00",
+    "candidate_attempts": 252,
+    "candidate_failure_groups": [
+      {
+        "status_code": 403,
+        "message": "ChatGPT-Web requirements returned HTTP 403",
+        "count": 252
+      }
+    ]
+  },
+  "success_overlap": {
+    "failed_403_keys": 2922,
+    "success_keys": 68,
+    "keys_with_both_403_and_success": 66,
+    "keys_with_success_after_403": 19
+  },
+  "limitations": [
+    "Historical raw requirements HTTP 403 response headers and HTML body were not retained; exact Cloudflare challenge versus other upstream access-policy cause cannot be determined.",
+    "Container health/resource readings reflect audit time, not a historical load sample.",
+    "Local source confirms a scheduler/pre-submit eligibility mismatch; live evidence shows all 940 rejected keys were marked invalid before their attempts.",
+    "Batch counts use request creation time; the last failed example completed at 22:06:07 China time."
+  ]
+}

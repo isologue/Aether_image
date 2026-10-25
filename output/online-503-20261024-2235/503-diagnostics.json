@@ -1,0 +1,1178 @@
+[
+  {
+    "request_id": "4b60cba4-ff66-4310-88b6-e93868418802",
+    "created_at": "2026-10-24T22:05:05+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "Selected image account became unavailable before submission",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 62404
+  },
+  {
+    "request_id": "0d0b67b4-798b-4d4b-8f36-c4d54f57d8fe",
+    "created_at": "2026-10-24T22:05:01+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 49931
+  },
+  {
+    "request_id": "2ef962ad-1a62-42fc-8657-29ca63ab7711",
+    "created_at": "2026-10-24T22:04:44+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 51902
+  },
+  {
+    "request_id": "d8661117-1e25-445a-a235-fc13aaafde5a",
+    "created_at": "2026-10-24T22:04:43+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 45241
+  },
+  {
+    "request_id": "5bd5ffbb-cea6-4603-8af2-4e308c3e033d",
+    "created_at": "2026-10-24T22:04:41+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "Selected image account became unavailable before submission",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 42046
+  },
+  {
+    "request_id": "67797981-c931-491b-9eb1-ec9634ffd905",
+    "created_at": "2026-10-24T22:04:40+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 31843
+  },
+  {
+    "request_id": "b292fb42-9d5f-47be-993b-6ae20bd4ad8e",
+    "created_at": "2026-10-24T22:04:39+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "Selected image account became unavailable before submission",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 28797
+  },
+  {
+    "request_id": "d2501940-5218-48c4-97e4-1ad6aca8341c",
+    "created_at": "2026-10-24T22:04:19+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 35678
+  },
+  {
+    "request_id": "195682d9-7edd-47a0-8b37-f79dfdc4fe87",
+    "created_at": "2026-10-24T22:04:08+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "Selected image account became unavailable before submission",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 41290
+  },
+  {
+    "request_id": "af7741cc-e404-4277-b879-c70118867ae9",
+    "created_at": "2026-10-24T22:04:06+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 46163
+  },
+  {
+    "request_id": "8612b72e-49b4-4f94-bbeb-8f3ec3e527af",
+    "created_at": "2026-10-24T22:03:59+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 30840
+  },
+  {
+    "request_id": "410abcca-aa64-469e-a176-a6663d989e6d",
+    "created_at": "2026-10-24T22:03:47+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 31699
+  },
+  {
+    "request_id": "db73f696-9d83-4bba-9639-6548cc468248",
+    "created_at": "2026-10-24T22:03:30+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "Selected image account became unavailable before submission",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 41507
+  },
+  {
+    "request_id": "cdec4e1e-da60-4f41-ac32-4f7d963e5ed6",
+    "created_at": "2026-10-24T22:03:27+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "Selected image account became unavailable before submission",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 37531
+  },
+  {
+    "request_id": "1ef729b6-8d32-4eab-88b0-c0a60d19fee1",
+    "created_at": "2026-10-24T22:03:26+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 57658
+  },
+  {
+    "request_id": "f255c04c-87cd-4c9e-a4ce-af87aa286a59",
+    "created_at": "2026-10-24T22:03:25+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "Selected image account became unavailable before submission",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 25694
+  },
+  {
+    "request_id": "44ebd80c-1674-4c34-95b2-01260bf6aa2e",
+    "created_at": "2026-10-24T22:03:24+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 51236
+  },
+  {
+    "request_id": "825a6d90-b91c-4359-9750-5bc19354803f",
+    "created_at": "2026-10-24T22:03:15+08:00",
+    "first_attempt_error": "Selected image account became unavailable before submission",
+    "last_attempt_error": "Selected image account became unavailable before submission",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 31244
+  },
+  {
+    "request_id": "7620ff68-c36c-458d-9d80-54a47ac4b4bd",
+    "created_at": "2026-10-24T22:03:10+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 11358
+  },
+  {
+    "request_id": "d22aa005-3527-4361-b081-ce143b31ad2c",
+    "created_at": "2026-10-24T22:03:10+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "Selected image account became unavailable before submission",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 25882
+  },
+  {
+    "request_id": "08470ceb-4cbf-4348-9d2f-0f9a0204a4dd",
+    "created_at": "2026-10-24T22:03:08+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "Selected image account became unavailable before submission",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 33944
+  },
+  {
+    "request_id": "855dd4df-af98-41df-b317-95c0d7ad413f",
+    "created_at": "2026-10-24T22:03:06+08:00",
+    "first_attempt_error": "Selected image account became unavailable before submission",
+    "last_attempt_error": "Selected image account became unavailable before submission",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 66570
+  },
+  {
+    "request_id": "040f4c51-798b-4566-beb7-a5eb4c83a07b",
+    "created_at": "2026-10-24T22:03:04+08:00",
+    "first_attempt_error": "Selected image account became unavailable before submission",
+    "last_attempt_error": "Selected image account became unavailable before submission",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 17494
+  },
+  {
+    "request_id": "e90a3456-18e0-445a-a98e-00fa43582100",
+    "created_at": "2026-10-24T22:02:59+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "Selected image account became unavailable before submission",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 19307
+  },
+  {
+    "request_id": "a410d886-7751-4441-9fab-dbfe935339db",
+    "created_at": "2026-10-24T22:02:57+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "Selected image account became unavailable before submission",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 28604
+  },
+  {
+    "request_id": "2a97fc8b-0677-497c-a52e-a763be13beab",
+    "created_at": "2026-10-24T22:02:53+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "Selected image account became unavailable before submission",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 59737
+  },
+  {
+    "request_id": "59cdd34b-efa4-4e01-b1cf-b61f5b9d896e",
+    "created_at": "2026-10-24T22:02:46+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "Selected image account became unavailable before submission",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 38342
+  },
+  {
+    "request_id": "2a37881f-a3d6-4ace-a159-5e8a858fa180",
+    "created_at": "2026-10-24T22:02:38+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "Selected image account became unavailable before submission",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 17688
+  },
+  {
+    "request_id": "5f253307-f5e0-43c7-8f28-9468732ede70",
+    "created_at": "2026-10-24T22:02:30+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "Selected image account became unavailable before submission",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 42521
+  },
+  {
+    "request_id": "7cbd309a-bcea-4ee1-97c3-0d74e666e0b6",
+    "created_at": "2026-10-24T22:02:29+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 13523
+  },
+  {
+    "request_id": "73b5d060-9d93-4796-9a0b-ebd403bc64e4",
+    "created_at": "2026-10-24T22:02:27+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "Selected image account became unavailable before submission",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 29784
+  },
+  {
+    "request_id": "590e370c-3190-4c27-bbdb-3423f0c68b1e",
+    "created_at": "2026-10-24T22:02:20+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 24905
+  },
+  {
+    "request_id": "921ecec7-c1f0-42ed-88fb-8c340a236d5e",
+    "created_at": "2026-10-24T22:02:20+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "Selected image account became unavailable before submission",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 45326
+  },
+  {
+    "request_id": "22df0fb9-19e5-4dc1-8ba7-cfb223485ac6",
+    "created_at": "2026-10-24T22:02:18+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 26876
+  },
+  {
+    "request_id": "5953e5de-31a9-40cd-b0fb-774aca8d0583",
+    "created_at": "2026-10-24T22:02:13+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "Selected image account became unavailable before submission",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 66478
+  },
+  {
+    "request_id": "99f76aa7-7539-4cbb-9fd2-c698bd1cb3a5",
+    "created_at": "2026-10-24T22:02:12+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "Selected image account became unavailable before submission",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 12119
+  },
+  {
+    "request_id": "ed5eb355-39e1-4d53-beab-9a4ea91c0c9d",
+    "created_at": "2026-10-24T22:02:07+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "Selected image account became unavailable before submission",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 12451
+  },
+  {
+    "request_id": "b3b0bcfe-f459-4fe5-85f8-5cf599b3f4b9",
+    "created_at": "2026-10-24T22:01:58+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 30222
+  },
+  {
+    "request_id": "b8ceabba-501c-4bc3-b49e-60e0a02f6b5e",
+    "created_at": "2026-10-24T22:01:52+08:00",
+    "first_attempt_error": "Selected image account became unavailable before submission",
+    "last_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 33118
+  },
+  {
+    "request_id": "1f31393b-46d5-41cc-b07c-c9a8c79943e9",
+    "created_at": "2026-10-24T22:01:50+08:00",
+    "first_attempt_error": "Selected image account became unavailable before submission",
+    "last_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 27608
+  },
+  {
+    "request_id": "cc055561-5e70-4d5e-b968-9732bd51270f",
+    "created_at": "2026-10-24T22:01:48+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "Selected image account became unavailable before submission",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 7638
+  },
+  {
+    "request_id": "17f488f3-da60-41ce-b1ac-74911b336012",
+    "created_at": "2026-10-24T22:01:44+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "Selected image account became unavailable before submission",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 67032
+  },
+  {
+    "request_id": "746cdccf-dde7-457e-836e-d5d561fdce1b",
+    "created_at": "2026-10-24T22:01:43+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "Selected image account became unavailable before submission",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 50992
+  },
+  {
+    "request_id": "a97e558d-cb8b-4765-967f-6d52d1f5fcec",
+    "created_at": "2026-10-24T22:01:38+08:00",
+    "first_attempt_error": "Selected image account became unavailable before submission",
+    "last_attempt_error": "Selected image account became unavailable before submission",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 8502
+  },
+  {
+    "request_id": "757b575b-080a-4540-8380-66212e6883f4",
+    "created_at": "2026-10-24T22:01:35+08:00",
+    "first_attempt_error": "Selected image account became unavailable before submission",
+    "last_attempt_error": "Selected image account became unavailable before submission",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 48398
+  },
+  {
+    "request_id": "39d7087c-78b9-4022-bb19-731ab12c8d8a",
+    "created_at": "2026-10-24T22:01:25+08:00",
+    "first_attempt_error": "Selected image account became unavailable before submission",
+    "last_attempt_error": "Selected image account became unavailable before submission",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 41236
+  },
+  {
+    "request_id": "8535216f-2583-452c-a5f3-f9e9097a2810",
+    "created_at": "2026-10-24T22:01:24+08:00",
+    "first_attempt_error": "Selected image account became unavailable before submission",
+    "last_attempt_error": "Selected image account became unavailable before submission",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 23228
+  },
+  {
+    "request_id": "b27b35d2-303e-4b8b-8dba-71a75971bc95",
+    "created_at": "2026-10-24T22:01:24+08:00",
+    "first_attempt_error": "Selected image account became unavailable before submission",
+    "last_attempt_error": "Selected image account became unavailable before submission",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 39738
+  },
+  {
+    "request_id": "16654e9d-e840-4117-8f86-13487d1a5334",
+    "created_at": "2026-10-24T22:01:20+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "Selected image account became unavailable before submission",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 26156
+  },
+  {
+    "request_id": "0a800689-c2c1-4733-8865-67dcd93e1993",
+    "created_at": "2026-10-24T22:01:20+08:00",
+    "first_attempt_error": "Selected image account became unavailable before submission",
+    "last_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 30187
+  },
+  {
+    "request_id": "fb275352-75c7-4091-baff-d87ecffe29d8",
+    "created_at": "2026-10-24T22:01:16+08:00",
+    "first_attempt_error": "Selected image account became unavailable before submission",
+    "last_attempt_error": "Selected image account became unavailable before submission",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 26697
+  },
+  {
+    "request_id": "92c8c11e-afc9-451e-a921-4c5f79bd9830",
+    "created_at": "2026-10-24T22:01:15+08:00",
+    "first_attempt_error": "Selected image account became unavailable before submission",
+    "last_attempt_error": "Selected image account became unavailable before submission",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 23636
+  },
+  {
+    "request_id": "03eba300-4083-4c81-8fad-82fa43b0994f",
+    "created_at": "2026-10-24T22:01:13+08:00",
+    "first_attempt_error": "Selected image account became unavailable before submission",
+    "last_attempt_error": "Selected image account became unavailable before submission",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 10471
+  },
+  {
+    "request_id": "784c50ce-c949-437d-820d-59f5553b8a27",
+    "created_at": "2026-10-24T22:01:07+08:00",
+    "first_attempt_error": "Selected image account became unavailable before submission",
+    "last_attempt_error": "Selected image account became unavailable before submission",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 17533
+  },
+  {
+    "request_id": "799e8151-7652-400b-830e-c29c3b19df3e",
+    "created_at": "2026-10-24T22:00:58+08:00",
+    "first_attempt_error": "Selected image account became unavailable before submission",
+    "last_attempt_error": "Selected image account became unavailable before submission",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 37905
+  },
+  {
+    "request_id": "c9fb80e8-e5d2-471e-a77e-049c9c01007b",
+    "created_at": "2026-10-24T22:00:51+08:00",
+    "first_attempt_error": "Selected image account became unavailable before submission",
+    "last_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 16492
+  },
+  {
+    "request_id": "91a9db92-9e1a-4a04-9cc3-4796f95f812c",
+    "created_at": "2026-10-24T22:00:49+08:00",
+    "first_attempt_error": "Selected image account became unavailable before submission",
+    "last_attempt_error": "Selected image account became unavailable before submission",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 38931
+  },
+  {
+    "request_id": "634e883a-e97a-4b58-b635-7117717a2b5a",
+    "created_at": "2026-10-24T22:00:47+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "Selected image account became unavailable before submission",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 19611
+  },
+  {
+    "request_id": "843bc255-fd5f-4945-8ac3-939c198e732f",
+    "created_at": "2026-10-24T22:00:45+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "Selected image account became unavailable before submission",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 27321
+  },
+  {
+    "request_id": "bb4008b7-eebf-4d23-92b3-c09962a4f464",
+    "created_at": "2026-10-24T22:00:44+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "Selected image account became unavailable before submission",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 30533
+  },
+  {
+    "request_id": "2a956b67-2b1d-44c1-ae21-eceaf18c1e91",
+    "created_at": "2026-10-24T22:00:35+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 18179
+  },
+  {
+    "request_id": "d752e744-aac4-4791-bb45-8d433b5356a8",
+    "created_at": "2026-10-24T22:00:30+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "Selected image account became unavailable before submission",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 46503
+  },
+  {
+    "request_id": "002483e5-fdef-4788-a641-a05a23c5cb47",
+    "created_at": "2026-10-24T22:00:29+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 31036
+  },
+  {
+    "request_id": "179f83b8-c929-4077-a54c-436dcb62d4b9",
+    "created_at": "2026-10-24T22:00:24+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 28305
+  },
+  {
+    "request_id": "c76a6f07-0e4f-461f-97f7-a4dab3bcc8a7",
+    "created_at": "2026-10-24T22:00:15+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 218571
+  },
+  {
+    "request_id": "ea6e1518-93a9-451a-824c-c4b37046aeef",
+    "created_at": "2026-10-24T22:00:12+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "Selected image account became unavailable before submission",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 42982
+  },
+  {
+    "request_id": "8c8ba5e4-827e-4819-b523-47ba145c6c1e",
+    "created_at": "2026-10-24T22:00:05+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "Selected image account became unavailable before submission",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 66790
+  },
+  {
+    "request_id": "11beee2d-3780-4a3d-ad76-5a583894eaf8",
+    "created_at": "2026-10-24T22:00:00+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "Selected image account became unavailable before submission",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 93664
+  },
+  {
+    "request_id": "74c7d88f-a00b-49c5-80ba-7e302addb0aa",
+    "created_at": "2026-10-24T21:59:54+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 39672
+  },
+  {
+    "request_id": "56f547ff-18fc-4b1d-9f9b-f5543ee25960",
+    "created_at": "2026-10-24T21:59:51+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 56325
+  },
+  {
+    "request_id": "dd0831fd-e794-4a32-9088-d4e5956cf196",
+    "created_at": "2026-10-24T21:59:40+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "Selected image account became unavailable before submission",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 36000
+  },
+  {
+    "request_id": "9910e45a-d400-4437-8ed2-e40ab9d8552b",
+    "created_at": "2026-10-24T21:59:40+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "Selected image account became unavailable before submission",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 40027
+  },
+  {
+    "request_id": "07bfbe5f-714c-4933-b7d5-bb33318ba894",
+    "created_at": "2026-10-24T21:59:29+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "Selected image account became unavailable before submission",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 40195
+  },
+  {
+    "request_id": "be3e63d6-2b24-4ae2-9f4c-596047f14e0d",
+    "created_at": "2026-10-24T21:59:24+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 72789
+  },
+  {
+    "request_id": "e5b512c2-3c88-4ade-9859-42bd04a87a05",
+    "created_at": "2026-10-24T21:59:19+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 36824
+  },
+  {
+    "request_id": "2406c132-83d6-4b0b-8bea-a93ccd64d7f4",
+    "created_at": "2026-10-24T21:59:03+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "Selected image account became unavailable before submission",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 90782
+  },
+  {
+    "request_id": "f60d7b46-0557-4c9d-a6f7-2fb4e0d18b12",
+    "created_at": "2026-10-24T21:59:01+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 79485
+  },
+  {
+    "request_id": "ac67ff4e-f567-4d74-9387-1e7c99bcc37b",
+    "created_at": "2026-10-24T21:58:58+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 55155
+  },
+  {
+    "request_id": "db6a173e-b677-41cf-8dcb-feaf3351112f",
+    "created_at": "2026-10-24T21:58:44+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 81899
+  },
+  {
+    "request_id": "6a32a473-4c14-4aae-a336-f5d078aa750b",
+    "created_at": "2026-10-24T21:58:20+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 47836
+  },
+  {
+    "request_id": "c8ac8945-834d-4acf-b222-7c2a0f4a3dd9",
+    "created_at": "2026-10-24T21:58:18+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 62983
+  },
+  {
+    "request_id": "93ae8f17-e9b6-4400-8206-7c6156c26e60",
+    "created_at": "2026-10-24T21:57:56+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 42297
+  },
+  {
+    "request_id": "fd02f574-4d55-4442-b919-8920c7718825",
+    "created_at": "2026-10-24T21:57:34+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 105102
+  },
+  {
+    "request_id": "9b49169d-e2ac-4acd-83d5-43490f64d7a2",
+    "created_at": "2026-10-24T21:57:26+08:00",
+    "first_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "last_attempt_error": "ChatGPT-Web requirements returned HTTP 403",
+    "image_generation": null,
+    "analytics_failure": {
+      "origin": "upstream",
+      "stage": "routing",
+      "reason": "candidates_exhausted",
+      "schema_version": 1
+    },
+    "end_to_end_time_ms": 50491
+  }
+]

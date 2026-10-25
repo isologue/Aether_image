@@ -1,0 +1,112 @@
+[
+  {
+    "id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "name": "流光",
+    "provider_type": "chatgpt_web",
+    "enabled": true,
+    "request_timeout": null,
+    "stream_first_byte_timeout": null,
+    "max_retries": 2,
+    "pool_advanced": {
+      "score_rules": {
+        "weights": {}
+      },
+      "probing_enabled": false,
+      "auto_remove_banned_keys": true,
+      "default_concurrent_limit": 1,
+      "ignore_exhausted_accounts": false,
+      "account_self_check_enabled": false,
+      "auto_remove_quota_exhausted_keys": false
+    },
+    "max_transfer_count": 10,
+    "max_transfer_timeout_seconds": 300,
+    "proxy": null
+  },
+  {
+    "id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "name": "chatgptweb",
+    "provider_type": "chatgpt_web",
+    "enabled": true,
+    "request_timeout": null,
+    "stream_first_byte_timeout": null,
+    "max_retries": 2,
+    "pool_advanced": {
+      "score_rules": {
+        "weights": {}
+      },
+      "probing_enabled": false,
+      "scheduling_presets": [
+        {
+          "mode": "single_account",
+          "preset": "cache_affinity",
+          "enabled": false
+        },
+        {
+          "preset": "lru",
+          "enabled": false
+        },
+        {
+          "preset": "single_account",
+          "enabled": false
+        },
+        {
+          "preset": "load_balance",
+          "enabled": true
+        },
+        {
+          "mode": "both",
+          "preset": "free_team_first",
+          "enabled": false
+        },
+        {
+          "preset": "free_first",
+          "enabled": false
+        },
+        {
+          "preset": "team_first",
+          "enabled": false
+        },
+        {
+          "preset": "plus_first",
+          "enabled": false
+        },
+        {
+          "preset": "pro_first",
+          "enabled": false
+        },
+        {
+          "preset": "quota_balanced",
+          "enabled": false
+        },
+        {
+          "preset": "recent_refresh",
+          "enabled": false
+        },
+        {
+          "preset": "priority_first",
+          "enabled": false
+        },
+        {
+          "preset": "health_first",
+          "enabled": true
+        },
+        {
+          "preset": "latency_first",
+          "enabled": false
+        },
+        {
+          "preset": "cost_first",
+          "enabled": false
+        }
+      ],
+      "auto_remove_banned_keys": true,
+      "default_concurrent_limit": 1,
+      "ignore_exhausted_accounts": false,
+      "account_self_check_enabled": false,
+      "auto_remove_quota_exhausted_keys": false
+    },
+    "max_transfer_count": 0,
+    "max_transfer_timeout_seconds": 300,
+    "proxy": null
+  }
+]

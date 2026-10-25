@@ -1,0 +1,66 @@
+[
+  {
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "oauth_invalid_reason": null,
+    "is_active": true,
+    "keys": 2517,
+    "earliest": null,
+    "latest": null
+  },
+  {
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "oauth_invalid_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "is_active": true,
+    "keys": 918,
+    "earliest": "2026-10-24T20:50:43+08:00",
+    "latest": "2026-10-24T20:55:52+08:00"
+  },
+  {
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "oauth_invalid_reason": "[OAUTH_EXPIRED] ChatGPT Web Token 无效或已过期\n[REFRESH_FAILED] Token 续期失败 (401): HTTP 401 (upstream_error_code=refresh_token_invalidated)",
+    "is_active": true,
+    "keys": 17,
+    "earliest": "2026-10-24T20:55:49+08:00",
+    "latest": "2026-10-24T21:31:33+08:00"
+  },
+  {
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "oauth_invalid_reason": "[OAUTH_EXPIRED] ChatGPT Web Token 无效或已过期",
+    "is_active": true,
+    "keys": 2,
+    "earliest": "2026-10-24T20:51:46+08:00",
+    "latest": "2026-10-24T21:11:41+08:00"
+  },
+  {
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "oauth_invalid_reason": "[REFRESH_FAILED] Token 续期失败 (401): refresh_token 已被使用并轮换，请重新登录授权",
+    "is_active": true,
+    "keys": 1,
+    "earliest": "2026-10-24T21:23:28+08:00",
+    "latest": "2026-10-24T21:23:28+08:00"
+  },
+  {
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "oauth_invalid_reason": null,
+    "is_active": true,
+    "keys": 7833,
+    "earliest": null,
+    "latest": null
+  },
+  {
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "oauth_invalid_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "is_active": true,
+    "keys": 1080,
+    "earliest": "2026-10-24T20:50:37+08:00",
+    "latest": "2026-10-24T20:56:57+08:00"
+  },
+  {
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "oauth_invalid_reason": "[OAUTH_EXPIRED] ChatGPT Web Token 无效或已过期",
+    "is_active": true,
+    "keys": 175,
+    "earliest": "2026-10-24T19:29:05+08:00",
+    "latest": "2026-10-24T21:34:14+08:00"
+  }
+]

@@ -175,7 +175,7 @@ async fn run(state: &AppState, task: &Value) -> Result<(bool, Value), String> {
         .await
         .map_err(|e| format!("{e:?}"))?
     };
-    let success = response.status().is_success();
+    let success = crate::image_storage::is_completed_image_response(&response);
     let bytes = to_bytes(response.into_body(), 256 * 1024 * 1024)
         .await
         .map_err(|e| e.to_string())?;

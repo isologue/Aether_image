@@ -5,7 +5,8 @@ import { RequestBodyProtocolError } from '@/api/dashboard'
 
 describe('body load error messages', () => {
   it('distinguishes timeouts, network failures, HTTP failures and storage errors', () => {
-    expect(formatRequestBodyLoadError(new AxiosError('timeout', 'ECONNABORTED'))).toContain('30 秒')
+    expect(formatRequestBodyLoadError(new AxiosError('timeout', 'ECONNABORTED'))).toContain('120 秒')
+    expect(formatRequestBodyLoadError(new AxiosError('timeout', 'ETIMEDOUT', { timeout: 45000 } as never))).toContain('45 秒')
     expect(formatRequestBodyLoadError(new AxiosError('offline', 'ERR_NETWORK'))).toContain('无法连接服务器')
     for (const status of [403, 404, 500]) {
       const error = new AxiosError('failed', undefined, undefined, undefined, { status } as AxiosResponse)

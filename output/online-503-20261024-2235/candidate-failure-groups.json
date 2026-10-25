@@ -1,0 +1,52 @@
+[
+  {
+    "status_code": 409,
+    "status": "failed",
+    "message": "Selected image account became unavailable before submission",
+    "count": 6946,
+    "keys": 940,
+    "requests": 84,
+    "latency_min_ms": 0,
+    "latency_max_ms": 386
+  },
+  {
+    "status_code": 403,
+    "status": "failed",
+    "message": "ChatGPT-Web requirements returned HTTP 403",
+    "count": 3485,
+    "keys": 2502,
+    "requests": 82,
+    "latency_min_ms": 100,
+    "latency_max_ms": 2660
+  },
+  {
+    "status_code": 400,
+    "status": "failed",
+    "message": "stream_terminal_error",
+    "count": 1,
+    "keys": 1,
+    "requests": 1,
+    "latency_min_ms": 8479,
+    "latency_max_ms": 8479
+  },
+  {
+    "status_code": 400,
+    "status": "failed",
+    "message": "我目前无法在这个聊天中直接生成或编辑图片，但可以帮你把提示词整理得更精准，方便直接用于韩漫风格分镜生成。\n\n你的画面重点是：**保持沈昭宁的角色形象一致、右侧沙发构图、暖米棕色室内光线，以及顶部自然雾化而不是生硬留白。**\n\n### 优化后的分镜提示词\n\n<text color=\"secondary\" size=\"sm\">可直接复制使用 · 保留两张参考图的用途区分</text>\n\n<box border radius=\"lg\" padding={4} gap={3}>\n  **画面风格**\n\n  Premium Korean webtoon illustration, polished vertical-scroll comic aesthetic, clean confident line art, soft cel shading, luminous natural skin, cinematic warm evening lighting, elegant composition, realistic anatomy, subtle emotional expression.\n\n  **角色一致性**",
+    "count": 1,
+    "keys": 1,
+    "requests": 1,
+    "latency_min_ms": 61592,
+    "latency_max_ms": 61592
+  },
+  {
+    "status_code": 400,
+    "status": "failed",
+    "message": "非常抱歉，该提示可能违反了关于自残、自杀或相关内容防护限制。如果你认为此判断有误，请重试或修改提示语。",
+    "count": 1,
+    "keys": 1,
+    "requests": 1,
+    "latency_min_ms": 177509,
+    "latency_max_ms": 177509
+  }
+]

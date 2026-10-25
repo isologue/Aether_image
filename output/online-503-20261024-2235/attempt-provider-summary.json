@@ -1,0 +1,74 @@
+[
+  {
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "status_code": 200,
+    "status": "success",
+    "attempts": 50,
+    "keys": 50,
+    "requests": 50
+  },
+  {
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "status_code": 400,
+    "status": "failed",
+    "attempts": 2,
+    "keys": 2,
+    "requests": 2
+  },
+  {
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "status_code": 403,
+    "status": "failed",
+    "attempts": 4300,
+    "keys": 2496,
+    "requests": 133
+  },
+  {
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "status_code": 409,
+    "status": "failed",
+    "attempts": 7425,
+    "keys": 914,
+    "requests": 111
+  },
+  {
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "status_code": null,
+    "status": "skipped",
+    "attempts": 1,
+    "keys": 1,
+    "requests": 1
+  },
+  {
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "status_code": 200,
+    "status": "success",
+    "attempts": 18,
+    "keys": 18,
+    "requests": 18
+  },
+  {
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "status_code": 400,
+    "status": "failed",
+    "attempts": 1,
+    "keys": 1,
+    "requests": 1
+  },
+  {
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "status_code": 403,
+    "status": "failed",
+    "attempts": 957,
+    "keys": 426,
+    "requests": 110
+  },
+  {
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "status_code": 409,
+    "status": "failed",
+    "attempts": 371,
+    "keys": 26,
+    "requests": 48
+  }
+]

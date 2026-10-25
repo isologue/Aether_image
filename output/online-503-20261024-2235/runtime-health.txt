@@ -1,0 +1,9 @@
+aether-app	30.00%	926.5MiB / 62.79GiB
+aether-postgres	50.19%	1.426GiB / 62.79GiB
+aether-redis	1.12%	6.961MiB / 62.79GiB
+0 false running healthy
+               total        used        free      shared  buff/cache   available
+Mem:           64295       11081        7441        1222       47746       53213
+Swap:              0           0           0
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/sda1       290G   75G  216G  26% /

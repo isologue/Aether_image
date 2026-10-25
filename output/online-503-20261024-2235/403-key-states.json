@@ -1,0 +1,22 @@
+[
+  {
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "is_active": true,
+    "oauth_invalid_reason": null,
+    "keys": 2123,
+    "invalid_keys": 0,
+    "unexpired_tokens": 2123,
+    "earliest_last_error": null,
+    "latest_last_error": null
+  },
+  {
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "is_active": true,
+    "oauth_invalid_reason": null,
+    "keys": 379,
+    "invalid_keys": 0,
+    "unexpired_tokens": 379,
+    "earliest_last_error": null,
+    "latest_last_error": null
+  }
+]

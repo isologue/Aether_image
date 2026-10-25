@@ -1,0 +1,29 @@
+[
+  {
+    "status": "failed",
+    "status_code": 503,
+    "billing_status": "void",
+    "count": 84,
+    "min_ms": 7638,
+    "max_ms": 218571,
+    "avg_ms": 41698
+  },
+  {
+    "status": "completed",
+    "status_code": 200,
+    "billing_status": "settled",
+    "count": 64,
+    "min_ms": 18903,
+    "max_ms": 102645,
+    "avg_ms": 32701
+  },
+  {
+    "status": "completed",
+    "status_code": 200,
+    "billing_status": "void",
+    "count": 4,
+    "min_ms": 15792,
+    "max_ms": 113671,
+    "avg_ms": 54430
+  }
+]

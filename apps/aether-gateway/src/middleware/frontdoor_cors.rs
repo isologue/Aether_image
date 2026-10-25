@@ -32,7 +32,7 @@ fn apply_frontdoor_cors_headers(
     headers.insert(
         http::header::ACCESS_CONTROL_EXPOSE_HEADERS,
         HeaderValue::from_static(if headers.contains_key("x-aether-body-field") {
-            "*, X-Aether-Body-Encoding, X-Aether-Body-Field, X-Aether-Body-Error, X-Aether-Usage-Id"
+            "*, X-Aether-Body-Encoding, X-Aether-Body-Field, X-Aether-Body-Error, X-Aether-Usage-Id, X-Aether-Body-Format, X-Aether-Body-Preview-Omitted, X-Aether-Body-Original-Bytes"
         } else {
             "*"
         }),
@@ -137,6 +137,9 @@ mod tests {
             "x-aether-body-field",
             "x-aether-body-error",
             "x-aether-usage-id",
+            "x-aether-body-format",
+            "x-aether-body-preview-omitted",
+            "x-aether-body-original-bytes",
         ] {
             assert!(exposed.split(',').any(|header| header.trim() == name));
         }

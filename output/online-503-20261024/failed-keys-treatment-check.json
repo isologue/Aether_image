@@ -1,0 +1,3710 @@
+[
+  {
+    "id": "85e5672b-1bb1-4ea1-a56f-4197cae519aa",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:45:19Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "96f5a597-1fef-44c2-bf6c-41734e87972a",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:45:53Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "293c66c4-bf3e-41c9-ac00-e599c23c3a44",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:45:53Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "cb52f3ac-d4ef-473f-9c88-ada7d71ab865",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:44:22Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "1b696e4b-f263-4c7f-b078-a8e361a0c81d",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:44:49Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "8a73b1d1-bab0-460a-a438-4e3d2cbf6d57",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:46:44Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "5856a663-ca11-486e-9736-eb173dd5d08c",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:44:56Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "fddd2fe2-ae04-4f13-8919-ab43497f2d24",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:43:37Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "2ed5d2d2-9f9c-473b-889e-66b7732e068c",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:44:40Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "2b566a71-b024-4311-9374-6b7ea5ef0f78",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:44:49Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "84db526b-841c-4f73-9ddf-45aef47663b5",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:44:41Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "14642691-1081-4d88-a0de-ac423131d2af",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:44:30Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "0696946c-c2bf-4bc5-968b-dcc936ade11f",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 1.0,
+        "last_failure_at": null,
+        "consecutive_failures": 0
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "d3cc521d-4dc1-4823-a588-c73fddac2f92",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:44:53Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "3112372c-72f8-4c14-b972-7a569e1ed309",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:44:23Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "b3177066-857a-49f7-9b80-97819314846e",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:46:14Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "b330e984-c928-4254-8890-29e201920264",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:44:39Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "b38f0f74-7a06-4ad3-9e92-0ed657f4943c",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:44:53Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "9595b425-ec62-4f95-995a-2c697c896111",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:44:47Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "0ccbf0e3-75ee-48c8-b231-04fa9a1cb870",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:43:36Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "b41a3e55-ae24-4373-be1d-99a04425e223",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:43:37Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "016aa54e-1bc5-4b1e-b403-c4c8076f5760",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:46:23Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "b41dfd8a-4539-4d19-b45e-b93eebdfa6f9",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:44:40Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "b3feca70-0b47-430a-ade4-7b1c169cf5fd",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:46:17Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "b561964e-e65d-4784-b324-2ca3f42bd352",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:44:48Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "13bffa04-0a97-44d8-bf77-61c785ca2ef4",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:45:20Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "b63f9d83-21df-4279-9b36-0941775a151d",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:44:52Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "003ed96f-94bf-40ec-a133-bdbe383bed31",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:44:54Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "02b7734b-1ad0-4c1a-82a7-c06edf6d1060",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:46:23Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "06a6502b-4c6b-41b0-aa5d-d8797a4d6a22",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:44:36Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "02ab9f49-33a5-4856-ba60-e6baa2bbf5a8",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:46:24Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "02e8e0b0-e0a9-4343-95da-395565f999ed",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:46:24Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "03d2c327-1dba-4e43-a367-26d8586d9bc2",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:42:36Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "03ebe5a7-a3ad-4aa0-9d1f-664028835ebe",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:42:36Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "03f4ebef-aeed-4ff9-a274-ac1313f5f624",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.4,
+        "last_failure_at": "2026-10-24T12:37:37Z",
+        "consecutive_failures": 3
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "03f52143-8469-40ad-8ace-bc61e3006b83",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.25,
+        "last_failure_at": "2026-10-24T12:44:20Z",
+        "consecutive_failures": 4
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "0a029218-2968-459c-8dd2-781566a74a0e",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:46:47Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "04186220-c84a-41a5-98a3-70a0a66d780b",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:37:41Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "0442de16-52d9-4e95-b520-0ad30958d2b4",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 1.0,
+        "last_failure_at": null,
+        "consecutive_failures": 0
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "045754c7-557a-4672-9c91-178b2785e4a1",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:43:34Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "049bcaab-09f3-4b22-bbe2-da367ab14469",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:43:33Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "04597722-aeb4-44bd-81c4-d315014206c3",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:43:34Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "045b3838-555c-4388-ae5f-6fd0e33f29b2",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:43:34Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "56eb43a0-d999-45fe-944f-774af0ed4eb8",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:44:46Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "045f9a41-a0e4-429e-9d20-2879d58ed182",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:43:35Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "04751348-4000-450a-83ba-71d5785f6b3b",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:43:35Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "04c7669a-97d3-4df3-8278-a04d53855af3",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:45:25Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "269d433e-4a0c-4c74-8500-ee5b86c6cb7e",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.4,
+        "last_failure_at": "2026-10-24T12:44:53Z",
+        "consecutive_failures": 3
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "04cea18e-aa64-48d1-8a4c-df37db0aaee2",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:45:24Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "04f845f5-231e-4c9e-80bf-a5b5953dc718",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:45:26Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "1a7bc5d0-8b66-4ff6-af20-e33c719c98ec",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:38:03Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "04ef82e7-f2c0-45af-a3b4-b16735e1fa18",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:45:24Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "04f9cc5a-5238-4e50-b281-a58183448384",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:45:24Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "0503ec9a-f8b1-450d-ac84-1d2a9892a48b",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:45:25Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "01343606-fc85-4675-8c9e-6a141d4c1b08",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.4,
+        "last_failure_at": "2026-10-24T12:44:56Z",
+        "consecutive_failures": 3
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "018b158c-42cc-4e5c-be47-91a4f449f5f1",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:44:56Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "0231ef13-b96a-4ca7-8609-1e2283b7626d",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:45:52Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "023d0db4-d9c5-45a9-ad9c-04a65a781715",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:45:20Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "0254759c-48d6-4e8f-ad12-5f71b74dbbc6",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:45:52Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "0260a060-e431-463c-bb77-d619afd4c9f9",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:46:44Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "02cd0eee-a57c-4a33-89f5-c0db47aa383c",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:45:21Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "02c6c615-6215-4916-b107-ffc02773cd86",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:46:43Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "014cb369-4001-429b-b894-7bc8c6e2b033",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:44:57Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "03ca6be6-1041-4844-aa1a-f4781136d5fe",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:45:53Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "043a9e04-802a-4946-ab35-38d8291253e1",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:46:19Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "060516d1-4dc8-4595-ba7f-bf91bdb43631",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:46:45Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "069ad5db-951a-45d6-bb9d-d2b0b939b02b",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:46:43Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "057a39a3-7ce4-4f48-bb9c-34e256aaee26",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:43:35Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "06e4baad-23c8-432d-8c02-f66be6b5ea91",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:46:43Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "0541ed4b-cb8a-466a-800b-ed2eed7387cb",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:45:50Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "049e4e88-9006-48a7-99f3-34b6f6f8ac97",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 1.0,
+        "last_failure_at": null,
+        "consecutive_failures": 0
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "cae085f7-e31e-4666-b7ce-943212e963e8",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:44:30Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "05068da2-c3d2-426d-ab17-ea6de23468db",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.4,
+        "last_failure_at": "2026-10-24T12:45:26Z",
+        "consecutive_failures": 3
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "b37afcc3-100a-4117-b7ff-c17f757ac6bc",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 1.0,
+        "last_failure_at": null,
+        "consecutive_failures": 0
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "04afd23d-55cc-4bdf-8a39-1ba2a707352e",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:43:34Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "053116b7-1792-4ccd-8eec-ce1d9d4663e1",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:45:23Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "052b02c2-44db-4fc8-9e18-cba534b7c61e",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:45:23Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "05392c36-e1c3-405f-a46a-a6327011e3ea",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:45:51Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "cce83686-76bc-4a1d-8a0a-ffbdf9809121",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:43:36Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "0536ec18-ab08-4558-92ec-29ff99a87c06",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:45:50Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "053dbdcb-bd60-4bd8-b07a-0d6dbcf66646",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:45:50Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "0548eb3d-05ab-452b-8813-e27f6cfb5b6d",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:45:50Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "055482bc-22af-4eb1-99ae-9221fc16312e",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:45:50Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "0554a981-2e21-4559-910b-1122aab0b82c",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:45:51Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "055571fe-01f5-49a2-981b-fda670e8f429",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:45:51Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "055627a1-b233-4884-87ec-1d3f0237268d",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:46:21Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "058e7105-3da8-4e04-91a9-8754b0e9b836",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:43:49Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "0573715d-b221-4451-9ced-c3e2b2524369",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:43:35Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "0581479a-1beb-4192-ae71-5799c3de6294",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:43:49Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "053cac56-ae71-4672-9df3-b01f7eb89274",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:45:51Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "06009174-d8c5-4d16-89d0-a6988c67513c",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:44:25Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "05eceea0-0d92-4c81-9b09-c95d37068aaa",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 1.0,
+        "last_failure_at": null,
+        "consecutive_failures": 0
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "060c287c-2367-4214-be9d-cc65deafe5fe",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:44:26Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "0610eece-4e94-4116-9ffb-e8eda8c4bdf5",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:44:26Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "061fbe8f-1c23-4e33-882c-7a54fc22cf6e",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:44:27Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "063707f7-2b22-4b06-b2c4-d7c12ded4fae",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:44:28Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "062de678-4a0b-45fe-8d35-06727c376eac",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:44:28Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "06738ae2-7209-476d-921e-ee2fd4b0e9d4",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:44:31Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "0648da84-ceff-47b8-a47e-ca71bf2693ca",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:44:29Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "065dd37a-bc05-47ce-bd61-016976d49215",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.4,
+        "last_failure_at": "2026-10-24T12:44:30Z",
+        "consecutive_failures": 3
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "067d0642-a9ee-4ea2-a4e2-1e465f72d605",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:44:32Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "06860669-aa5c-4f8e-9a4a-f56fd9dedd70",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 1.0,
+        "last_failure_at": null,
+        "consecutive_failures": 0
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "06888c67-4727-4fa8-837e-e59eb359342f",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.25,
+        "last_failure_at": "2026-10-24T12:44:37Z",
+        "consecutive_failures": 4
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "06a7e66a-8486-434b-b01f-7af6d620fa0a",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.25,
+        "last_failure_at": "2026-10-24T12:44:36Z",
+        "consecutive_failures": 4
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "06a98a65-45b0-496c-b0ad-8cf2e4854050",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.4,
+        "last_failure_at": "2026-10-24T12:44:37Z",
+        "consecutive_failures": 3
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "06d74314-676b-43d4-b058-f3556e2308a9",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.4,
+        "last_failure_at": "2026-10-24T12:44:40Z",
+        "consecutive_failures": 3
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "05707007-a404-4be4-9a0a-31ca705c7c21",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:43:35Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "06bd1491-d2d7-42a4-86a0-bba133faea06",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 1.0,
+        "last_failure_at": null,
+        "consecutive_failures": 0
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "06b3b322-31e0-414b-82ca-9a2430d912fe",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.2,
+        "last_failure_at": "2026-10-24T12:44:37Z",
+        "consecutive_failures": 5
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "06cae2bf-c2d7-4e1f-85ad-17f454212292",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.4,
+        "last_failure_at": "2026-10-24T12:44:39Z",
+        "consecutive_failures": 3
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "07012a15-71c0-468f-853e-fbc8964e66f0",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:44:41Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "07363275-1e5c-498b-b559-04b2f9d76f2b",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:44:42Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "0753342c-9dc4-4a2b-b1bb-236bb9868f40",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.4,
+        "last_failure_at": "2026-10-24T12:44:43Z",
+        "consecutive_failures": 3
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "075331f9-fdee-4521-b2f2-fdf38993c9ee",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:44:43Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "073ad9e5-3c43-4412-8ee4-227c9bcbf814",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:44:42Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "0620ff5d-da43-4227-b3dc-06f8ca77db0b",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:44:27Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "d3bdd069-4d14-4aa3-8990-0c5cf218e618",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:44:48Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "0765b335-ab38-4bb5-812c-43c9053d278a",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:44:44Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "076df163-92f9-44ec-8a6e-d5b38aca529f",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:44:44Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "077f0eb2-ceda-4138-be46-d6e4ffa5bcf1",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:44:45Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "079f85bf-2cb0-40e5-9aae-03794a72ddbe",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:44:46Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "07824f5f-2518-47a5-83f6-72fc26924043",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 1.0,
+        "last_failure_at": null,
+        "consecutive_failures": 0
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "07743e41-f84d-43b4-96cb-d68f15819af4",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:44:45Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "078729cf-73f0-4b43-b161-9e73796b28e5",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:44:46Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "07a01fd0-f032-43f8-a75d-d1de9780fd68",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:44:46Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "07a7e968-318b-4e40-b2b9-423232ed5e3f",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:44:47Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "07a9aa4b-6dc3-46d9-a9b4-adc720cf4e9d",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.4,
+        "last_failure_at": "2026-10-24T12:44:50Z",
+        "consecutive_failures": 3
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "07c87ac8-a60b-44dc-b4d5-cd87077a59e8",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:44:52Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "07b4ffaf-c670-4cd8-a58c-09781c905ecc",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 1.0,
+        "last_failure_at": null,
+        "consecutive_failures": 0
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "07b644a8-350e-4335-a787-81a9c65a3f3f",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:44:51Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "07bb18b6-b38f-40f8-a5bb-8c511b6754c2",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:44:52Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "07d55b2b-d20f-4de9-b0e8-8484c765593a",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:44:52Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "d60da76f-9daa-46b1-9d21-847da0767b9d",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:46:18Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "07dc749b-596e-458a-83ee-e1420b1071eb",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:44:53Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "06f23561-6369-4893-b6db-533af10c7f32",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.4,
+        "last_failure_at": "2026-10-24T12:44:41Z",
+        "consecutive_failures": 3
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "07e68e39-bf86-4bef-b744-1284cf4c5524",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:44:53Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "07f0fa1d-04a6-484b-a8ed-ede30603d41b",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.4,
+        "last_failure_at": "2026-10-24T12:44:54Z",
+        "consecutive_failures": 3
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "0645b469-a515-4651-8541-9111d509925c",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:44:28Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "08414dd8-22c7-462f-8cb4-29113253ebdd",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:44:56Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "082ba588-ea3d-4e30-b863-dfa53572caa1",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:44:56Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "080d79ac-1e53-4ed4-a020-056bfe81b9b0",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:44:55Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "0825c5b0-dcc1-4b81-8d0d-708b94aab4f7",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:44:55Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "08333b15-fd8a-405a-aff8-6af037cb357a",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:44:56Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "084495d8-5ecf-4bdc-9f66-e880d79039dc",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:44:57Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "084b0923-ac61-4fdb-9a1a-60a22fe2edbd",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:44:57Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "086e78c9-8ed0-49ba-8fd7-91556ea78870",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:44:58Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "07b9dece-ea29-493e-8f59-cd442fd7f97f",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:44:52Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "09515781-8d2a-45ed-93aa-78b0190a547b",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 1.0,
+        "last_failure_at": null,
+        "consecutive_failures": 0
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "0952811a-3076-462e-99e4-1199fefbb1c4",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:45:27Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "09541d7a-bf8a-4cb6-a38a-66ad2903fe53",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 1.0,
+        "last_failure_at": null,
+        "consecutive_failures": 0
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "0962de33-75f3-4870-9dfa-61ffcc1f57c9",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 1.0,
+        "last_failure_at": null,
+        "consecutive_failures": 0
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "095f5cf0-26a1-41fe-b010-eb1abbf817e7",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:45:52Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "098638c7-035f-4ab5-a8a3-d75b684b963c",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:46:26Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "09708abd-7bbb-4400-9655-b788431d9e19",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:46:25Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "09f04bfc-5c42-4e7d-a175-286441aaf0f3",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:46:46Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "0989a6d2-6cf0-436c-ba29-39c478dfb0d1",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:46:26Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "04142210-1cf6-4c24-95c9-2881cba52759",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 1.0,
+        "last_failure_at": null,
+        "consecutive_failures": 0
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "0990f067-c47b-4e3c-9210-bcf3a6129bd0",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:46:27Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "09c7cdea-65ed-4655-8c01-b80f587ba070",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 1.0,
+        "last_failure_at": null,
+        "consecutive_failures": 0
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "09ca75ce-0700-474e-ab75-9c33d0f382b8",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:46:46Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "0a0249ca-9e0b-469e-bb01-d279ba404a16",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:46:47Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "09fa2778-12b3-4ec5-8b22-4b292ca823c9",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:46:47Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "02bb0d47-a6bb-4e50-a547-06ca55b9bf93",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:46:22Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "0a0ce007-3865-4800-a576-b0b844f54ed8",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:46:48Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "0a0f6cfd-9b0a-4dee-926d-57ef790a45c6",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:46:49Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "0a157224-f57f-4054-9828-11a56d4c3f34",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:46:50Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "0a157b8c-2cad-4731-a1b1-baf530d1c301",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:46:50Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "09dc3859-3ab9-46e7-ae70-4c7027c77974",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:46:46Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "4f48d5fe-68d5-4980-ba5c-b0a0ffad89d3",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:38:05Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "067c31dd-7eb7-43b8-bf82-ef0d29bc0449",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:44:32Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "32b788e0-3caa-4925-84c1-52e1981376a5",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:43:37Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "076910dc-885a-4f05-906d-c8352a1cdbbe",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:44:44Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "51c39102-7fd9-46fc-be15-2fc84595c46f",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:44:52Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "06751694-e70e-434c-af84-b6ad450c7f1b",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:44:31Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "eb42c667-14ad-41ff-9d80-08c7137e7a04",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:44:29Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "dc859d1f-16e4-477e-8f10-ed61287899a4",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:44:38Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "14ea849c-3159-4d99-858f-5aa458e380e1",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:44:43Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "07304c9e-5f4a-41f4-a89b-c03cbd6267a2",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 1.0,
+        "last_failure_at": null,
+        "consecutive_failures": 0
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "330d5822-225a-4749-8834-b5e53cb97cf3",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:44:45Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "16605dff-d62b-491a-8306-60cee7613be2",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:44:44Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "b2d14a70-a5c8-4564-9d19-ca0583c47eed",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:44:52Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "b326cf53-be71-4eb3-90ce-ce6b4b3d3440",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:44:52Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "1c644da7-f64b-462d-ba14-b63fb92ee986",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:44:53Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "08087bbd-0feb-490a-8273-53353defb32e",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.4,
+        "last_failure_at": "2026-10-24T12:44:55Z",
+        "consecutive_failures": 3
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "f8652c1f-e359-4a7f-870b-36d2564fb557",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:44:55Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "0861b8a3-e8cb-4101-b865-b3bcf585865d",
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:44:57Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "fb3154c4-15e2-4bb0-89cd-6842282b209d",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:44:30Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "b5432981-1203-4f78-a3f3-cbd0f03b6d8c",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:45:21Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "1ad0b69f-1ae0-4567-8456-757b6ec2cf5f",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:46:20Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "1bbeb5a9-73ee-40fb-bc6b-bf293a02015f",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:44:28Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "1beb0088-c941-4111-8f52-70f45392a634",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:44:52Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "1c11c4db-0a11-4d9a-a6ae-2884dc29852d",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:44:49Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "fcbb8551-d3bf-4e0a-b02e-9bc05a6595bc",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:43:36Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "1cbdb63d-dc98-49b2-bdc2-976371b1877f",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:44:44Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "1d29d504-e9c7-4a96-b879-94c6189ea257",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:44:52Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "fd4c6467-6096-4c3d-a528-6b8a9d1cb5c8",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:44:57Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "1ccacb2b-f7ac-4a5e-b7ee-66da9264eacb",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:44:45Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "2680bf32-6475-4de2-95e3-ea556765dfa4",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:44:39Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "26a897d3-1e6c-472f-8ee8-db4d74c22667",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.4,
+        "last_failure_at": "2026-10-24T12:44:51Z",
+        "consecutive_failures": 3
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "273da0ea-546a-449b-ba64-3e74667abf2a",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:44:23Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "293a7022-5b8c-41c4-982f-6af2093fea68",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:44:24Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "294b2a5b-dbe1-4e99-8541-58da222bc5e4",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:44:23Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "2b3dc4cd-2804-4233-b55d-d13211d7d4ce",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:44:29Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "83f3a4e8-6b8a-4e30-a49a-c1b66ab63222",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.7,
+        "last_failure_at": "2026-10-24T12:45:52Z",
+        "consecutive_failures": 1
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "85aed556-cca2-427d-88b7-c8c1adc5bcac",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:45:22Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": null,
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  },
+  {
+    "id": "262d5cf1-2d88-4efa-a66b-674113e62399",
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "active": true,
+    "status": "active",
+    "health": {
+      "openai:image": {
+        "health_score": 0.55,
+        "last_failure_at": "2026-10-24T12:47:23Z",
+        "consecutive_failures": 2
+      }
+    },
+    "circuit": null,
+    "oauth_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "last_429_at": null,
+    "last_429_type": null,
+    "metadata_keys": []
+  }
+]

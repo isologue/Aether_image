@@ -4,6 +4,7 @@ use axum::{body::Body, response::Response};
 
 mod analytics;
 mod analytics_routes;
+mod body_preview;
 mod detail_routes;
 mod replay;
 mod summary_routes;

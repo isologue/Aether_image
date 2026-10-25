@@ -1,0 +1,16 @@
+[
+  {
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "api_format": "openai:image",
+    "base_url": "https://chatgpt.com",
+    "max_retries": 2,
+    "proxy": null
+  },
+  {
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "api_format": "openai:image",
+    "base_url": "https://chatgpt.com",
+    "max_retries": 2,
+    "proxy": null
+  }
+]

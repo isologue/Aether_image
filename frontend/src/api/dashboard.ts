@@ -191,6 +191,13 @@ export interface RequestSettlementSnapshot {
 }
 
 export type RequestBodyField = 'request_body' | 'provider_request_body' | 'response_body' | 'client_response_body'
+export const REQUEST_BODY_TIMEOUT_MS = 120_000
+export interface RequestBodyPreview {
+  omittedValues: number
+  originalBytes: number
+}
+export type RequestBodyFormat = 'raw' | 'preview'
+
 export type RequestBodyLoadErrorCode = 'too_large' | 'decode_failed' | 'missing' | 'storage_unavailable'
 
 export class RequestBodyProtocolError extends Error {
@@ -490,18 +497,31 @@ export const dashboardApi = {
     return options.signal ? fetchDetail() : cachedRequest(cacheKey, fetchDetail, cacheTtlMs)
   },
 
-  async getRequestBody(requestId: string, field: RequestBodyField, signal?: AbortSignal, onProgress?: (loaded: number) => void) {
+  async getRequestBody(requestId: string, field: RequestBodyField, signal?: AbortSignal, onProgress?: (loaded: number) => void, format: RequestBodyFormat = 'raw') {
     const response = await apiClient.get<ArrayBuffer>(`/api/admin/usage/${requestId}`, {
-      params: { include_bodies: true, body_field: field, body_format: 'raw' },
+      params: { include_bodies: true, body_field: field, body_format: format },
+      timeout: REQUEST_BODY_TIMEOUT_MS,
       responseType: 'arraybuffer',
       signal,
       ...(onProgress ? { onDownloadProgress: (event: { loaded: number }) => onProgress(event.loaded) } : {}),
     })
     const encoding = response.headers['x-aether-body-encoding']
-    if ((encoding !== 'gzip' && encoding !== 'json') || response.headers['x-aether-usage-id'] !== requestId || response.headers['x-aether-body-field'] !== field) {
+    if ((encoding !== 'gzip' && encoding !== 'json') || response.headers['x-aether-usage-id'] !== requestId || response.headers['x-aether-body-field'] !== field
+      || (format === 'raw' && response.headers['x-aether-body-format'] === 'preview')) {
       throw new RequestBodyProtocolError()
     }
-    return { bytes: response.data, encoding: encoding as 'gzip' | 'json' }
+    let preview: RequestBodyPreview | undefined
+    if (format === 'preview') {
+      const omitted = response.headers['x-aether-body-preview-omitted']
+      const original = response.headers['x-aether-body-original-bytes']
+      if (response.headers['x-aether-body-format'] !== 'preview'
+        || !/^\d+$/.test(String(omitted)) || !/^\d+$/.test(String(original))
+        || !Number.isSafeInteger(Number(omitted)) || !Number.isSafeInteger(Number(original))) {
+        throw new RequestBodyProtocolError()
+      }
+      preview = { omittedValues: Number(omitted), originalBytes: Number(original) }
+    }
+    return { bytes: response.data, encoding: encoding as 'gzip' | 'json', ...(preview ? { preview } : {}) }
   },
 
   async prefetchRequestDetail(requestId: string): Promise<void> {
@@ -528,7 +548,7 @@ export const dashboardApi = {
 
   // 获取 cURL 命令数据（含明文 API Key）
   async getCurlData(requestId: string): Promise<CurlData> {
-    const response = await apiClient.get<CurlData>(`/api/admin/usage/${requestId}/curl`)
+    const response = await apiClient.get<CurlData>(`/api/admin/usage/${requestId}/curl`, { timeout: REQUEST_BODY_TIMEOUT_MS })
     return response.data
   },
 

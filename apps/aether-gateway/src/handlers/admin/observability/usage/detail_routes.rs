@@ -186,9 +186,11 @@ async fn build_admin_usage_raw_body_response(
     state: &AdminAppState<'_>,
     item: &StoredRequestUsageAudit,
     field: UsageBodyField,
+    preview: bool,
 ) -> Response<Body> {
     let result = read_admin_usage_raw_body(state, item, field).await;
     let mut response = match result {
+        Ok(Some(payload)) if preview => admin_usage_preview_payload_response(payload).await,
         Ok(Some(payload)) => admin_usage_raw_payload_response(payload),
         Ok(None) => admin_usage_raw_body_error(http::StatusCode::NOT_FOUND, "missing"),
         Err(error) => {
@@ -227,6 +229,46 @@ async fn build_admin_usage_raw_body_response(
         "usage_record",
         &item.id,
     )
+}
+
+async fn admin_usage_preview_payload_response(payload: StoredUsageBodyPayload) -> Response<Body> {
+    match tokio::task::spawn_blocking(move || {
+        super::body_preview::build_usage_body_preview(payload)
+    })
+    .await
+    {
+        Ok(Ok(preview)) => {
+            let mut response = admin_usage_raw_payload_response(preview.payload);
+            let headers = response.headers_mut();
+            headers.insert(
+                "x-aether-body-format",
+                http::HeaderValue::from_static("preview"),
+            );
+            headers.insert(
+                "x-aether-body-preview-omitted",
+                http::HeaderValue::from(preview.omitted_values),
+            );
+            headers.insert(
+                "x-aether-body-original-bytes",
+                http::HeaderValue::from(preview.original_bytes),
+            );
+            response
+        }
+        result => {
+            let code = match result {
+                Ok(Err(code)) => code,
+                _ => "storage_unavailable",
+            };
+            admin_usage_raw_body_error(
+                if code == "too_large" {
+                    http::StatusCode::PAYLOAD_TOO_LARGE
+                } else {
+                    http::StatusCode::SERVICE_UNAVAILABLE
+                },
+                code,
+            )
+        }
+    }
 }
 
 fn admin_usage_raw_payload_response(payload: StoredUsageBodyPayload) -> Response<Body> {
@@ -426,14 +468,20 @@ pub(super) async fn maybe_build_local_admin_usage_detail_response(
                         .map(|(_, value)| value.into_owned())
                 });
             if let Some(format) = body_format {
-                if format != "raw" || body_field.is_none() {
+                if !matches!(format.as_str(), "raw" | "preview") || body_field.is_none() {
                     return Ok(Some(admin_usage_bad_request_response(
-                        "body_format=raw 必须指定 body_field",
+                        "body_format 必须为 raw 或 preview，且必须指定 body_field",
                     )));
                 }
                 if let Some(field) = body_field {
                     return Ok(Some(
-                        build_admin_usage_raw_body_response(state, &item, field).await,
+                        build_admin_usage_raw_body_response(
+                            state,
+                            &item,
+                            field,
+                            format == "preview",
+                        )
+                        .await,
                     ));
                 }
             }
@@ -570,7 +618,7 @@ pub(super) async fn maybe_build_local_admin_usage_detail_response(
 
 #[cfg(test)]
 mod tests {
-    use super::admin_usage_body_load_error_code;
+    use super::{admin_usage_body_load_error_code, StoredUsageBodyPayload};
     use crate::GatewayError;
 
     #[tokio::test]
@@ -596,6 +644,41 @@ mod tests {
                 .unwrap();
             assert_eq!(bytes.as_ref(), expected.as_slice());
         }
+    }
+
+    #[tokio::test]
+    async fn preview_response_identifies_omissions_and_keeps_raw_separate() {
+        let bytes = serde_json::to_vec(&serde_json::json!({
+            "prompt": "keep this prompt", "images": [format!("data:image/png;base64,{}", "a".repeat(10000))]
+        })).unwrap();
+        let response = super::admin_usage_preview_payload_response(StoredUsageBodyPayload::Json(
+            bytes.clone(),
+        ))
+        .await;
+        assert_eq!(response.headers()["x-aether-body-format"], "preview");
+        assert_eq!(response.headers()["x-aether-body-preview-omitted"], "1");
+        assert_eq!(
+            response.headers()["x-aether-body-original-bytes"],
+            bytes.len().to_string()
+        );
+        let preview = axum::body::to_bytes(response.into_body(), 4096)
+            .await
+            .unwrap();
+        assert!(std::str::from_utf8(&preview)
+            .unwrap()
+            .contains("keep this prompt"));
+        let response =
+            super::admin_usage_raw_payload_response(StoredUsageBodyPayload::Json(bytes.clone()));
+        let raw = axum::body::to_bytes(response.into_body(), 20000)
+            .await
+            .unwrap();
+        assert_eq!(raw.as_ref(), bytes.as_slice());
+        let response = super::admin_usage_preview_payload_response(StoredUsageBodyPayload::Json(
+            b"invalid".to_vec(),
+        ))
+        .await;
+        assert_eq!(response.headers()["x-aether-body-error"], "decode_failed");
+        assert!(response.headers().get("x-aether-body-format").is_none());
     }
 
     #[test]

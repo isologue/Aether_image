@@ -129,7 +129,7 @@ describe('RequestDetailDrawer body capture', () => {
     expect(document.body.querySelector('[data-body-capture-notice]')).toBeNull()
     findButton('请求体')!.click()
     await expectBody('request_body')
-    expect(mocks.getRequestBody).toHaveBeenLastCalledWith('usage-full-capture', 'request_body', expect.any(AbortSignal))
+    expect(mocks.getRequestBody).toHaveBeenLastCalledWith('usage-full-capture', 'request_body', expect.any(AbortSignal), expect.any(Function), 'preview')
     findButton('响应体')!.click()
     await expectBody('response_body')
     findButton('请求体')!.click()
@@ -295,6 +295,95 @@ describe('RequestDetailDrawer body capture', () => {
     findButton('响应体')!.click()
     await expectBody('response_body')
     expect(documents[0].dispose).toHaveBeenCalledOnce()
+  })
+
+  it('loads a small preview first and reads full Base64 before copying', async () => {
+    const preview = { prompt: 'visible prompt', images: ['[图片摘要]'], n: 2 }
+    const full = { ...preview, images: [`data:image/png;base64,${'a'.repeat(100_000)}`] }
+    mocks.getRequestBody.mockImplementation(async (_id, _field, _signal, _progress, format) =>
+      format === 'preview' ? { ...body(preview), preview: { omittedValues: 1, originalBytes: 100_100 } } : body(full))
+    await openDrawer()
+    findButton('请求体')!.click()
+    await expectBody('visible prompt')
+    expect(document.body.querySelector('[data-testid="body-load-status"]')?.textContent).toContain('已省略 1 处')
+    expect(findButton('加载完整正文')).toBeDefined()
+    expect(mocks.getRequestBody).toHaveBeenCalledOnce()
+    const previewDocument = documents[0]
+    document.body.querySelector<HTMLButtonElement>('button[title="复制"]')!.click()
+    await vi.waitFor(() => expect(mocks.copyToClipboard).toHaveBeenCalledWith(JSON.stringify(full, null, 2), false))
+    expect(mocks.getRequestBody.mock.calls[1][4]).toBe('raw')
+    expect(previewDocument.copy).not.toHaveBeenCalled()
+    expect(previewDocument.dispose).toHaveBeenCalledOnce()
+    expect(document.body.querySelector('[data-testid="body-load-status"]')).toBeNull()
+  })
+
+  it('shows downloaded bytes and preserves the preview after full-body timeout, then retries full', async () => {
+    const preview = { prompt: 'keep visible', images: ['[图片摘要]'] }
+    let rejectFull!: (error: unknown) => void
+    mocks.getRequestBody.mockResolvedValueOnce({ ...body(preview), preview: { omittedValues: 1, originalBytes: 1_400_000 } })
+    mocks.getRequestBody.mockImplementationOnce((_id, _field, _signal, progress) => {
+      progress(512 * 1024)
+      return new Promise((_resolve, reject) => { rejectFull = reject })
+    })
+    const full = { prompt: 'full prompt', images: ['complete base64'] }
+    mocks.getRequestBody.mockResolvedValueOnce(body(full))
+    await openDrawer()
+    findButton('请求体')!.click()
+    await expectBody('keep visible')
+    findButton('加载完整正文')!.click()
+    await vi.waitFor(() => expect(document.body.querySelector('[data-testid="body-load-status"]')?.textContent).toContain('512 KB'))
+    expect(document.body.querySelector('[data-testid="body-load-status"]')?.textContent).toContain('正在加载完整正文')
+    await expectBody('keep visible')
+    expect(document.body.querySelector<HTMLButtonElement>('button[title="复制"]')!.disabled).toBe(true)
+    rejectFull(new AxiosError('timeout', 'ECONNABORTED'))
+    await vi.waitFor(() => expect(document.body.textContent).toContain('120 秒'))
+    await expectBody('keep visible')
+    expect(documents[0].dispose).not.toHaveBeenCalled()
+    findButton('重试完整正文')!.click()
+    await expectBody('full prompt')
+    expect(mocks.getRequestBody.mock.calls.map(call => call[4])).toEqual(['preview', 'raw', 'raw'])
+  })
+
+  it('cancels a full-body upgrade when changing records and never copies stale content', async () => {
+    mocks.getRequestBody.mockResolvedValueOnce({ ...body({ prompt: 'first preview' }), preview: { omittedValues: 1, originalBytes: 10000 } })
+    let resolveFull!: (value: ReturnType<typeof body>) => void
+    mocks.getRequestBody.mockImplementationOnce(() => new Promise(resolve => { resolveFull = resolve }))
+    const host = await openDrawer()
+    findButton('请求体')!.click()
+    await expectBody('first preview')
+    document.body.querySelector<HTMLButtonElement>('button[title="复制"]')!.click()
+    await vi.waitFor(() => expect(mocks.getRequestBody).toHaveBeenCalledTimes(2))
+    const signal = lastSignal()
+    host.requestId.value = 'usage-other'
+    await vi.waitFor(() => expect(signal.aborted).toBe(true))
+    resolveFull(body({ prompt: 'obsolete full body' }))
+    await nextTick()
+    expect(mocks.copyToClipboard).not.toHaveBeenCalled()
+    expect(document.body.textContent).not.toContain('obsolete full body')
+  })
+
+  it('downloads full JSON rather than the image summary', async () => {
+    const full = { prompt: 'download', images: ['complete Base64'] }
+    mocks.getRequestBody.mockResolvedValueOnce({ ...body({ prompt: 'preview' }), preview: { omittedValues: 1, originalBytes: 10000 } })
+    mocks.getRequestBody.mockResolvedValueOnce(body(full))
+    const createObjectURL = vi.fn(() => 'blob:test')
+    const revokeObjectURL = vi.fn()
+    vi.stubGlobal('URL', class extends URL {
+      static createObjectURL = createObjectURL
+      static revokeObjectURL = revokeObjectURL
+    })
+    const click = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {})
+    try {
+      await openDrawer()
+      findButton('请求体')!.click()
+      await expectBody('preview')
+      document.body.querySelector<HTMLButtonElement>('button[title="下载完整正文"]')!.click()
+      await vi.waitFor(() => expect(createObjectURL).toHaveBeenCalledOnce())
+      expect(mocks.getRequestBody.mock.calls[1][4]).toBe('raw')
+      expect(documents[1].copy).toHaveBeenCalledWith()
+      expect(documents[0].copy).not.toHaveBeenCalled()
+      expect(click).toHaveBeenCalledOnce()
+    } finally { click.mockRestore(); vi.unstubAllGlobals() }
   })
 
   it('requests full copy from the worker only after an explicit click', async () => {

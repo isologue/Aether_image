@@ -1530,7 +1530,15 @@ async fn run_chatgpt_web_image_plan_scenario(
 
     let status = response.status();
     let response_json: serde_json::Value = response.json().await.expect("body should parse");
-    assert_eq!(status, StatusCode::OK, "{response_json}");
+    assert_eq!(
+        status,
+        if refused {
+            StatusCode::BAD_REQUEST
+        } else {
+            StatusCode::OK
+        },
+        "{response_json}"
+    );
     if refused {
         assert_eq!(response_json["status"], "completed");
         assert_eq!(response_json["outcome"], "content_refused");

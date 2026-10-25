@@ -5627,6 +5627,54 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn content_refusal_http_400_preserves_completed_usage_and_void_billing() {
+        use aether_usage_runtime::{
+            build_sync_terminal_usage_payload_seed, build_terminal_usage_context_seed,
+            build_upsert_usage_record_from_event, GatewaySyncReportRequest, UsageEventType,
+        };
+        let reason = "This request violates our content policy.";
+        for succeeded in [true, false] {
+            let flow = crate::image_tasks::flow::ImageFlow::default();
+            let plan = sample_plan("http://127.0.0.1:1", json!({"prompt":"test"}), false);
+            let payload: GatewaySyncReportRequest = serde_json::from_value(json!({
+                "trace_id":plan.request_id, "report_kind":"openai_image_sync_success",
+                "status_code":200, "headers":{},
+                "body_json":{"status":"completed", "outcome":"content_refused",
+                    "data":[], "refusal":reason,
+                    "usage":{"input_tokens":0, "output_tokens":0, "total_tokens":0}}
+            }))
+            .unwrap();
+            crate::image_tasks::flow::scope(Some(flow.clone()), async {
+                let context = build_terminal_usage_context_seed(&plan, None);
+                assert!(crate::image_tasks::flow::defer(
+                    context,
+                    build_sync_terminal_usage_payload_seed(&payload),
+                ));
+                crate::image_tasks::flow::content_refusal(reason);
+            })
+            .await;
+            let event = flow.terminal_event(succeeded).unwrap().unwrap();
+            let record = build_upsert_usage_record_from_event(&event).unwrap();
+            if succeeded {
+                assert_eq!(event.event_type, UsageEventType::Completed);
+                assert_eq!(event.data.status_code, Some(400));
+                assert_eq!(record.status, "completed");
+                assert_eq!(record.billing_status, "void");
+                assert_eq!(record.total_cost_usd.unwrap_or_default(), 0.0);
+                assert_eq!(record.actual_total_cost_usd.unwrap_or_default(), 0.0);
+                let metadata = event.data.request_metadata.as_ref().unwrap();
+                assert_eq!(metadata["response_outcome"], "content_refused");
+                assert_eq!(metadata["content_refusal_reason"], reason);
+            } else {
+                assert_eq!(event.event_type, UsageEventType::Failed);
+                assert_eq!(event.data.status_code, Some(502));
+                assert_eq!(record.status, "failed");
+            }
+            assert!(flow.terminal_event(succeeded).unwrap().is_none());
+        }
+    }
+
+    #[tokio::test]
     async fn audit_image_flow_keeps_errors_after_task_local_scope_exits() {
         use aether_usage_runtime::{
             build_sync_terminal_usage_payload_seed, build_terminal_usage_context_seed,

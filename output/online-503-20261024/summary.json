@@ -1,0 +1,68 @@
+{
+  "sample_size": 1000,
+  "sample_newest": "2026-10-24T20:47:17+08:00",
+  "sample_oldest": "2026-10-24T13:41:52+08:00",
+  "failed_503": 14,
+  "failure_time_start": "2026-10-24T20:37:29+08:00",
+  "failure_time_end": "2026-10-24T20:46:42+08:00",
+  "candidate_attempts": 252,
+  "distinct_candidate_keys": 206,
+  "candidate_failure_groups": [
+    {
+      "status_code": 403,
+      "message": "ChatGPT-Web requirements returned HTTP 403",
+      "count": 252
+    }
+  ],
+  "failure_duration_seconds_min": 4.433,
+  "failure_duration_seconds_max": 38.223,
+  "all_503_void": true,
+  "all_failed_keys_current_active": true,
+  "nonbillable_probe": [
+    {
+      "method": "GET",
+      "url": "https://chatgpt.com/",
+      "exit": 0,
+      "http_line": "HTTP/2 403 ",
+      "headers": {
+        "content-type": "text/html; charset=UTF-8",
+        "cf-mitigated": "challenge",
+        "server": "cloudflare",
+        "cf-ray": "a4f930c21f721ae5-LAX"
+      },
+      "body_bytes": 8665,
+      "title": null,
+      "markers": [
+        "challenge-platform",
+        "Enable JavaScript and cookies"
+      ],
+      "json_error": null,
+      "stderr": ""
+    },
+    {
+      "method": "POST",
+      "url": "https://chatgpt.com/backend-api/sentinel/chat-requirements",
+      "exit": 0,
+      "http_line": "HTTP/2 403 ",
+      "headers": {
+        "content-type": "text/html; charset=UTF-8",
+        "cf-mitigated": "challenge",
+        "server": "cloudflare",
+        "cf-ray": "a4f930c2ffc5757a-PHX"
+      },
+      "body_bytes": 8907,
+      "title": null,
+      "markers": [
+        "challenge-platform",
+        "Enable JavaScript and cookies"
+      ],
+      "json_error": null,
+      "stderr": ""
+    }
+  ],
+  "limitations": [
+    "Usage failures occurred before latest app restart at 2026-10-24T20:49:31+08:00.",
+    "Stored failed attempts omit raw HTML and response headers.",
+    "Connectivity probe uses host curl without authentication, not the app browser transport, and does not prove every historical 403 was a Cloudflare challenge."
+  ]
+}

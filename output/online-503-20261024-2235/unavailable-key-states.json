@@ -1,0 +1,54 @@
+[
+  {
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "is_active": true,
+    "status": "active",
+    "auth_type": "oauth",
+    "oauth_invalid_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "keys": 911,
+    "attempts": 6605,
+    "invalid_before_attempt": 911,
+    "token_unexpired_at_attempt": 911,
+    "invalid_since": "2026-10-24T20:50:43+08:00",
+    "earliest_token_expiry": "2026-10-28T01:46:08+08:00"
+  },
+  {
+    "provider_id": "ee0a8ebb-0b91-494b-8ed2-7f7fd4ea4519",
+    "is_active": true,
+    "status": "active",
+    "auth_type": "oauth",
+    "oauth_invalid_reason": "[REFRESH_FAILED] ChatGPT Web 访问验证失败，请检查浏览器指纹、Cloudflare 验证或代理/地区限制",
+    "keys": 26,
+    "attempts": 326,
+    "invalid_before_attempt": 26,
+    "token_unexpired_at_attempt": 26,
+    "invalid_since": "2026-10-24T20:50:39+08:00",
+    "earliest_token_expiry": "2026-10-30T01:33:47+08:00"
+  },
+  {
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "is_active": true,
+    "status": "active",
+    "auth_type": "oauth",
+    "oauth_invalid_reason": "[OAUTH_EXPIRED] ChatGPT Web Token 无效或已过期",
+    "keys": 2,
+    "attempts": 8,
+    "invalid_before_attempt": 2,
+    "token_unexpired_at_attempt": 2,
+    "invalid_since": "2026-10-24T20:51:46+08:00",
+    "earliest_token_expiry": "2026-10-29T12:23:03+08:00"
+  },
+  {
+    "provider_id": "b759e9db-9aec-4615-9a68-00cd27fe197a",
+    "is_active": true,
+    "status": "active",
+    "auth_type": "oauth",
+    "oauth_invalid_reason": "[REFRESH_FAILED] Token 续期失败 (401): refresh_token 已被使用并轮换，请重新登录授权",
+    "keys": 1,
+    "attempts": 7,
+    "invalid_before_attempt": 1,
+    "token_unexpired_at_attempt": 1,
+    "invalid_since": "2026-10-24T21:23:28+08:00",
+    "earliest_token_expiry": "2026-10-28T21:29:51+08:00"
+  }
+]

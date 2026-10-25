@@ -199,6 +199,7 @@ impl ImageFlow {
         if let Some((_, id, _)) = task {
             context.request_metadata.get_or_insert_with(|| json!({}))["image_task_id"] = json!(id);
         }
+        let refused = succeeded && refusal.is_some();
         if succeeded {
             if let Some(reason) = refusal {
                 let metadata = context.request_metadata.get_or_insert_with(|| json!({}));
@@ -217,7 +218,15 @@ impl ImageFlow {
                         json!({"error":{"code":"image_result_failed","message":"Final image preparation failed"}}),
                     );
                 }
-                aether_usage_runtime::build_sync_terminal_usage_seed(context, payload)
+                let mut seed =
+                    aether_usage_runtime::build_sync_terminal_usage_seed(context, payload);
+                if refused {
+                    // The client receives 400, but this is a completed policy
+                    // refusal: keep reservations released and billing void.
+                    seed.status_code = 400;
+                    seed.terminal_state = aether_usage_runtime::UsageTerminalState::Completed;
+                }
+                seed
             }
             DeferredTerminal::Stream(context, mut payload, void) => {
                 if !succeeded {

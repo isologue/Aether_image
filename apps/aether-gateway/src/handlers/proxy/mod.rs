@@ -1074,7 +1074,9 @@ pub(crate) fn proxy_request(
             ))
             .await;
             if let Some(flow) = crate::image_tasks::flow::current() {
-                let succeeded = transformed.as_ref().is_ok_and(|r| r.status().is_success());
+                let succeeded = transformed
+                    .as_ref()
+                    .is_ok_and(crate::image_storage::is_completed_image_response);
                 if !crate::image_tasks::flow::is_async()
                     && !transformed.as_ref().is_ok_and(|r| {
                         r.headers()
